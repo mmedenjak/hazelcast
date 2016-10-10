@@ -115,7 +115,7 @@ public abstract class AbstractHazelcastBeanDefinitionParser extends AbstractBean
         protected void createAndFillListedBean(Node node,
                                                final Class clazz,
                                                final String propertyName,
-                                               final ManagedMap managedMap,
+                                               final ManagedMap<String, AbstractBeanDefinition> managedMap,
                                                String... excludeNames) {
             BeanDefinitionBuilder builder = createBeanBuilder(clazz);
             final AbstractBeanDefinition beanDefinition = builder.getBeanDefinition();
@@ -127,33 +127,60 @@ public abstract class AbstractHazelcastBeanDefinitionParser extends AbstractBean
             managedMap.put(name, beanDefinition);
         }
 
-        protected void fillValues(Node node, BeanDefinitionBuilder builder, String... excludeNames) {
-            Collection<String> epn = excludeNames != null && excludeNames.length > 0
-                    ? new HashSet<String>(Arrays.asList(excludeNames)) : null;
-            fillAttributeValues(node, builder, epn);
+        /**
+         * Adds property values to the {@link BeanDefinitionBuilder} from the node attributes and the node child elements.
+         * Converts the attribute and node names from dash-separated to camel case in the process. Skips the property if
+         * the converted property name is in the excluded properties parameter.
+         *
+         * @param node the node for which the attributes and element values will be added to the builder
+         * @param builder the builder which will receive property values
+         * @param excludeProperties the excluded property names (xml attribute and element names converted to camel-case)
+         */
+        protected void fillValues(Node node, BeanDefinitionBuilder builder, String... excludeProperties) {
+            final Collection<String> excludedProperties = excludeProperties != null && excludeProperties.length > 0
+                    ? new HashSet<String>(Arrays.asList(excludeProperties)) : null;
+            fillAttributeValues(node, builder, excludedProperties);
             for (Node n : childElements(node)) {
-                String name = xmlToJavaName(cleanNodeName(n));
-                if (epn != null && epn.contains(name)) {
+                final String name = xmlToJavaName(cleanNodeName(n));
+                if (excludedProperties != null && excludedProperties.contains(name)) {
                     continue;
                 }
-                String value = getTextContent(n);
+                final String value = getTextContent(n);
                 builder.addPropertyValue(name, value);
             }
         }
 
-        protected void fillAttributeValues(Node node, BeanDefinitionBuilder builder, String... excludeNames) {
-            Collection<String> epn = excludeNames != null && excludeNames.length > 0
-                    ? new HashSet<String>(Arrays.asList(excludeNames)) : null;
+        /**
+         * Adds property values to the {@link BeanDefinitionBuilder} from the node attributes. Converts the attribute names from
+         * dash-separated to camel case in the process. Skips the property if the converted property name is in the excluded
+         * properties parameter.
+
+         * @param node the node for which the attributes will be added to the builder
+         * @param builder the builder which will receive property values
+         * @param excludeProperties the excluded property names (xml attribute names converted to camel-case)
+         */
+        protected void fillAttributeValues(Node node, BeanDefinitionBuilder builder, String... excludeProperties) {
+            final Collection<String> epn = excludeProperties != null && excludeProperties.length > 0
+                    ? new HashSet<String>(Arrays.asList(excludeProperties)) : null;
             fillAttributeValues(node, builder, epn);
         }
 
-        protected void fillAttributeValues(Node node, BeanDefinitionBuilder builder, Collection<String> epn) {
+        /**
+         * Adds property values to the {@link BeanDefinitionBuilder} from the node attributes. Converts the attribute names from
+         * dash-separated to camel case in the process. Skips the property if the converted property name is in the excluded
+         * properties parameter.
+
+         * @param node the node for which the attributes will be added to the builder
+         * @param builder the builder which will receive property values
+         * @param excludedProperties the excluded property names (xml attribute names converted to camel-case)
+         */
+        protected void fillAttributeValues(Node node, BeanDefinitionBuilder builder, Collection<String> excludedProperties) {
             final NamedNodeMap atts = node.getAttributes();
             if (atts != null) {
                 for (int a = 0; a < atts.getLength(); a++) {
                     final Node att = atts.item(a);
                     final String name = xmlToJavaName(att.getNodeName());
-                    if (epn != null && epn.contains(name)) {
+                    if (excludedProperties != null && excludedProperties.contains(name)) {
                         continue;
                     }
                     final String value = att.getNodeValue();

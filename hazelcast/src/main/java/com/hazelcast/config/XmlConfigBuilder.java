@@ -408,7 +408,6 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
         this.config.addQuorumConfig(quorumConfig);
     }
 
-
     private void handleServices(Node node) {
         Node attDefaults = node.getAttributes().getNamedItem("enable-defaults");
         boolean enableDefaults = attDefaults == null || getBooleanValue(getTextContent(attDefaults));
@@ -954,9 +953,8 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
             } else if ("item-listeners".equals(nodeName)) {
                 for (Node listenerNode : childElements(n)) {
                     if ("item-listener".equals(cleanNodeName(listenerNode))) {
-                        NamedNodeMap attrs = listenerNode.getAttributes();
-                        boolean incValue = getBooleanValue(getTextContent(attrs.getNamedItem("include-value")));
-                        String listenerClass = getTextContent(listenerNode);
+                        final boolean incValue = getBooleanValue(getAttribute(listenerNode, "include-value"));
+                        final String listenerClass = getTextContent(listenerNode);
                         sConfig.addItemListenerConfig(new ItemListenerConfig(listenerClass, incValue));
                     }
                 }
@@ -986,16 +984,15 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
             } else if ("entry-listeners".equals(nodeName)) {
                 for (Node listenerNode : childElements(n)) {
                     if ("entry-listener".equals(cleanNodeName(listenerNode))) {
-                        NamedNodeMap attrs = listenerNode.getAttributes();
-                        boolean incValue = getBooleanValue(getTextContent(attrs.getNamedItem("include-value")));
-                        boolean local = getBooleanValue(getTextContent(attrs.getNamedItem("local")));
+                        final boolean incValue = getBooleanValue(getAttribute(listenerNode, "include-value"));
+                        final boolean local = getBooleanValue(getAttribute(listenerNode, "local"));
                         String listenerClass = getTextContent(listenerNode);
                         multiMapConfig.addEntryListenerConfig(new EntryListenerConfig(listenerClass, local, incValue));
                     }
                 }
             } else if ("statistics-enabled".equals(nodeName)) {
                 multiMapConfig.setStatisticsEnabled(getBooleanValue(value));
-            }  else if ("binary".equals(nodeName)) {
+            } else if ("binary".equals(nodeName)) {
                 multiMapConfig.setBinary(getBooleanValue(value));
             }
         }
@@ -1025,10 +1022,9 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
             } else if ("entry-listeners".equals(nodeName)) {
                 for (Node listenerNode : childElements(n)) {
                     if ("entry-listener".equals(cleanNodeName(listenerNode))) {
-                        NamedNodeMap attrs = listenerNode.getAttributes();
-                        boolean incValue = getBooleanValue(getTextContent(attrs.getNamedItem("include-value")));
-                        boolean local = getBooleanValue(getTextContent(attrs.getNamedItem("local")));
-                        String listenerClass = getTextContent(listenerNode);
+                        final boolean incValue = getBooleanValue(getAttribute(listenerNode, "include-value"));
+                        final boolean local = getBooleanValue(getAttribute(listenerNode, "local"));
+                        final String listenerClass = getTextContent(listenerNode);
                         replicatedMapConfig.addEntryListenerConfig(new EntryListenerConfig(listenerClass, local, incValue));
                     }
                 }
@@ -1041,12 +1037,12 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
 
     //CHECKSTYLE:OFF
     private void handleMap(Node parentNode) throws Exception {
-        String name = getAttribute(parentNode, "name");
-        MapConfig mapConfig = new MapConfig();
+        final String name = getAttribute(parentNode, "name");
+        final MapConfig mapConfig = new MapConfig();
         mapConfig.setName(name);
         for (Node node : childElements(parentNode)) {
-            String nodeName = cleanNodeName(node);
-            String value = getTextContent(node).trim();
+            final String nodeName = cleanNodeName(node);
+            final String value = getTextContent(node).trim();
             if ("backup-count".equals(nodeName)) {
                 mapConfig.setBackupCount(getIntegerValue("backup-count", value));
             } else if ("in-memory-format".equals(nodeName)) {
@@ -1054,15 +1050,14 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
             } else if ("async-backup-count".equals(nodeName)) {
                 mapConfig.setAsyncBackupCount(getIntegerValue("async-backup-count", value));
             } else if ("eviction-policy".equals(nodeName)) {
-                if(mapConfig.getMapEvictionPolicy() == null) {
+                if (mapConfig.getMapEvictionPolicy() == null) {
                     mapConfig.setEvictionPolicy(EvictionPolicy.valueOf(upperCaseInternal(value)));
                 }
             } else if ("max-size".equals(nodeName)) {
                 MaxSizeConfig msc = mapConfig.getMaxSizeConfig();
-                Node maxSizePolicy = node.getAttributes().getNamedItem("policy");
-                if (maxSizePolicy != null) {
-                    msc.setMaxSizePolicy(MaxSizeConfig.MaxSizePolicy.valueOf(
-                            upperCaseInternal(getTextContent(maxSizePolicy))));
+                final String maxSizePolicyStr = getAttribute(node, "policy");
+                if (maxSizePolicyStr != null) {
+                    msc.setMaxSizePolicy(MaxSizeConfig.MaxSizePolicy.valueOf(upperCaseInternal(maxSizePolicyStr)));
                 }
                 int size = sizeParser(value);
                 msc.setSize(size);
@@ -1128,8 +1123,8 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
 
 
     private NearCacheConfig handleNearCacheConfig(Node node) {
-        String name = getAttribute(node, "name");
-        NearCacheConfig nearCacheConfig = new NearCacheConfig(name);
+        final String name = getAttribute(node, "name");
+        final NearCacheConfig nearCacheConfig = new NearCacheConfig(name);
         for (Node child : childElements(node)) {
             String nodeName = cleanNodeName(child);
             String value = getTextContent(child).trim();
@@ -1160,14 +1155,12 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private HotRestartConfig createHotRestartConfig(Node node) {
-        HotRestartConfig hotRestartConfig = new HotRestartConfig();
-
-        Node attrEnabled = node.getAttributes().getNamedItem("enabled");
-        boolean enabled = getBooleanValue(getTextContent(attrEnabled));
+        final HotRestartConfig hotRestartConfig = new HotRestartConfig();
+        final boolean enabled = getBooleanValue(getAttribute(node, "enabled"));
         hotRestartConfig.setEnabled(enabled);
 
         for (Node n : childElements(node)) {
-            String name = cleanNodeName(n);
+            final String name = cleanNodeName(n);
             if ("fsync".equals(name)) {
                 hotRestartConfig.setFsync(getBooleanValue(getTextContent(n)));
             }
@@ -1508,10 +1501,9 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void queryCachePredicateHandler(Node childNode, QueryCacheConfig queryCacheConfig) {
-        NamedNodeMap predicateAttributes = childNode.getAttributes();
-        String predicateType = getTextContent(predicateAttributes.getNamedItem("type"));
-        String textContent = getTextContent(childNode);
-        PredicateConfig predicateConfig = new PredicateConfig();
+        final String predicateType = getAttribute(childNode, "type");
+        final String textContent = getTextContent(childNode);
+        final PredicateConfig predicateConfig = new PredicateConfig();
         if ("class-name".equals(predicateType)) {
             predicateConfig.setClassName(textContent);
         } else if ("sql".equals(predicateType)) {
@@ -1545,11 +1537,11 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private MapStoreConfig createMapStoreConfig(Node node) {
-        MapStoreConfig mapStoreConfig = new MapStoreConfig();
-        NamedNodeMap atts = node.getAttributes();
+        final MapStoreConfig mapStoreConfig = new MapStoreConfig();
+        final NamedNodeMap atts = node.getAttributes();
         for (int a = 0; a < atts.getLength(); a++) {
-            Node att = atts.item(a);
-            String value = getTextContent(att).trim();
+            final Node att = atts.item(a);
+            final String value = getTextContent(att).trim();
             if ("enabled".equals(att.getNodeName())) {
                 mapStoreConfig.setEnabled(getBooleanValue(value));
             } else if ("initial-mode".equals(att.getNodeName())) {
@@ -1676,9 +1668,7 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleReliableTopic(Node node) {
-        Node attName = node.getAttributes().getNamedItem("name");
-        String name = getTextContent(attName);
-        ReliableTopicConfig topicConfig = new ReliableTopicConfig(name);
+        final ReliableTopicConfig topicConfig = new ReliableTopicConfig(getAttribute(node, "name"));
         for (Node n : childElements(node)) {
             String nodeName = cleanNodeName(n);
             if ("read-batch-size".equals(nodeName)) {
@@ -1702,13 +1692,11 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleJobTracker(Node node) {
-        Node attName = node.getAttributes().getNamedItem("name");
-        String name = getTextContent(attName);
-        JobTrackerConfig jConfig = new JobTrackerConfig();
-        jConfig.setName(name);
+        final JobTrackerConfig jConfig = new JobTrackerConfig();
+        jConfig.setName(getAttribute(node, "name"));
         for (Node n : childElements(node)) {
-            String nodeName = cleanNodeName(n);
-            String value = getTextContent(n).trim();
+            final String nodeName = cleanNodeName(n);
+            final String value = getTextContent(n).trim();
             if ("max-thread-size".equals(nodeName)) {
                 jConfig.setMaxThreadSize(getIntegerValue("max-thread-size", value));
             } else if ("queue-size".equals(nodeName)) {
@@ -1734,10 +1722,8 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleSemaphore(Node node) {
-        Node attName = node.getAttributes().getNamedItem("name");
-        String name = getTextContent(attName);
-        SemaphoreConfig sConfig = new SemaphoreConfig();
-        sConfig.setName(name);
+        final SemaphoreConfig sConfig = new SemaphoreConfig();
+        sConfig.setName(getAttribute(node, "name"));
         for (Node n : childElements(node)) {
             String nodeName = cleanNodeName(n);
             String value = getTextContent(n).trim();
@@ -1755,26 +1741,24 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleRingbuffer(Node node) {
-        Node attName = node.getAttributes().getNamedItem("name");
-        String name = getTextContent(attName);
-        RingbufferConfig rbConfig = new RingbufferConfig(name);
+        final RingbufferConfig rbConfig = new RingbufferConfig(getAttribute(node, "name"));
         for (Node n : childElements(node)) {
-            String nodeName = cleanNodeName(n);
-            String value = getTextContent(n).trim();
+            final String nodeName = cleanNodeName(n);
+            final String value = getTextContent(n).trim();
             if ("capacity".equals(nodeName)) {
-                int capacity = getIntegerValue("capacity", value);
+                final int capacity = getIntegerValue("capacity", value);
                 rbConfig.setCapacity(capacity);
             } else if ("backup-count".equals(nodeName)) {
-                int backupCount = getIntegerValue("backup-count", value);
+                final int backupCount = getIntegerValue("backup-count", value);
                 rbConfig.setBackupCount(backupCount);
             } else if ("async-backup-count".equals(nodeName)) {
-                int asyncBackupCount = getIntegerValue("async-backup-count", value);
+                final int asyncBackupCount = getIntegerValue("async-backup-count", value);
                 rbConfig.setAsyncBackupCount(asyncBackupCount);
             } else if ("time-to-live-seconds".equals(nodeName)) {
-                int timeToLiveSeconds = getIntegerValue("time-to-live-seconds", value);
+                final int timeToLiveSeconds = getIntegerValue("time-to-live-seconds", value);
                 rbConfig.setTimeToLiveSeconds(timeToLiveSeconds);
             } else if ("in-memory-format".equals(nodeName)) {
-                InMemoryFormat inMemoryFormat = InMemoryFormat.valueOf(upperCaseInternal(value));
+                final InMemoryFormat inMemoryFormat = InMemoryFormat.valueOf(upperCaseInternal(value));
                 rbConfig.setInMemoryFormat(inMemoryFormat);
             } else if ("ringbuffer-store".equals(nodeName)) {
                 final RingbufferStoreConfig ringbufferStoreConfig = createRingbufferStoreConfig(n);
@@ -1794,13 +1778,12 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handlePartitionGroup(Node node) {
-        NamedNodeMap atts = node.getAttributes();
-        Node enabledNode = atts.getNamedItem("enabled");
-        boolean enabled = enabledNode != null ? getBooleanValue(getTextContent(enabledNode)) : false;
+        final String enabledStr = getAttribute(node, "enabled");
+        final boolean enabled = enabledStr != null && getBooleanValue(enabledStr);
         config.getPartitionGroupConfig().setEnabled(enabled);
-        Node groupTypeNode = atts.getNamedItem("group-type");
-        MemberGroupType groupType = groupTypeNode != null
-                ? MemberGroupType.valueOf(upperCaseInternal(getTextContent(groupTypeNode)))
+        final String groupTypeStr = getAttribute(node, "group-type");
+        MemberGroupType groupType = groupTypeStr != null
+                ? MemberGroupType.valueOf(upperCaseInternal(groupTypeStr))
                 : MemberGroupType.PER_MEMBER;
         config.getPartitionGroupConfig().setGroupType(groupType);
         for (Node child : childElements(node)) {
@@ -1811,7 +1794,7 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleMemberGroup(Node node) {
-        MemberGroupConfig memberGroupConfig = new MemberGroupConfig();
+        final MemberGroupConfig memberGroupConfig = new MemberGroupConfig();
         for (Node child : childElements(node)) {
             if ("interface".equals(cleanNodeName(child))) {
                 String value = getTextContent(child);
@@ -1822,21 +1805,19 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleSerialization(Node node) {
-        SerializationConfig serializationConfig = parseSerialization(node);
+        final SerializationConfig serializationConfig = parseSerialization(node);
         config.setSerializationConfig(serializationConfig);
     }
 
     private void handleManagementCenterConfig(Node node) {
-        NamedNodeMap attrs = node.getAttributes();
+        final String enabledStr = getAttribute(node, "enabled");
+        final boolean enabled = enabledStr != null && getBooleanValue(enabledStr);
 
-        Node enabledNode = attrs.getNamedItem("enabled");
-        boolean enabled = enabledNode != null && getBooleanValue(getTextContent(enabledNode));
+        final String updateIntervalStr = getAttribute(node, "update-interval");
+        int interval = updateIntervalStr != null ? getIntegerValue("update-interval", updateIntervalStr)
+                : ManagementCenterConfig.UPDATE_INTERVAL;
 
-        Node intervalNode = attrs.getNamedItem("update-interval");
-        int interval = intervalNode != null ? getIntegerValue("update-interval",
-                getTextContent(intervalNode)) : ManagementCenterConfig.UPDATE_INTERVAL;
-
-        String url = getTextContent(node);
+        final String url = getTextContent(node);
         ManagementCenterConfig managementCenterConfig = config.getManagementCenterConfig();
         managementCenterConfig.setEnabled(enabled);
         managementCenterConfig.setUpdateInterval(interval);
@@ -1844,9 +1825,9 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleSecurity(Node node) throws Exception {
-        NamedNodeMap atts = node.getAttributes();
-        Node enabledNode = atts.getNamedItem("enabled");
-        boolean enabled = enabledNode != null && getBooleanValue(getTextContent(enabledNode));
+        final String enabledStr = getAttribute(node, "enabled");
+        final boolean enabled = enabledStr != null && getBooleanValue(enabledStr);
+
         config.getSecurityConfig().setEnabled(enabled);
         for (Node child : childElements(node)) {
             String nodeName = cleanNodeName(child);
@@ -1867,13 +1848,11 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleSecurityInterceptors(Node node) throws Exception {
-        SecurityConfig cfg = config.getSecurityConfig();
+        final SecurityConfig cfg = config.getSecurityConfig();
         for (Node child : childElements(node)) {
             String nodeName = cleanNodeName(child);
             if ("interceptor".equals(nodeName)) {
-                NamedNodeMap attrs = child.getAttributes();
-                Node classNameNode = attrs.getNamedItem("class-name");
-                String className = getTextContent(classNameNode);
+                final String className = getAttribute(child, "class-name");
                 cfg.addSecurityInterceptorConfig(new SecurityInterceptorConfig(className));
             }
         }
@@ -1881,13 +1860,13 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
 
     private void handleMemberAttributes(Node node) {
         for (Node n : childElements(node)) {
-            String name = cleanNodeName(n);
+            final String name = cleanNodeName(n);
             if (!"attribute".equals(name)) {
                 continue;
             }
-            String attributeName = getTextContent(n.getAttributes().getNamedItem("name"));
-            String attributeType = getTextContent(n.getAttributes().getNamedItem("type"));
-            String value = getTextContent(n);
+            final String attributeName = getAttribute(n, "name");
+            final String attributeType = getAttribute(n, "type");
+            final String value = getTextContent(n);
             if ("string".equals(attributeType)) {
                 config.getMemberAttributeConfig().setStringAttribute(attributeName, value);
             } else if ("boolean".equals(attributeType)) {
@@ -1911,14 +1890,12 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleCredentialsFactory(Node node) throws Exception {
-        NamedNodeMap attrs = node.getAttributes();
-        Node classNameNode = attrs.getNamedItem("class-name");
-        String className = getTextContent(classNameNode);
-        SecurityConfig cfg = config.getSecurityConfig();
-        CredentialsFactoryConfig credentialsFactoryConfig = new CredentialsFactoryConfig(className);
+        final String className = getAttribute(node, "class-name");
+        final SecurityConfig cfg = config.getSecurityConfig();
+        final CredentialsFactoryConfig credentialsFactoryConfig = new CredentialsFactoryConfig(className);
         cfg.setMemberCredentialsConfig(credentialsFactoryConfig);
         for (Node child : childElements(node)) {
-            String nodeName = cleanNodeName(child);
+            final String nodeName = cleanNodeName(child);
             if ("properties".equals(nodeName)) {
                 fillProperties(child, credentialsFactoryConfig.getProperties());
                 break;
@@ -1927,7 +1904,7 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handleLoginModules(Node node, boolean member) throws Exception {
-        SecurityConfig cfg = config.getSecurityConfig();
+        final SecurityConfig cfg = config.getSecurityConfig();
         for (Node child : childElements(node)) {
             String nodeName = cleanNodeName(child);
             if ("login-module".equals(nodeName)) {
@@ -1942,13 +1919,11 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private LoginModuleConfig handleLoginModule(Node node) throws Exception {
-        NamedNodeMap attrs = node.getAttributes();
-        Node classNameNode = attrs.getNamedItem("class-name");
-        String className = getTextContent(classNameNode);
-        Node usageNode = attrs.getNamedItem("usage");
-        LoginModuleUsage usage = usageNode != null ? LoginModuleUsage.get(getTextContent(usageNode))
+        final String className = getAttribute(node, "class-name");
+        final String usageStr = getAttribute(node, "usage");
+        final LoginModuleUsage usage = usageStr != null ? LoginModuleUsage.get(usageStr)
                 : LoginModuleUsage.REQUIRED;
-        LoginModuleConfig moduleConfig = new LoginModuleConfig(className, usage);
+        final LoginModuleConfig moduleConfig = new LoginModuleConfig(className, usage);
         for (Node child : childElements(node)) {
             String nodeName = cleanNodeName(child);
             if ("properties".equals(nodeName)) {
@@ -1960,11 +1935,9 @@ public class XmlConfigBuilder extends AbstractConfigBuilder implements ConfigBui
     }
 
     private void handlePermissionPolicy(Node node) throws Exception {
-        NamedNodeMap attrs = node.getAttributes();
-        Node classNameNode = attrs.getNamedItem("class-name");
-        String className = getTextContent(classNameNode);
-        SecurityConfig cfg = config.getSecurityConfig();
-        PermissionPolicyConfig policyConfig = new PermissionPolicyConfig(className);
+        final String className = getAttribute(node, "class-name");
+        final SecurityConfig cfg = config.getSecurityConfig();
+        final PermissionPolicyConfig policyConfig = new PermissionPolicyConfig(className);
         cfg.setClientPolicyConfig(policyConfig);
         for (Node child : childElements(node)) {
             String nodeName = cleanNodeName(child);

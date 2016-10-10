@@ -51,62 +51,34 @@ import static java.text.MessageFormat.format;
 public class Config {
 
     private static final ILogger LOGGER = Logger.getLogger(Config.class);
-
-    private URL configurationUrl;
-
-    private File configurationFile;
-
-    private ClassLoader classLoader;
-
-    private Properties properties = new Properties();
-
-    private String instanceName;
-
-    private GroupConfig groupConfig = new GroupConfig();
-
-    private NetworkConfig networkConfig = new NetworkConfig();
-
-    private ConfigPatternMatcher configPatternMatcher = new MatchingPointConfigPatternMatcher();
-
     private final Map<String, MapConfig> mapConfigs = new ConcurrentHashMap<String, MapConfig>();
-
     private final Map<String, CacheSimpleConfig> cacheConfigs = new ConcurrentHashMap<String, CacheSimpleConfig>();
-
     private final Map<String, TopicConfig> topicConfigs = new ConcurrentHashMap<String, TopicConfig>();
-
     private final Map<String, ReliableTopicConfig> reliableTopicConfigs = new ConcurrentHashMap<String, ReliableTopicConfig>();
-
     private final Map<String, QueueConfig> queueConfigs = new ConcurrentHashMap<String, QueueConfig>();
-
     private final Map<String, MultiMapConfig> multiMapConfigs = new ConcurrentHashMap<String, MultiMapConfig>();
-
     private final Map<String, ListConfig> listConfigs = new ConcurrentHashMap<String, ListConfig>();
-
     private final Map<String, SetConfig> setConfigs = new ConcurrentHashMap<String, SetConfig>();
-
     private final Map<String, ExecutorConfig> executorConfigs = new ConcurrentHashMap<String, ExecutorConfig>();
-
     private final Map<String, DurableExecutorConfig> durableExecutorConfigs
             = new ConcurrentHashMap<String, DurableExecutorConfig>();
-
     private final Map<String, SemaphoreConfig> semaphoreConfigs = new ConcurrentHashMap<String, SemaphoreConfig>();
-
     private final Map<String, ReplicatedMapConfig> replicatedMapConfigs = new ConcurrentHashMap<String, ReplicatedMapConfig>();
-
     private final Map<String, WanReplicationConfig> wanReplicationConfigs = new ConcurrentHashMap<String, WanReplicationConfig>();
-
     private final Map<String, JobTrackerConfig> jobTrackerConfigs = new ConcurrentHashMap<String, JobTrackerConfig>();
-
     private final Map<String, QuorumConfig> quorumConfigs = new ConcurrentHashMap<String, QuorumConfig>();
-
     private final Map<String, RingbufferConfig> ringbufferConfigs = new ConcurrentHashMap<String, RingbufferConfig>();
-
-    private ServicesConfig servicesConfig = new ServicesConfig();
-
-    private SecurityConfig securityConfig = new SecurityConfig();
-
     private final List<ListenerConfig> listenerConfigs = new LinkedList<ListenerConfig>();
-
+    private URL configurationUrl;
+    private File configurationFile;
+    private ClassLoader classLoader;
+    private Properties properties = new Properties();
+    private String instanceName;
+    private GroupConfig groupConfig = new GroupConfig();
+    private NetworkConfig networkConfig = new NetworkConfig();
+    private ConfigPatternMatcher configPatternMatcher = new MatchingPointConfigPatternMatcher();
+    private ServicesConfig servicesConfig = new ServicesConfig();
+    private SecurityConfig securityConfig = new SecurityConfig();
     private PartitionGroupConfig partitionGroupConfig = new PartitionGroupConfig();
 
     private ManagementCenterConfig managementCenterConfig = new ManagementCenterConfig();

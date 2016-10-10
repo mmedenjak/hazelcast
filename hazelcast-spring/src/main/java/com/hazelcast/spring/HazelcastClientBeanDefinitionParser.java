@@ -84,14 +84,14 @@ public class HazelcastClientBeanDefinitionParser extends AbstractHazelcastBeanDe
         private BeanDefinitionBuilder builder;
 
         //= new HashMap<String, NearCacheConfig>();
-        private ManagedMap nearCacheConfigMap;
+        private ManagedMap<String, AbstractBeanDefinition> nearCacheConfigMap;
 
         public SpringXmlBuilder(ParserContext parserContext) {
             this.parserContext = parserContext;
             this.builder = BeanDefinitionBuilder.rootBeanDefinition(HazelcastClient.class);
             this.builder.setFactoryMethod("newHazelcastClient");
             this.builder.setDestroyMethodName("shutdown");
-            this.nearCacheConfigMap = new ManagedMap();
+            this.nearCacheConfigMap = new ManagedMap<String, AbstractBeanDefinition>();
 
             this.configBuilder = BeanDefinitionBuilder.rootBeanDefinition(ClientConfig.class);
             configBuilder.addPropertyValue("nearCacheConfigMap", nearCacheConfigMap);

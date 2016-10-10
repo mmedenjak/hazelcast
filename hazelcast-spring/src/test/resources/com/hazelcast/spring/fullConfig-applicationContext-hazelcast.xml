@@ -151,10 +151,7 @@
                                  queue-capacity="300"
                                  statistics-enabled="false"
             />
-            <hz:queue name="testQ"
-                      max-size="1000"
-            >
-
+            <hz:queue name="testQ" max-size="1000">
                 <hz:item-listeners>
                     <hz:item-listener class-name="com.hazelcast.spring.DummyItemListener" include-value="true"/>
                 </hz:item-listeners>
@@ -251,7 +248,6 @@
                     <hz:entry-listener implementation="dummyEntryListener" local="true"/>
                 </hz:entry-listeners>
             </hz:map>
-
             <hz:map name="testMap3"
                     backup-count="2"
                     max-size="0"
@@ -357,17 +353,15 @@
             </hz:multimap>
 
             <hz:list name="testList"
-                      max-size="9999"
-                      backup-count="1"
-                      async-backup-count="1"
-                      statistics-enabled="false"
-            />
+                     max-size="9999"
+                     backup-count="1"
+                     async-backup-count="1"
+                     statistics-enabled="false"/>
             <hz:set name="testSet"
-                      max-size="7777"
-                      backup-count="0"
-                      async-backup-count="0"
-                      statistics-enabled="false"
-            />
+                    max-size="7777"
+                    backup-count="0"
+                    async-backup-count="0"
+                    statistics-enabled="false"/>
 
             <hz:topic name="testTopic">
                 <hz:statistics-enabled>false</hz:statistics-enabled>

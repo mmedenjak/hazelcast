@@ -1195,10 +1195,8 @@
                                     </xs:element>
                                 </xs:sequence>
                                 <xs:attribute name="name" type="xs:string" use="optional" default="default"/>
-                                <xs:attribute name="in-memory-format" type="in-memory-format" use="optional"
-                                              default="OBJECT"/>
-                                <xs:attribute name="concurrency-level" type="concurrency-level" use="optional"
-                                              default="32">
+                                <xs:attribute name="in-memory-format" type="in-memory-format" use="optional"  default="OBJECT"/>
+                                <xs:attribute name="concurrency-level" type="concurrency-level" use="optional" default="32">
                                     <xs:annotation>
                                         <xs:documentation>
                                             Number of parallel mutexes to minimize contention on keys. The default value

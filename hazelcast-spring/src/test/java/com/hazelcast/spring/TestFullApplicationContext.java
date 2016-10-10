@@ -194,7 +194,6 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
     @Resource(name = "dummyMapStore")
     private MapStore dummyMapStore;
-
     @Autowired
     private MapStoreFactory dummyMapStoreFactory;
 
@@ -389,16 +388,17 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
     @Test
     public void testQueueConfig() {
-        QueueConfig testQConfig = config.getQueueConfig("testQ");
+        final QueueConfig testQConfig = config.getQueueConfig("testQ");
         assertNotNull(testQConfig);
         assertEquals("testQ", testQConfig.getName());
         assertEquals(1000, testQConfig.getMaxSize());
         assertEquals(1, testQConfig.getItemListenerConfigs().size());
         assertTrue(testQConfig.isStatisticsEnabled());
-        ItemListenerConfig listenerConfig = testQConfig.getItemListenerConfigs().get(0);
+        final ItemListenerConfig listenerConfig = testQConfig.getItemListenerConfigs().get(0);
         assertEquals("com.hazelcast.spring.DummyItemListener", listenerConfig.getClassName());
         assertTrue(listenerConfig.isIncludeValue());
-        QueueConfig qConfig = config.getQueueConfig("q");
+
+        final QueueConfig qConfig = config.getQueueConfig("q");
         assertNotNull(qConfig);
         assertEquals("q", qConfig.getName());
         assertEquals(2500, qConfig.getMaxSize());
@@ -980,7 +980,6 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
         assertEquals(expectedComparatorClassName, mapConfig.getMapEvictionPolicy().getClass().getName());
     }
-
 
 
 }
