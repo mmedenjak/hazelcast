@@ -43,7 +43,7 @@ import static com.hazelcast.util.StringUtil.timeToString;
  * An operation could be compared to a {@link Runnable}. It contains logic that is going to be executed; this logic
  * will be placed in the {@link Operation#run()} method.
  */
-public abstract class Operation implements DataSerializable {
+public abstract class Operation<O extends Operation<O>> implements DataSerializable {
 
     /** Marks an {@link Operation} as non-partition-specific. */
     public static final int GENERIC_PARTITION_ID = -1;
@@ -75,7 +75,7 @@ public abstract class Operation implements DataSerializable {
     private transient Object service;
     private transient Address callerAddress;
     private transient Connection connection;
-    private transient OperationResponseHandler responseHandler;
+    private transient OperationResponseHandler<? super Operation<O>> responseHandler;
 
     protected Operation() {
         setFlag(true, BITMASK_VALIDATE_TARGET);
@@ -119,7 +119,7 @@ public abstract class Operation implements DataSerializable {
     }
 
     @SuppressFBWarnings("ES_COMPARING_PARAMETER_STRING_WITH_EQ")
-    public final Operation setServiceName(String serviceName) {
+    public final Operation<O> setServiceName(String serviceName) {
         // If the name of the service is the same as the name already provided, the call is skipped.
         // We can do a == instead of an equals because serviceName are typically constants, and it will
         // prevent serialization of the service-name if it is already provided by the getServiceName.
@@ -158,7 +158,7 @@ public abstract class Operation implements DataSerializable {
      * @return the updated Operation.
      * @see #getPartitionId()
      */
-    public final Operation setPartitionId(int partitionId) {
+    public final Operation<O> setPartitionId(int partitionId) {
         this.partitionId = partitionId;
         setFlag(partitionId > Short.MAX_VALUE, BITMASK_PARTITION_ID_32_BIT);
         return this;
@@ -168,7 +168,7 @@ public abstract class Operation implements DataSerializable {
         return replicaIndex;
     }
 
-    public final Operation setReplicaIndex(int replicaIndex) {
+    public final Operation<O> setReplicaIndex(int replicaIndex) {
         if (replicaIndex < 0 || replicaIndex >= InternalPartition.MAX_REPLICA_COUNT) {
             throw new IllegalArgumentException("Replica index is out of range [0-"
                     + (InternalPartition.MAX_REPLICA_COUNT - 1) + "]");
@@ -265,7 +265,7 @@ public abstract class Operation implements DataSerializable {
         return isFlagSet(BITMASK_VALIDATE_TARGET);
     }
 
-    public final Operation setValidateTarget(boolean validateTarget) {
+    public final Operation<O> setValidateTarget(boolean validateTarget) {
         setFlag(validateTarget, BITMASK_VALIDATE_TARGET);
         return this;
     }
@@ -274,7 +274,7 @@ public abstract class Operation implements DataSerializable {
         return nodeEngine;
     }
 
-    public final Operation setNodeEngine(NodeEngine nodeEngine) {
+    public final Operation<O> setNodeEngine(NodeEngine nodeEngine) {
         this.nodeEngine = nodeEngine;
         return this;
     }
@@ -288,7 +288,7 @@ public abstract class Operation implements DataSerializable {
         return (T) service;
     }
 
-    public final Operation setService(Object service) {
+    public final Operation<O> setService(Object service) {
         this.service = service;
         return this;
     }
@@ -298,7 +298,7 @@ public abstract class Operation implements DataSerializable {
     }
 
     // Accessed using OperationAccessor
-    final Operation setCallerAddress(Address callerAddress) {
+    final Operation<O> setCallerAddress(Address callerAddress) {
         this.callerAddress = callerAddress;
         return this;
     }
@@ -308,7 +308,7 @@ public abstract class Operation implements DataSerializable {
     }
 
     // Accessed using OperationAccessor
-    final Operation setConnection(Connection connection) {
+    final Operation<O> setConnection(Connection connection) {
         this.connection = connection;
         return this;
     }
@@ -318,7 +318,7 @@ public abstract class Operation implements DataSerializable {
      *
      * @return the OperationResponseHandler
      */
-    public final OperationResponseHandler getOperationResponseHandler() {
+    public final OperationResponseHandler<? super Operation<O>> getOperationResponseHandler() {
         return responseHandler;
     }
 
@@ -328,13 +328,13 @@ public abstract class Operation implements DataSerializable {
      * @param responseHandler the OperationResponseHandler to set.
      * @return this instance.
      */
-    public final Operation setOperationResponseHandler(OperationResponseHandler responseHandler) {
+    public final Operation<O> setOperationResponseHandler(OperationResponseHandler<? super Operation<O>> responseHandler) {
         this.responseHandler = responseHandler;
         return this;
     }
 
     public final void sendResponse(Object value) {
-        OperationResponseHandler operationResponseHandler = getOperationResponseHandler();
+        OperationResponseHandler<? super Operation<O>> operationResponseHandler = getOperationResponseHandler();
         operationResponseHandler.sendResponse(this, value);
     }
 
@@ -350,7 +350,7 @@ public abstract class Operation implements DataSerializable {
     }
 
     // Accessed using OperationAccessor
-    final Operation setInvocationTime(long invocationTime) {
+    final Operation<O> setInvocationTime(long invocationTime) {
         this.invocationTime = invocationTime;
         return this;
     }
@@ -379,7 +379,7 @@ public abstract class Operation implements DataSerializable {
      * @see #getCallTimeout()
      */
     // Accessed using OperationAccessor
-    final Operation setCallTimeout(long callTimeout) {
+    final Operation<O> setCallTimeout(long callTimeout) {
         this.callTimeout = callTimeout;
         setFlag(callTimeout > Integer.MAX_VALUE, BITMASK_CALL_TIMEOUT_64_BIT);
         return this;
@@ -435,7 +435,7 @@ public abstract class Operation implements DataSerializable {
         return callerUuid;
     }
 
-    public Operation setCallerUuid(String callerUuid) {
+    public Operation<O> setCallerUuid(String callerUuid) {
         this.callerUuid = callerUuid;
         setFlag(callerUuid != null, BITMASK_CALLER_UUID_SET);
         return this;

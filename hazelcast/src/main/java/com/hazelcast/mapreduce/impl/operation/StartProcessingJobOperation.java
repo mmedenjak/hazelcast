@@ -40,7 +40,7 @@ import java.util.concurrent.CancellationException;
  * @param <K> type of the key
  */
 public class StartProcessingJobOperation<K>
-        extends Operation
+        extends Operation<StartProcessingJobOperation<K>>
         implements IdentifiedDataSerializable {
 
     private String name;

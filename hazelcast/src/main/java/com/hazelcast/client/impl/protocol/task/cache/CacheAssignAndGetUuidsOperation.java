@@ -19,6 +19,7 @@ package com.hazelcast.client.impl.protocol.task.cache;
 import com.hazelcast.cache.impl.CacheDataSerializerHook;
 import com.hazelcast.cache.impl.CacheEventHandler;
 import com.hazelcast.cache.impl.CacheService;
+import com.hazelcast.cache.impl.operation.CacheGetInvalidationMetaDataOperation;
 import com.hazelcast.internal.nearcache.impl.invalidation.MetaDataGenerator;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.Operation;
@@ -27,7 +28,7 @@ import com.hazelcast.spi.impl.AllowedDuringPassiveState;
 
 import java.util.UUID;
 
-public class CacheAssignAndGetUuidsOperation extends Operation
+public class CacheAssignAndGetUuidsOperation extends Operation<CacheAssignAndGetUuidsOperation>
         implements PartitionAwareOperation, IdentifiedDataSerializable, AllowedDuringPassiveState {
 
     private UUID partitionUuid;

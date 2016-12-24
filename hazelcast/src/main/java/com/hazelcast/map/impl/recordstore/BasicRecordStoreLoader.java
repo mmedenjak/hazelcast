@@ -214,7 +214,7 @@ class BasicRecordStoreLoader implements RecordStoreLoader {
         MapOperationProvider operationProvider = mapServiceContext.getMapOperationProvider(name);
         MapOperation operation = operationProvider.createPutFromLoadAllOperation(name, keyValueSequence);
         operation.setNodeEngine(nodeEngine);
-        operation.setOperationResponseHandler(new OperationResponseHandler() {
+        operation.setOperationResponseHandler(new OperationResponseHandler<Operation>() {
             @Override
             public void sendResponse(Operation op, Object obj) {
                 if (finishedBatchCounter.decrementAndGet() == 0) {

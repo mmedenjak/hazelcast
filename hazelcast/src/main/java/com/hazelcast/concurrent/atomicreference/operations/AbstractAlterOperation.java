@@ -23,7 +23,8 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-public abstract class AbstractAlterOperation extends AtomicReferenceBackupAwareOperation {
+public abstract class AbstractAlterOperation<O extends AbstractAlterOperation<O>>
+        extends AtomicReferenceBackupAwareOperation<O> {
 
     protected Data function;
     protected Object response;

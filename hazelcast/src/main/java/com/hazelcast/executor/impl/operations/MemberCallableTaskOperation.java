@@ -23,7 +23,7 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.ExceptionAction;
 import com.hazelcast.spi.exception.TargetNotMemberException;
 
-public final class MemberCallableTaskOperation extends AbstractCallableTaskOperation
+public final class MemberCallableTaskOperation extends AbstractCallableTaskOperation<MemberCallableTaskOperation>
         implements IdentifiedDataSerializable {
 
     public MemberCallableTaskOperation() {

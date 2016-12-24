@@ -25,7 +25,7 @@ import com.hazelcast.spi.BackupOperation;
 import java.io.IOException;
 
 public class AggregateBackupOperation
-        extends AbstractCardinalityEstimatorOperation
+        extends AbstractCardinalityEstimatorOperation<AggregateBackupOperation>
         implements BackupOperation {
 
     private long hash;

@@ -27,7 +27,7 @@ import com.hazelcast.spi.impl.NodeEngineImpl;
 
 import java.io.IOException;
 
-public class MergeClustersOperation extends AbstractClusterOperation {
+public class MergeClustersOperation extends AbstractClusterOperation<MergeClustersOperation> {
 
     private Address newTargetAddress;
 

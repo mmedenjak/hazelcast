@@ -30,7 +30,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class XaReplicationOperation extends Operation implements IdentifiedDataSerializable {
+public class XaReplicationOperation extends Operation<XaReplicationOperation> implements IdentifiedDataSerializable {
 
     private List<XATransactionDTO> migrationData;
 

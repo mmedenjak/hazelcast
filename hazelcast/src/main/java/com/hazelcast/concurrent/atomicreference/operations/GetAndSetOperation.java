@@ -25,7 +25,7 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-public class GetAndSetOperation extends AtomicReferenceBackupAwareOperation {
+public class GetAndSetOperation extends AtomicReferenceBackupAwareOperation<GetAndSetOperation> {
 
     private Data newValue;
     private Data returnValue;

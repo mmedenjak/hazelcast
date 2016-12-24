@@ -26,7 +26,7 @@ import com.hazelcast.spi.NodeEngine;
 
 import java.io.IOException;
 
-public class ApplyOperation extends AbstractAtomicReferenceOperation {
+public class ApplyOperation extends AbstractAtomicReferenceOperation<ApplyOperation> {
 
     protected Data function;
     protected Data returnValue;

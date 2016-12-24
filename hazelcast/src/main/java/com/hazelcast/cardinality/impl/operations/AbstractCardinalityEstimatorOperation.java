@@ -27,8 +27,8 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-public abstract class AbstractCardinalityEstimatorOperation
-        extends Operation
+public abstract class AbstractCardinalityEstimatorOperation<T extends Operation<T>>
+        extends Operation<T>
         implements PartitionAwareOperation, IdentifiedDataSerializable {
 
     protected String name;

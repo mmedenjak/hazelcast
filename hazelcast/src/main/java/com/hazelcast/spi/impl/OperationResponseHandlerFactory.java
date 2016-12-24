@@ -27,23 +27,21 @@ public final class OperationResponseHandlerFactory {
     private OperationResponseHandlerFactory() {
     }
 
-    public static OperationResponseHandler createEmptyResponseHandler() {
+    public static OperationResponseHandler<Operation> createEmptyResponseHandler() {
         return EMPTY_RESPONSE_HANDLER;
     }
 
-    private static class NoResponseHandler
-            implements OperationResponseHandler {
-
+    private static class NoResponseHandler implements OperationResponseHandler<Operation> {
         @Override
         public void sendResponse(Operation op, Object obj) {
         }
     }
 
-    public static OperationResponseHandler createErrorLoggingResponseHandler(ILogger logger) {
+    public static OperationResponseHandler<Operation> createErrorLoggingResponseHandler(ILogger logger) {
         return new ErrorLoggingResponseHandler(logger);
     }
 
-    private static final class ErrorLoggingResponseHandler implements OperationResponseHandler {
+    private static final class ErrorLoggingResponseHandler implements OperationResponseHandler<Operation> {
         private final ILogger logger;
 
         private ErrorLoggingResponseHandler(ILogger logger) {

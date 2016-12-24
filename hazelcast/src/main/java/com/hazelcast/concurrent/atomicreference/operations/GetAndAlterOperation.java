@@ -22,7 +22,7 @@ import com.hazelcast.core.IFunction;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.NodeEngine;
 
-public class GetAndAlterOperation extends AbstractAlterOperation {
+public class GetAndAlterOperation extends AbstractAlterOperation<GetAndAlterOperation> {
 
     public GetAndAlterOperation() {
     }

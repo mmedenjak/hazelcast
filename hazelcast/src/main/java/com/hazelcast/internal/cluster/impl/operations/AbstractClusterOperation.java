@@ -20,7 +20,7 @@ import com.hazelcast.internal.cluster.impl.ClusterDataSerializerHook;
 import com.hazelcast.internal.cluster.impl.ClusterServiceImpl;
 import com.hazelcast.spi.Operation;
 
-abstract class AbstractClusterOperation extends Operation implements JoinOperation {
+abstract class AbstractClusterOperation<T extends Operation<T>> extends Operation<T> implements JoinOperation {
 
     @Override
     public boolean returnsResponse() {

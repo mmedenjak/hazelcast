@@ -28,8 +28,8 @@ import java.io.IOException;
  * This is the base class for all map reduce framework operations, it always contains the name of
  * the JobTracker and the unique jobId
  */
-public abstract class ProcessingOperation
-        extends Operation
+public abstract class ProcessingOperation<O extends ProcessingOperation<O>>
+        extends Operation<O>
         implements IdentifiedDataSerializable {
 
     private transient String name;

@@ -36,8 +36,7 @@ import static com.hazelcast.mapreduce.impl.operation.RequestPartitionResult.Resu
 /**
  * This operation requests a new partition to process by the requester on the job owning node
  */
-public class RequestPartitionMapping
-        extends ProcessingOperation {
+public class RequestPartitionMapping extends ProcessingOperation<RequestPartitionMapping> {
 
     private volatile RequestPartitionResult result;
 

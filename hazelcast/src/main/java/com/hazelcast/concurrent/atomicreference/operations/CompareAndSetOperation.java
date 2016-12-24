@@ -25,7 +25,7 @@ import com.hazelcast.spi.Operation;
 
 import java.io.IOException;
 
-public class CompareAndSetOperation extends AtomicReferenceBackupAwareOperation {
+public class CompareAndSetOperation extends AtomicReferenceBackupAwareOperation<CompareAndSetOperation> {
 
     private Data expect;
     private Data update;

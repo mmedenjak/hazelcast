@@ -35,8 +35,7 @@ import static com.hazelcast.mapreduce.impl.operation.RequestPartitionResult.Resu
 /**
  * This operation tells the job owner to mark a partition as fully processed
  */
-public class RequestPartitionProcessed
-        extends ProcessingOperation {
+public class RequestPartitionProcessed extends ProcessingOperation<RequestPartitionMapping> {
 
     private volatile RequestPartitionResult result;
 
@@ -58,8 +57,7 @@ public class RequestPartitionProcessed
     }
 
     @Override
-    public void run()
-            throws Exception {
+    public void run() throws Exception {
         MapReduceService mapReduceService = getService();
         JobSupervisor supervisor = mapReduceService.getJobSupervisor(getName(), getJobId());
         if (supervisor == null) {

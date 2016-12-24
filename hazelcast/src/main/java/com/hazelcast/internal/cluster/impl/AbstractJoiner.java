@@ -329,7 +329,7 @@ public abstract class AbstractJoiner implements Joiner {
         Collection<Address> targetMemberAddresses = joinMessage.getMemberAddresses();
         if (targetMemberAddresses.contains(node.getThisAddress())) {
             node.nodeEngine.getOperationService()
-                    .send(new MemberRemoveOperation(node.getThisAddress()), joinMessage.getAddress());
+                           .send(new MemberRemoveOperation(node.getThisAddress()), joinMessage.getAddress());
             logger.info(node.getThisAddress() + " CANNOT merge to " + joinMessage.getAddress()
                     + ", because it thinks this-node as its member.");
             return false;
@@ -352,7 +352,7 @@ public abstract class AbstractJoiner implements Joiner {
      * This is a pure function that must produce always the same output when called with the same parameters.
      * This logic should not be changed, otherwise compatibility will be broken.
      *
-     * @param thisAddress this address
+     * @param thisAddress   this address
      * @param targetAddress target address
      * @return true if this address should merge to target, false otherwise
      */
@@ -395,7 +395,7 @@ public abstract class AbstractJoiner implements Joiner {
         NodeEngine nodeEngine = node.nodeEngine;
         Future future = nodeEngine.getOperationService().createInvocationBuilder(ClusterServiceImpl.SERVICE_NAME,
                 new SplitBrainMergeValidationOperation(node.createSplitBrainJoinMessage()), target)
-                .setTryCount(1).invoke();
+                                  .setTryCount(1).invoke();
         try {
             return (SplitBrainJoinMessage) future.get(SPLIT_BRAIN_JOIN_CHECK_TIMEOUT_SECONDS, TimeUnit.SECONDS);
         } catch (TimeoutException e) {
@@ -433,9 +433,10 @@ public abstract class AbstractJoiner implements Joiner {
 
         waitWithDeadline(futures, SPLIT_BRAIN_MERGE_TIMEOUT_SECONDS, TimeUnit.SECONDS, splitBrainMergeExceptionHandler);
 
-        Operation mergeClustersOperation = new MergeClustersOperation(targetAddress);
-        mergeClustersOperation.setNodeEngine(node.nodeEngine).setService(clusterService)
-                .setOperationResponseHandler(createEmptyResponseHandler());
+        MergeClustersOperation mergeClustersOperation = new MergeClustersOperation(targetAddress);
+        mergeClustersOperation.setNodeEngine(node.nodeEngine)
+                              .setService(clusterService)
+                              .setOperationResponseHandler(createEmptyResponseHandler());
         operationService.run(mergeClustersOperation);
     }
 

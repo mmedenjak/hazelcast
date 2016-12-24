@@ -20,7 +20,7 @@ import com.hazelcast.concurrent.atomicreference.AtomicReferenceDataSerializerHoo
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.ReadonlyOperation;
 
-public class GetOperation extends AbstractAtomicReferenceOperation implements ReadonlyOperation {
+public class GetOperation extends AbstractAtomicReferenceOperation<GetOperation> implements ReadonlyOperation {
 
     private Data returnValue;
 

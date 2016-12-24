@@ -33,7 +33,8 @@ import com.hazelcast.util.ExceptionUtil;
 import java.io.IOException;
 import java.util.concurrent.Callable;
 
-abstract class AbstractCallableTaskOperation extends Operation implements IdentifiedDataSerializable {
+abstract class AbstractCallableTaskOperation<T extends AbstractCallableTaskOperation<T>>
+        extends Operation<T> implements IdentifiedDataSerializable {
 
     protected String name;
     protected String uuid;

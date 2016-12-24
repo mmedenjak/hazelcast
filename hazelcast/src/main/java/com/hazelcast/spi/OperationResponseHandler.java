@@ -23,9 +23,9 @@ package com.hazelcast.spi;
  * Also during the development of Hazelcast 3.6 additional methods will be added to the OperationResponseHandler for certain
  * types of responses like exceptions, backup complete etc.
  *
- * @param <O> type of the {@link Operation}
+ * @param <T> type of the {@link Operation}
  */
-public interface OperationResponseHandler<O extends Operation> {
+public interface OperationResponseHandler<T> {
 
     /**
      * Sends a response.
@@ -33,5 +33,5 @@ public interface OperationResponseHandler<O extends Operation> {
      * @param op       the operation that got executed.
      * @param response the response of the operation that got executed.
      */
-    void sendResponse(O op, Object response);
+    void sendResponse(T op, Object response);
 }
