@@ -52,7 +52,7 @@ public interface WanReplicationService
     /**
      * Pauses wan replication to target group for the called node
      *
-     * @param name name of WAN replication configuration
+     * @param name            name of WAN replication configuration
      * @param targetGroupName name of wan target cluster config
      */
     void pause(String name, String targetGroupName);
@@ -60,22 +60,41 @@ public interface WanReplicationService
     /**
      * Resumes wan replication to target group for the called node.
      *
-     * @param name name of WAN replication configuration
+     * @param name            name of WAN replication configuration
      * @param targetGroupName name of wan target cluster config
      */
     void resume(String name, String targetGroupName);
 
     void checkWanReplicationQueues(String name);
 
+    /**
+     * Initiate wan sync for a specific map.
+     * NOTE: not supported on OS, only on EE
+     *
+     * @param wanReplicationName the name of the wan replication config
+     * @param targetGroupName    the group name on the target cluster
+     * @param mapName            the map name
+     * @throws SyncFailedException           if there is sync request in progress
+     * @throws UnsupportedOperationException if the operation is not supported (not EE)
+     */
     void syncMap(String wanReplicationName, String targetGroupName, String mapName);
 
+    /**
+     * Initiate wan sync for all maps.
+     * NOTE: not supported on OS, only on EE
+     *
+     * @param wanReplicationName the name of the wan replication config
+     * @param targetGroupName    the group name on the target cluster
+     * @throws SyncFailedException           if there is sync request in progress
+     * @throws UnsupportedOperationException if the operation is not supported (not EE)
+     */
     void syncAllMaps(String wanReplicationName, String targetGroupName);
 
     /**
      * Clears WAN replication queues of the given wanReplicationName for the given target.
      *
-     * @param wanReplicationName
-     * @param targetGroupName
+     * @param wanReplicationName the name of the wan replication config
+     * @param targetGroupName    the target cluster group name
      */
     void clearQueues(String wanReplicationName, String targetGroupName);
 
