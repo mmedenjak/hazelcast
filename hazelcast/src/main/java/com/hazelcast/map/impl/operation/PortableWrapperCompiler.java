@@ -81,7 +81,7 @@ public class PortableWrapperCompiler {
 
         typeMap.put(FieldType.BOOLEAN, Types.BOOLEAN);
         typeMap.put(FieldType.INT, Types.INT);
-        typeMap.put(FieldType.LONG, Types.LONG);
+//        typeMap.put(FieldType.LONG, Types.LONG);
 
         for (String fieldName : classDef.getFieldNames()) {
             final FieldDefinition fd = classDef.getField(fieldName);

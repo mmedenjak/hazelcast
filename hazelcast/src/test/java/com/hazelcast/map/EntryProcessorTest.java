@@ -102,7 +102,7 @@ public class EntryProcessorTest extends HazelcastTestSupport {
         final Random rnd = new Random();
         for (int i = 0; i < 1000; i++) {
 
-            final int dutyCnt = rnd.nextInt(10);
+            final int dutyCnt = rnd.nextInt(10) + 1;
             final Portable[] duties = new Portable[dutyCnt];
             for (int j = 0; j < dutyCnt; j++) {
                 duties[j] = new PortableDuty("Some random duty", rnd.nextInt(5));
