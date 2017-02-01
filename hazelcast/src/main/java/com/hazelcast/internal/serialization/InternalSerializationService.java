@@ -17,13 +17,17 @@
 package com.hazelcast.internal.serialization;
 
 import com.hazelcast.core.PartitioningStrategy;
+import com.hazelcast.internal.serialization.impl.DefaultPortableReaderWriter;
 import com.hazelcast.nio.BufferObjectDataInput;
 import com.hazelcast.nio.BufferObjectDataOutput;
 import com.hazelcast.nio.Disposable;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.ClassDefinition;
 import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.io.IOException;
@@ -53,11 +57,17 @@ public interface InternalSerializationService extends SerializationService, Disp
 
     BufferObjectDataInput createObjectDataInput(Data data);
 
+    BufferObjectDataOutput createObjectDataOutput(Data data);
+
     BufferObjectDataOutput createObjectDataOutput(int size);
 
     BufferObjectDataOutput createObjectDataOutput();
 
     PortableReader createPortableReader(Data data) throws IOException;
+
+    PortableWriter createPortableWriter(Data data) throws IOException;
+
+    DefaultPortableReaderWriter createPortableReaderWriter(Data data);
 
     PortableContext getPortableContext();
 
@@ -67,4 +77,5 @@ public interface InternalSerializationService extends SerializationService, Disp
 
     byte getVersion();
 
+    Object compile(ClassDefinition cd);
 }

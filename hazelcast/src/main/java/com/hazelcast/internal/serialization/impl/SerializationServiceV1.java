@@ -24,7 +24,9 @@ import com.hazelcast.internal.serialization.impl.ConstantSerializers.BooleanSeri
 import com.hazelcast.internal.serialization.impl.ConstantSerializers.ByteSerializer;
 import com.hazelcast.internal.serialization.impl.ConstantSerializers.StringArraySerializer;
 import com.hazelcast.internal.serialization.impl.bufferpool.BufferPoolFactory;
+import com.hazelcast.map.impl.operation.PortableWrapperCompiler;
 import com.hazelcast.nio.BufferObjectDataInput;
+import com.hazelcast.nio.BufferObjectDataOutput;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.serialization.ClassDefinition;
 import com.hazelcast.nio.serialization.Data;
@@ -36,6 +38,7 @@ import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -85,12 +88,13 @@ public class SerializationServiceV1 extends AbstractSerializationService {
 
     private final PortableContextImpl portableContext;
     private final PortableSerializer portableSerializer;
+    private final PortableWrapperCompiler portableWrapperCompiler = new PortableWrapperCompiler();
 
-     SerializationServiceV1(InputOutputFactory inputOutputFactory, byte version, int portableVersion, ClassLoader classLoader,
-            Map<Integer, ? extends DataSerializableFactory> dataSerializableFactories,
-            Map<Integer, ? extends PortableFactory> portableFactories, ManagedContext managedContext,
-            PartitioningStrategy globalPartitionStrategy, int initialOutputBufferSize, BufferPoolFactory bufferPoolFactory,
-            boolean enableCompression, boolean enableSharedObject) {
+    SerializationServiceV1(InputOutputFactory inputOutputFactory, byte version, int portableVersion, ClassLoader classLoader,
+                           Map<Integer, ? extends DataSerializableFactory> dataSerializableFactories,
+                           Map<Integer, ? extends PortableFactory> portableFactories, ManagedContext managedContext,
+                           PartitioningStrategy globalPartitionStrategy, int initialOutputBufferSize, BufferPoolFactory bufferPoolFactory,
+                           boolean enableCompression, boolean enableSharedObject) {
         super(inputOutputFactory, version, classLoader, managedContext, globalPartitionStrategy, initialOutputBufferSize,
                 bufferPoolFactory);
 
@@ -120,8 +124,50 @@ public class SerializationServiceV1 extends AbstractSerializationService {
         return portableSerializer.createReader(in);
     }
 
+    public PortableWriter createPortableWriter(Data data) throws IOException {
+        BufferObjectDataOutput out = inputOutputFactory.createOutput(data, this);
+        return portableSerializer.createWriter(out, data);
+    }
+
+    public DefaultPortableReaderWriter createPortableReaderWriter(Data data) {
+        try {
+            BufferObjectDataOutput out = createObjectDataOutput(data);
+            BufferObjectDataInput in = createObjectDataInput(data);
+            return portableSerializer.createReaderWriter(in, out);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public PortableContext getPortableContext() {
         return portableContext;
+    }
+
+
+    private final ThreadLocal<Map<ClassDefinition, Object>> objectsMap = new ThreadLocal<Map<ClassDefinition, Object>>();
+
+    @Override
+    public Object compile(ClassDefinition cd) {
+        try {
+            final Portable instance = portableSerializer.createNewPortableInstance(cd.getFactoryId(), cd.getClassId());
+            final Class<? extends Portable> c = instance.getClass();
+            final Class clazz = portableWrapperCompiler.compile(cd, c.getName());
+            Map<ClassDefinition, Object> localMap = objectsMap.get();
+            if (localMap == null) {
+                localMap = new HashMap<ClassDefinition, Object>();
+                objectsMap.set(localMap);
+            }
+            if (!localMap.containsKey(cd)) {
+                final Object o = clazz.newInstance();
+                localMap.put(cd, o);
+                return o;
+            }
+            return localMap.get(cd);
+        } catch (InstantiationException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void registerConstantSerializers() {

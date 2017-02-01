@@ -42,6 +42,11 @@ final class UnsafeInputOutputFactory implements InputOutputFactory {
     }
 
     @Override
+    public BufferObjectDataOutput createOutput(Data data, InternalSerializationService service) {
+        throw new UnsupportedOperationException("Not supported");
+    }
+
+    @Override
     public ByteOrder getByteOrder() {
         return ByteOrder.nativeOrder();
     }

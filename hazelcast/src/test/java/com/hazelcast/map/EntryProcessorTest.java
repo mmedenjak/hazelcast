@@ -35,6 +35,8 @@ import com.hazelcast.monitor.LocalMapStats;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.DataSerializable;
+import com.hazelcast.nio.serialization.Portable;
+import com.hazelcast.nio.serialization.PortableFactory;
 import com.hazelcast.query.EntryObject;
 import com.hazelcast.query.IndexAwarePredicate;
 import com.hazelcast.query.Predicate;
@@ -63,6 +65,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
@@ -82,6 +86,54 @@ import static org.junit.Assert.fail;
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
 public class EntryProcessorTest extends HazelcastTestSupport {
+
+
+    @Test
+    public void testExecuteOnEntriesPortable() {
+        final Config config = getConfig();
+        config.getSerializationConfig().addPortableFactory(1, new PortableFactory() {
+            public Portable create(int classId) {
+                return classId == 2 ? new PortableEmployee() : new PortableDuty();
+            }
+        });
+        HazelcastInstance instance = createHazelcastInstance(config);
+        IMap<Integer, PortableEmployee> map = instance.getMap("map");
+
+        final Random rnd = new Random();
+        for (int i = 0; i < 1000; i++) {
+
+            final int dutyCnt = rnd.nextInt(10);
+            final Portable[] duties = new Portable[dutyCnt];
+            for (int j = 0; j < dutyCnt; j++) {
+                duties[j] = new PortableDuty("Some random duty", rnd.nextInt(5));
+            }
+            map.put(i, new PortableEmployee(i % 90, true, i, String.valueOf("Matko " + i), duties));
+        }
+
+//        for (int i = 0; i < 1000 * 1000; i++) {
+        map.executeOnEntries(new AbstractEntryProcessor<Integer, PortableEmployee>() {
+            @Override
+            public Object process(Map.Entry<Integer, PortableEmployee> entry) {
+                final PortableEmployee val = entry.getValue();
+                val.setAge(50);
+                val.setIsEmployee(false);
+//                    if (val.getAge() > 50) {
+//                        val.setIsEmployee(false);
+//                    }
+                return null;
+            }
+        });
+//        }
+
+        for (Entry<Integer, PortableEmployee> e : map.entrySet()) {
+            final PortableEmployee v = e.getValue();
+            if (v.getAge() != 50 || v.getIsEmployee()) {
+                System.out.println();
+                throw new RuntimeException("WOOT");
+            }
+        }
+    }
+
 
     @Test
     public void testExecuteOnEntriesWithEntryListener() {
@@ -1535,7 +1587,7 @@ public class EntryProcessorTest extends HazelcastTestSupport {
     public void receivesEntryRemovedEvent_onPostProcessingMapStore_after_executeOnKey() throws Exception {
         Config config = getConfig();
         config.getMapConfig("default")
-                .getMapStoreConfig().setEnabled(true).setImplementation(new TestPostProcessingMapStore());
+              .getMapStoreConfig().setEnabled(true).setImplementation(new TestPostProcessingMapStore());
         HazelcastInstance node = createHazelcastInstance(config);
         IMap<Integer, Integer> map = node.getMap("test");
         final CountDownLatch latch = new CountDownLatch(1);
@@ -1563,7 +1615,7 @@ public class EntryProcessorTest extends HazelcastTestSupport {
     public void receivesEntryRemovedEvent_onPostProcessingMapStore_after_executeOnEntries() throws Exception {
         Config config = getConfig();
         config.getMapConfig("default")
-                .getMapStoreConfig().setEnabled(true).setImplementation(new TestPostProcessingMapStore());
+              .getMapStoreConfig().setEnabled(true).setImplementation(new TestPostProcessingMapStore());
         HazelcastInstance node = createHazelcastInstance(config);
         IMap<Integer, Integer> map = node.getMap("test");
         final CountDownLatch latch = new CountDownLatch(1);
@@ -1576,7 +1628,7 @@ public class EntryProcessorTest extends HazelcastTestSupport {
 
         map.put(1, 1);
 
-        map.executeOnEntries(new AbstractEntryProcessor<Integer,Integer>() {
+        map.executeOnEntries(new AbstractEntryProcessor<Integer, Integer>() {
             @Override
             public Integer process(Map.Entry<Integer, Integer> entry) {
                 entry.setValue(null);

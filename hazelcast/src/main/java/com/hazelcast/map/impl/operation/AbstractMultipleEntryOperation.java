@@ -21,6 +21,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.core.EntryEventType;
 import com.hazelcast.core.EntryView;
 import com.hazelcast.internal.serialization.InternalSerializationService;
+import com.hazelcast.internal.serialization.impl.DefaultPortableReaderWriter;
 import com.hazelcast.map.EntryBackupProcessor;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.LazyMapEntry;
@@ -49,6 +50,7 @@ abstract class AbstractMultipleEntryOperation extends MapOperation implements Mu
     protected EntryProcessor entryProcessor;
     protected EntryBackupProcessor backupProcessor;
     protected List<WanEventWrapper> wanEventList = new ArrayList<WanEventWrapper>();
+
 
     protected AbstractMultipleEntryOperation() {
     }

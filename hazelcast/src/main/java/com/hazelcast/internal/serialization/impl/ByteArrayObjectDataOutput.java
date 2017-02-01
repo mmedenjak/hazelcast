@@ -49,6 +49,13 @@ class ByteArrayObjectDataOutput extends VersionedObjectDataOutput implements Buf
         isBigEndian = byteOrder == ByteOrder.BIG_ENDIAN;
     }
 
+    public ByteArrayObjectDataOutput(Data data, InternalSerializationService service, ByteOrder byteOrder) {
+        this.buffer = data.toByteArray();
+        this.initialSize = data.totalSize();
+        this.service = service;
+        isBigEndian = byteOrder == ByteOrder.BIG_ENDIAN;
+    }
+
     @Override
     public void write(int b) {
         ensureAvailable(1);

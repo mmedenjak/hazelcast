@@ -22,6 +22,7 @@ import com.hazelcast.nio.BufferObjectDataOutput;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.ClassDefinition;
+import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
@@ -70,6 +71,20 @@ final class PortableSerializer implements StreamSerializer<Portable> {
         writer.end();
     }
 
+    public DefaultPortableReaderWriter createReaderWriter(
+            BufferObjectDataInput in, BufferObjectDataOutput out) throws IOException {
+        int factoryId = in.readInt();
+        int classId = in.readInt();
+        int version = in.readInt();
+        ClassDefinition cd = setupPositionAndDefinition(in, factoryId, classId, version);
+        return new DefaultPortableReaderWriter(this, in, out, cd);
+    }
+
+    public DefaultPortableWriter createWriter(BufferObjectDataOutput out, Data data) throws IOException {
+        final ClassDefinition cd = context.lookupClassDefinition(data);
+        return new DefaultPortableWriter(this, out, cd);
+    }
+
     @Override
     public Portable read(ObjectDataInput in) throws IOException {
         if (!(in instanceof BufferObjectDataInput)) {
@@ -105,7 +120,7 @@ final class PortableSerializer implements StreamSerializer<Portable> {
         return currentVersion;
     }
 
-    private Portable createNewPortableInstance(int factoryId, int classId) {
+    public Portable createNewPortableInstance(int factoryId, int classId) {
         final PortableFactory portableFactory = factories.get(factoryId);
         if (portableFactory == null) {
             throw new HazelcastSerializationException("Could not find PortableFactory for factory-id: " + factoryId);

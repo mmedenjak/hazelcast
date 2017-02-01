@@ -85,6 +85,10 @@ public class CachedQueryEntry extends QueryableEntry {
         return valueData;
     }
 
+    public InternalSerializationService getSerializationService(){
+        return serializationService;
+    }
+
     @Override
     protected Object getTargetObject(boolean key) {
         Object targetObject;

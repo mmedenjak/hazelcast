@@ -30,5 +30,7 @@ public interface InputOutputFactory {
 
     BufferObjectDataOutput createOutput(int size, InternalSerializationService service);
 
+    BufferObjectDataOutput createOutput(Data data, InternalSerializationService service);
+
     ByteOrder getByteOrder();
 }

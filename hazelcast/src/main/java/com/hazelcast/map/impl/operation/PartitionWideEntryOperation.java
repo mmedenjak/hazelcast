@@ -17,11 +17,15 @@
 package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.core.ManagedContext;
+import com.hazelcast.internal.serialization.InternalSerializationService;
+import com.hazelcast.internal.serialization.impl.DefaultPortableReaderWriter;
 import com.hazelcast.map.EntryBackupProcessor;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.map.impl.MapEntries;
 import com.hazelcast.map.impl.record.Record;
+import com.hazelcast.nio.BufferObjectDataInput;
+import com.hazelcast.nio.BufferObjectDataOutput;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.Data;
@@ -73,7 +77,21 @@ public class PartitionWideEntryOperation extends AbstractMultipleEntryOperation 
                 continue;
             }
 
-            Map.Entry entry = createMapEntry(dataKey, oldValue);
+            final InternalSerializationService serializationService
+                    = ((InternalSerializationService) getNodeEngine().getSerializationService());
+            final Data valueData = (Data) oldValue;
+
+
+            final DefaultPortableReaderWriter rw = serializationService.createPortableReaderWriter(valueData);
+
+            final Object compiled = serializationService.compile(rw.cd);
+            ((PortableReaderWriterSetter) compiled).setPortableReaderWriter(rw);
+
+//            final BufferObjectDataInput in = serializationService.createObjectDataInput(valueData);
+//            final BufferObjectDataOutput out = serializationService.createObjectDataOutput(valueData);
+//            rw.setData(in, out);
+
+            Map.Entry entry = createMapEntry(dataKey, compiled);
             Data response = process(entry);
             if (response != null) {
                 responses.add(dataKey, response);
