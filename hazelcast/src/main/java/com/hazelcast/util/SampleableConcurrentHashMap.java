@@ -84,6 +84,58 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
         return nextTableIndex;
     }
 
+    public Iterator<V> iterator(final int tableIndex, final int minSize) {
+        return new ValueIterator(tableIndex, minSize);
+    }
+
+    private class ValueIterator implements Iterator<V> {
+        private final int minSize;
+        private final HashEntry<K, V>[] currentTable;
+        private int fetched = 0;
+        private int index;
+        private HashEntry<K, V> nextEntry;
+
+        public ValueIterator(int tableIndex, int minSize) {
+            final Segment<K, V> segment = segments[0];
+            this.currentTable = segment.table;
+            this.index = tableIndex >= 0 && tableIndex < segment.table.length ? tableIndex : currentTable.length - 1;
+            this.minSize = minSize;
+            this.nextEntry = findNext();
+        }
+
+        private HashEntry<K, V> findNext() {
+            boolean hasNextInBucket;
+            while ((hasNextInBucket = nextEntry != null && nextEntry.next != null)
+                    || (index >= 0 && fetched < minSize)) {
+                nextEntry = hasNextInBucket ? nextEntry.next : currentTable[index--];
+
+                if (nextEntry != null && nextEntry.key() != null
+                        && isValidForFetching(nextEntry.value(), Clock.currentTimeMillis())) {
+                    fetched++;
+                    return nextEntry;
+                }
+            }
+            return null;
+        }
+
+        @Override
+        public boolean hasNext() {
+            return nextEntry != null;
+        }
+
+        @Override
+        public void remove() {
+            throw new UnsupportedOperationException("remove");
+        }
+
+        @Override
+        public V next() {
+            final HashEntry<K, V> curr = nextEntry;
+            nextEntry = findNext();
+            return curr.value();
+        }
+    }
+
     /**
      * Fetches entries from given <code>tableIndex</code> as <code>size</code>
      * and puts them into <code>entries</code> list.
@@ -197,7 +249,7 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
     /**
      * This class is implements both of "Iterable" and "Iterator" interfaces.
      * So we can use only one object (instead of two) both for "Iterable" and "Iterator" interfaces.
-     *
+     * <p>
      * NOTE: Assumed that it is not accessed by multiple threads. So there is no synchronization.
      */
     private final class LazySamplingEntryIterableIterator<E extends SamplingEntry> implements Iterable<E>, Iterator<E> {

@@ -19,9 +19,11 @@ package com.hazelcast.map.impl.recordstore;
 import com.hazelcast.map.impl.EntryCostEstimator;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
 import com.hazelcast.map.impl.iterator.MapKeysWithCursor;
+import com.hazelcast.map.impl.record.Record;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.util.Collection;
+import java.util.Iterator;
 
 /**
  * Represents actual storage layer behind a {@link RecordStore}.
@@ -78,4 +80,5 @@ public interface Storage<K, R> {
 
     MapEntriesWithCursor fetchEntries(int tableIndex, int size, SerializationService serializationService);
 
+    int fetchValues(int tableIndex, int size, Collection<R> bucket);
 }

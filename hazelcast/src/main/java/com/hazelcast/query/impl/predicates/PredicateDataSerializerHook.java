@@ -21,6 +21,7 @@ import com.hazelcast.internal.serialization.impl.ArrayDataSerializableFactory;
 import com.hazelcast.internal.serialization.impl.FactoryIdHelper;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.query.PartitionIteratingPredicate;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.PartitionPredicate;
 import com.hazelcast.query.SqlPredicate;
@@ -55,8 +56,9 @@ public class PredicateDataSerializerHook
     public static final int PAGING_PREDICATE = 15;
     public static final int PARTITION_PREDICATE = 16;
     public static final int NULL_OBJECT = 17;
+    public static final int ITERATING_PREDICATE = 18;
 
-    public static final int LEN = NULL_OBJECT + 1;
+    public static final int LEN = ITERATING_PREDICATE + 1;
 
     @Override
     public int getFactoryId() {
@@ -150,6 +152,11 @@ public class PredicateDataSerializerHook
         constructors[PARTITION_PREDICATE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
             public IdentifiedDataSerializable createNew(Integer arg) {
                 return new PartitionPredicate();
+            }
+        };
+        constructors[ITERATING_PREDICATE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new PartitionIteratingPredicate();
             }
         };
         constructors[NULL_OBJECT] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {

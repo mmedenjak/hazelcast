@@ -54,7 +54,7 @@ public class MapProjectionPagingTest extends HazelcastTestSupport {
     @Before
     public void setup() {
         Config config = getConfig();
-        TestHazelcastInstanceFactory nodeFactory = createHazelcastInstanceFactory(2);
+        TestHazelcastInstanceFactory nodeFactory = createHazelcastInstanceFactory(1);
         HazelcastInstance local = nodeFactory.newHazelcastInstance(config);
         nodeFactory.newHazelcastInstance(config);
         map = local.getMap(randomString());

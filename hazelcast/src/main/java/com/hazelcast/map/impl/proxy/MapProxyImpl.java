@@ -59,6 +59,7 @@ import com.hazelcast.mapreduce.aggregation.Supplier;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.projection.Projection;
 import com.hazelcast.query.PagingPredicate;
+import com.hazelcast.query.PartitionIteratingPredicate;
 import com.hazelcast.query.PartitionPredicate;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.TruePredicate;
@@ -657,26 +658,28 @@ public class MapProxyImpl<K, V> extends MapProxySupport implements IMap<K, V> {
 
     private Set executePredicate(Predicate predicate, IterationType iterationType, boolean uniqueResult) {
         checkNotNull(predicate, NULL_PREDICATE_IS_NOT_ALLOWED);
-        MapQueryEngine queryEngine = getMapQueryEngine();
-        QueryResult result;
+        final MapQueryEngine queryEngine = getMapQueryEngine();
+        final Predicate p;
+        final Target t;
         if (predicate instanceof PartitionPredicate) {
-            PartitionPredicate partitionPredicate = (PartitionPredicate) predicate;
-            Data key = toData(partitionPredicate.getPartitionKey());
-            int partitionId = getNodeEngine().getPartitionService().getPartitionId(key);
-            Query query = Query.of()
-                    .mapName(getName())
-                    .predicate(partitionPredicate.getTarget())
-                    .iterationType(iterationType)
-                    .build();
-            result = queryEngine.execute(query, Target.of().partitionOwner(partitionId).build());
+            final PartitionPredicate partitionPredicate = (PartitionPredicate) predicate;
+            final Data key = toData(partitionPredicate.getPartitionKey());
+            final int partitionId = getNodeEngine().getPartitionService().getPartitionId(key);
+            p = partitionPredicate.getTarget();
+            t = Target.of().partitionOwner(partitionId).build();
+        } else if (predicate instanceof PartitionIteratingPredicate) {
+            final PartitionIteratingPredicate partitionPredicate = (PartitionIteratingPredicate) predicate;
+            p = predicate;
+            t = Target.of().partitionOwner(partitionPredicate.getPartitionId()).build();
         } else {
-            Query query = Query.of()
-                    .mapName(getName())
-                    .predicate(predicate)
-                    .iterationType(iterationType)
-                    .build();
-            result = queryEngine.execute(query, Target.ALL_NODES);
+            p = predicate;
+            t = Target.ALL_NODES;
         }
+        final QueryResult result = queryEngine.execute(Query.of()
+                                                            .mapName(getName())
+                                                            .predicate(p)
+                                                            .iterationType(iterationType)
+                                                            .build(), t);
         return QueryResultUtils.transformToSet(serializationService, result, predicate, iterationType, uniqueResult);
     }
 
@@ -692,10 +695,10 @@ public class MapProxyImpl<K, V> extends MapProxySupport implements IMap<K, V> {
 
         MapQueryEngine queryEngine = getMapQueryEngine();
         Query query = Query.of()
-                .mapName(getName())
-                .predicate(predicate)
-                .iterationType(IterationType.KEY)
-                .build();
+                           .mapName(getName())
+                           .predicate(predicate)
+                           .iterationType(IterationType.KEY)
+                           .build();
         QueryResult result = queryEngine.execute(query, Target.LOCAL_NODE);
         return QueryResultUtils.transformToSet(serializationService, result, predicate, IterationType.KEY, false);
     }
@@ -774,11 +777,11 @@ public class MapProxyImpl<K, V> extends MapProxySupport implements IMap<K, V> {
         aggregator = serializationService.toObject(serializationService.toData(aggregator));
 
         Query query = Query.of()
-                .mapName(getName())
-                .predicate(TruePredicate.INSTANCE)
-                .iterationType(IterationType.ENTRY)
-                .aggregator(aggregator)
-                .build();
+                           .mapName(getName())
+                           .predicate(TruePredicate.INSTANCE)
+                           .iterationType(IterationType.ENTRY)
+                           .aggregator(aggregator)
+                           .build();
         AggregationResult result = queryEngine.execute(query, Target.ALL_NODES);
         return result.<R>getAggregator().aggregate();
     }
@@ -795,11 +798,11 @@ public class MapProxyImpl<K, V> extends MapProxySupport implements IMap<K, V> {
         }
 
         Query query = Query.of()
-                .mapName(getName())
-                .predicate(predicate)
-                .iterationType(IterationType.ENTRY)
-                .aggregator(aggregator)
-                .build();
+                           .mapName(getName())
+                           .predicate(predicate)
+                           .iterationType(IterationType.ENTRY)
+                           .aggregator(aggregator)
+                           .build();
         AggregationResult result = queryEngine.execute(query, Target.ALL_NODES);
         return result.<R>getAggregator().aggregate();
     }
@@ -812,11 +815,11 @@ public class MapProxyImpl<K, V> extends MapProxySupport implements IMap<K, V> {
         projection = serializationService.toObject(serializationService.toData(projection));
 
         Query query = Query.of()
-                .mapName(getName())
-                .predicate(TruePredicate.INSTANCE)
-                .iterationType(IterationType.VALUE)
-                .projection(projection)
-                .build();
+                           .mapName(getName())
+                           .predicate(TruePredicate.INSTANCE)
+                           .iterationType(IterationType.VALUE)
+                           .projection(projection)
+                           .build();
         QueryResult result = queryEngine.execute(query, Target.ALL_NODES);
         return QueryResultUtils.transformToSet(serializationService, result, TruePredicate.INSTANCE,
                 IterationType.VALUE, false);
@@ -831,11 +834,11 @@ public class MapProxyImpl<K, V> extends MapProxySupport implements IMap<K, V> {
         MapQueryEngine queryEngine = getMapQueryEngine();
 
         Query query = Query.of()
-                .mapName(getName())
-                .predicate(predicate)
-                .iterationType(IterationType.VALUE)
-                .projection(projection)
-                .build();
+                           .mapName(getName())
+                           .predicate(predicate)
+                           .iterationType(IterationType.VALUE)
+                           .projection(projection)
+                           .build();
         queryEngine.execute(query, Target.ALL_NODES);
         QueryResult result = queryEngine.execute(query, Target.ALL_NODES);
         return QueryResultUtils.transformToSet(serializationService, result, predicate,

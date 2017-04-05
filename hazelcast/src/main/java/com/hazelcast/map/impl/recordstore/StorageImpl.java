@@ -173,4 +173,14 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
         return new MapEntriesWithCursor(entriesData, newTableIndex);
     }
 
+    @Override
+    public int fetchValues(int tableIndex, int size, Collection<R> bucket) {
+        final List<Map.Entry<Data, R>> entries = new ArrayList<Map.Entry<Data, R>>(size);
+        final int newTableIndex = records.fetchEntries(tableIndex, size, entries);
+        for (Map.Entry<Data, R> entry : entries) {
+            bucket.add(entry.getValue());
+        }
+        return newTableIndex;
+    }
+
 }

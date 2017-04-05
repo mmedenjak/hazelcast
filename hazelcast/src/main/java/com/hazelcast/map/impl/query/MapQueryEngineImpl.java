@@ -21,6 +21,7 @@ import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.map.QueryResultSizeExceededException;
 import com.hazelcast.map.impl.MapServiceContext;
+import com.hazelcast.query.PartitionIteratingPredicate;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.Predicate;
 import com.hazelcast.query.TruePredicate;
@@ -98,6 +99,8 @@ public class MapQueryEngineImpl implements MapQueryEngine {
         Query adjustedQuery = Query.of(query).iterationType(retrievalIterationType).build();
         if (adjustedQuery.getPredicate() instanceof PagingPredicate) {
             ((PagingPredicate) adjustedQuery.getPredicate()).setIterationType(query.getIterationType());
+        } else if (adjustedQuery.getPredicate() instanceof PartitionIteratingPredicate) {
+            ((PartitionIteratingPredicate) adjustedQuery.getPredicate()).setIterationType(query.getIterationType());
         } else {
             if (adjustedQuery.getPredicate() == TruePredicate.INSTANCE) {
                 queryResultSizeLimiter.precheckMaxResultLimitOnLocalPartitions(adjustedQuery.getMapName());
