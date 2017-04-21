@@ -30,10 +30,10 @@
 
     <modules>
         <module>hazelcast</module>
-        <module>hazelcast-client</module>
-        <module>hazelcast-spring</module>
-        <module>hazelcast-build-utils</module>
-        <module>hazelcast-all</module>
+        <!--<module>hazelcast-client</module>-->
+        <!--<module>hazelcast-spring</module>-->
+        <!--<module>hazelcast-build-utils</module>-->
+        <!--<module>hazelcast-all</module>-->
     </modules>
 
     <properties>
@@ -262,10 +262,11 @@
                         <exclude>**/jsr/**.java</exclude>
                         <exclude>**/client/**Request.*</exclude>
                     </excludes>
-                    <groups>com.hazelcast.test.annotation.QuickTest</groups>
+                    <groups>com.hazelcast.test.annotation.LateJoinTest</groups>
                     <excludedGroups>
                         com.hazelcast.test.annotation.SlowTest,
-                        com.hazelcast.test.annotation.NightlyTest
+                        com.hazelcast.test.annotation.NightlyTest,
+                        com.hazelcast.test.annotation.QuickTest
                     </excludedGroups>
                 </configuration>
                 <dependencies>

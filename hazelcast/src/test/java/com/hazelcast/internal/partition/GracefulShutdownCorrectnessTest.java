@@ -17,8 +17,10 @@
 package com.hazelcast.internal.partition;
 
 import com.hazelcast.test.HazelcastParametersRunnerFactory;
+import com.hazelcast.test.annotation.LateJoinTest;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
+import com.hazelcast.test.annotation.Repeat;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,7 +30,8 @@ import java.util.Collection;
 
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(HazelcastParametersRunnerFactory.class)
-@Category({QuickTest.class, ParallelTest.class})
+@Category(LateJoinTest.class)
+@Repeat(value = 50)
 public class GracefulShutdownCorrectnessTest extends AbstractGracefulShutdownCorrectnessTest {
 
     @Parameterized.Parameters(name = "backups:{0},nodes:{1},shutdown:{2}")
