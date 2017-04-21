@@ -176,19 +176,12 @@ public abstract class AbstractJoiner implements Joiner {
     }
 
     private void ensureConnectionToAllMembers() {
-        boolean allConnected = false;
+        boolean allConnected;
         if (clusterService.isJoined()) {
             logger.fine("Waiting for all connections");
             int connectAllWaitSeconds = node.getProperties().getSeconds(GroupProperty.CONNECT_ALL_WAIT_SECONDS);
             int checkCount = 0;
-            while (checkCount++ < connectAllWaitSeconds && !allConnected) {
-                try {
-                    //noinspection BusyWait
-                    TimeUnit.SECONDS.sleep(1);
-                } catch (InterruptedException ignored) {
-                    EmptyStatement.ignore(ignored);
-                }
-
+            do {
                 allConnected = true;
                 Collection<Member> members = clusterService.getMembers();
                 for (Member member : members) {
@@ -199,7 +192,15 @@ public abstract class AbstractJoiner implements Joiner {
                         }
                     }
                 }
-            }
+                if (!allConnected) {
+                    try {
+                        //noinspection BusyWait
+                        TimeUnit.SECONDS.sleep(1);
+                    } catch (InterruptedException ignored) {
+                        EmptyStatement.ignore(ignored);
+                    }
+                }
+            } while (checkCount++ < connectAllWaitSeconds && !allConnected);
         }
     }
 
