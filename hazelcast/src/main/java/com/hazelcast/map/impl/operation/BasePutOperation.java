@@ -65,8 +65,8 @@ public abstract class BasePutOperation extends LockAwareOperation implements Bac
         if (record == null) {
             return;
         }
-        final Data valueConvertedData = mapServiceContext.toData(value);
-        final EntryView entryView = EntryViews.createSimpleEntryView(dataKey, valueConvertedData, record);
+        //final Data valueConvertedData = mapServiceContext.toData(value);
+        final EntryView entryView = EntryViews.createSimpleEntryView(dataKey, null, record);
         mapEventPublisher.publishWanReplicationUpdate(name, entryView);
     }
 
