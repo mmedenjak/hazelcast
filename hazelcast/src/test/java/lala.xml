@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hazelcast
+        xsi:schemaLocation="http://www.hazelcast.com/schema/config http://www.hazelcast.com/schema/config/hazelcast-config-3.8.xsd"
+        xmlns="http://www.hazelcast.com/schema/config"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+    <!--
+       14.4. JMX Monitoring
+       Add the following system properties to enable JMX agent.
+       -Dcom.sun.management.jmxremote
+       -Dcom.sun.management.jmxremote.port=portNo (to specify jmx port) (optional)
+       -Dcom.sun.management.jmxremote.authenticate=false (to disable jmx auth) (optional)
+       Enable the Hazelcast property hazelcast.jmx using Hazelcast configuration (API, XML, Spring) or by setting the system property -Dhazelcast.jmx=true.
+    -->
+
+    <license-key>ENTERPRISE#90Nodes#7a5UjSVHlNKAOyFE1wm6Jkr0fIbTu1010113600909091110100901000008</license-key>
+
+    <properties>
+        <property name="hazelcast.performance.monitoring.enabled">true</property>
+        <property name="hazelcast.performance.monitoring.delay.seconds">300</property>
+        <property name="hazelcast.diagnostics.enabled">true</property>
+        <property name="hazelcast.diagnostics.delay.seconds">300</property>
+        <property name="hazelcast.diagnostics.metric.level">info</property>
+        <property name="hazelcast.diagnostics.invocation.sample.period.seconds">30</property>
+        <property name="hazelcast.diagnostics.pending.invocations.period.seconds">30</property>
+        <property name="hazelcast.diagnostics.slowoperations.period.seconds">30</property>
+        <property name="hazelcast.logging.type">slf4j</property>
+        <property name="hazelcast.operation.call.timeout.millis">1000</property>
+        <property name="hazelcast.icmp.enabled">false</property>
+    </properties>
+
+    <!-- Management center for Enterprise -->
+    <management-center enabled="true">http://ngphzmgt-cmc-01.sys.comcast.net:8090/ngphazelcast</management-center>
+    <!-- Name and password of the Hazelcast cluster for this datacenter -->
+    <group>
+        <name>NGP-ch2</name>
+        <password>sendTheBits</password>
+    </group>
+
+    <network>
+        <reuse-address>true</reuse-address>
+
+        <!-- Only try to bind to port 5701 -->
+        <port auto-increment="false" port-count="1">5701</port>
+
+        <!-- Only allow 100 ports to be used for outbount traffic -->
+        <outbound-ports>
+            <ports>33000-33100</ports>
+        </outbound-ports>
+
+        <join>
+            <multicast enabled="false"/>
+            <tcp-ip enabled="true">
+                <member>ngphz-ch2-01.sys.comcast.net</member>
+                <member>ngphz-ch2-02.sys.comcast.net</member>
+                <member>ngphz-ch2-03.sys.comcast.net</member>
+                <member>ngphz-ch2-04.sys.comcast.net</member>
+                <member>ngphz-ch2-05.sys.comcast.net</member>
+            </tcp-ip>
+        </join>
+    </network>
+
+    <!-- WAN REPLICATION START -->
+    <wan-replication name="ngp-wan-replication">
+        <wan-publisher group-name="NGP-cmc">
+            <class-name>com.hazelcast.enterprise.wan.replication.WanBatchReplication</class-name>
+            <queue-full-behavior>DISCARD_AFTER_MUTATION</queue-full-behavior>
+            <queue-capacity>100000</queue-capacity>
+            <properties>
+                <property name="batch.size">5000</property>
+                <property name="batch.max.delay.millis">200</property>
+                <property name="snapshot.enabled">true</property>
+                <property name="response.timeout.millis">60000</property>
+                <property name="ack.type">ACK_ON_OPERATION_COMPLETE</property>
+                <property name="endpoints">ngphz-cmc-01.sys.comcast.net:5701, ngphz-cmc-02.sys.comcast.net:5701, ngphz-cmc-03.sys.comcast.net:5701, ngphz-cmc-04.sys.comcast.net:5701, ngphz-cmc-05.sys.comcast.net:5701</property>
+                <property name="group.password">sendTheBits</property>
+            </properties>
+        </wan-publisher>
+
+        <wan-publisher group-name="NGP-as">
+            <class-name>com.hazelcast.enterprise.wan.replication.WanBatchReplication</class-name>
+            <queue-full-behavior>DISCARD_AFTER_MUTATION</queue-full-behavior>
+            <queue-capacity>100000</queue-capacity>
+            <properties>
+                <property name="batch.size">5000</property>
+                <property name="batch.max.delay.millis">200</property>
+                <property name="snapshot.enabled">true</property>
+                <property name="response.timeout.millis">60000</property>
+                <property name="ack.type">ACK_ON_OPERATION_COMPLETE</property>
+                <property name="endpoints">ngphz-as-01.sys.comcast.net:5701, ngphz-as-02.sys.comcast.net:5701, ngphz-as-03.sys.comcast.net:5701, ngphz-as-04.sys.comcast.net:5701, ngphz-as-05.sys.comcast.net:5701</property>
+                <property name="group.password">sendTheBits</property>
+            </properties>
+        </wan-publisher>
+
+        <wan-publisher group-name="NGP-po">
+            <class-name>com.hazelcast.enterprise.wan.replication.WanBatchReplication</class-name>
+            <queue-full-behavior>DISCARD_AFTER_MUTATION</queue-full-behavior>
+            <queue-capacity>100000</queue-capacity>
+            <properties>
+                <property name="batch.size">5000</property>
+                <property name="batch.max.delay.millis">200</property>
+                <property name="snapshot.enabled">true</property>
+                <property name="response.timeout.millis">60000</property>
+                <property name="ack.type">ACK_ON_OPERATION_COMPLETE</property>
+                <property name="endpoints">ngphz-po-01.sys.comcast.net:5701, ngphz-po-02.sys.comcast.net:5701, ngphz-po-03.sys.comcast.net:5701, ngphz-po-04.sys.comcast.net:5701, ngphz-po-05.sys.comcast.net:5701</property>
+                <property name="group.password">sendTheBits</property>
+            </properties>
+        </wan-publisher>
+    </wan-replication>
+    <!-- WAN REPLICATION END -->
+
+    <map name="availability">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>0</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <read-backup-data>true</read-backup-data>
+        <!-- NOTE - Total Number should be 8 Million across the cluster. This value ***needs*** to be set according to how
+        many nodes there are in the cluster. -->
+        <max-size policy="PER_NODE">1600000</max-size>
+        <eviction-policy>LRU</eviction-policy>
+        <!--  When the maximum size is reached, the specified percentage of the map will be evicted.
+        The default value is 25 percent. If the value is set to a value that is too small, then only that small
+        amount of map entries are evicted, which can lead to a lot of overhead if map entries are frequently inserted.-->
+        <eviction-percentage>25</eviction-percentage>
+        <!-- Maximum number of seconds for each entry to stay in the map. Entries that are older than time-to-live-seconds
+        and are not updated for this duration will get automatically evicted from the map. -->
+        <!-- 4 Hour for ARS -->
+        <time-to-live-seconds>14400</time-to-live-seconds>
+        <max-idle-seconds>8100</max-idle-seconds>
+        <wan-replication-ref name="ngp-wan-replication">
+            <merge-policy>com.hazelcast.map.merge.PassThroughMergePolicy</merge-policy>
+            <republishing-enabled>false</republishing-enabled>
+        </wan-replication-ref>
+    </map>
+
+    <map name="vodEntitlements">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>0</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <max-size policy="PER_NODE">800000</max-size>
+        <eviction-policy>LRU</eviction-policy>
+        <time-to-live-seconds>4500</time-to-live-seconds>
+        <wan-replication-ref name="ngp-wan-replication">
+            <merge-policy>com.hazelcast.map.merge.PassThroughMergePolicy</merge-policy>
+            <republishing-enabled>false</republishing-enabled>
+        </wan-replication-ref>
+    </map>
+
+    <map name="linearEntitlements">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>0</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <!-- NOTE - Total Number should be 2 Million across the cluster. This value ***needs*** to be set according to how
+        many nodes there are in the cluster. -->
+        <max-size policy="PER_NODE">400000</max-size>
+        <eviction-policy>LRU</eviction-policy>
+        <!-- 60 seconds for UES Linear Entitlements - this is different because currently UES isn't adding temp source Ids-->
+        <time-to-live-seconds>60</time-to-live-seconds>
+        <!-- WAN REPLICATION START -->
+        <wan-replication-ref name="ngp-wan-replication">
+            <merge-policy>com.hazelcast.map.merge.PassThroughMergePolicy</merge-policy>
+            <republishing-enabled>false</republishing-enabled>
+        </wan-replication-ref>
+        <!-- WAN REPLICATION END -->
+    </map>
+
+    <map name="lockerRights">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>0</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <max-size policy="PER_NODE">1600000</max-size>
+        <eviction-policy>LRU</eviction-policy>
+        <time-to-live-seconds>21600</time-to-live-seconds>
+        <wan-replication-ref name="ngp-wan-replication">
+            <merge-policy>com.hazelcast.map.merge.PassThroughMergePolicy</merge-policy>
+            <republishing-enabled>false</republishing-enabled>
+        </wan-replication-ref>
+    </map>
+
+    <map name="partner">
+        <in-memory-format>BINARY</in-memory-format>
+        <backup-count>0</backup-count>
+        <async-backup-count>0</async-backup-count>
+        <!-- NOTE - Total Number should be 8 Million across the cluster. This value ***needs*** to be set according to how
+        many nodes there are in the cluster. -->
+        <max-size policy="PER_NODE">1600000</max-size>
+        <eviction-policy>LRU</eviction-policy>
+        <!-- 1 Hour for Partner -->
+        <time-to-live-seconds>3600</time-to-live-seconds>
+    </map>
+</hazelcast>
