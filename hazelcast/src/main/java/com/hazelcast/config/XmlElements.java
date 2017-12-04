@@ -58,6 +58,7 @@ enum XmlElements {
     USER_CODE_DEPLOYMENT("user-code-deployment", false),
     CARDINALITY_ESTIMATOR("cardinality-estimator", false),
     RELIABLE_ID_GENERATOR("reliable-id-generator", true),
+    CRDT_REPLICATION("crdt-replication", false),
     ;
 
     final String name;

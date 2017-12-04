@@ -19,6 +19,7 @@ package com.hazelcast.spring;
 import com.hazelcast.config.AtomicLongConfig;
 import com.hazelcast.config.AtomicReferenceConfig;
 import com.hazelcast.config.AwsConfig;
+import com.hazelcast.config.CRDTReplicationConfig;
 import com.hazelcast.config.CacheDeserializedValues;
 import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.Config;
@@ -104,6 +105,7 @@ import com.hazelcast.core.QueueStoreFactory;
 import com.hazelcast.core.ReplicatedMap;
 import com.hazelcast.core.RingbufferStore;
 import com.hazelcast.core.RingbufferStoreFactory;
+import com.hazelcast.crdt.pncounter.PNCounter;
 import com.hazelcast.memory.MemoryUnit;
 import com.hazelcast.nio.SocketInterceptor;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
@@ -241,6 +243,9 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
 
     @Resource
     private StreamSerializer dummySerializer;
+
+    @Resource(name = "pnCounter")
+    private PNCounter pnCounter;
 
     @BeforeClass
     @AfterClass
@@ -779,6 +784,7 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         assertNotNull(countDownLatch);
         assertNotNull(semaphore);
         assertNotNull(lock);
+        assertNotNull(pnCounter);
         assertEquals("map1", map1.getName());
         assertEquals("map2", map2.getName());
         assertEquals("testMultimap", multiMap.getName());
@@ -864,6 +870,13 @@ public class TestFullApplicationContext extends HazelcastTestSupport {
         for (MemberGroupConfig mgc : pgc.getMemberGroupConfigs()) {
             assertEquals(2, mgc.getInterfaces().size());
         }
+    }
+
+    @Test
+    public void testCRDTReplicationConfig() {
+        CRDTReplicationConfig replicationConfig = config.getCRDTReplicationConfig();
+        assertEquals(10, replicationConfig.getMaxConcurrentReplicationTargets());
+        assertEquals(2000, replicationConfig.getReplicationPeriodMillis());
     }
 
     @Test

@@ -19,6 +19,7 @@ package com.hazelcast.spring;
 import com.hazelcast.config.AtomicLongConfig;
 import com.hazelcast.config.AtomicReferenceConfig;
 import com.hazelcast.config.AwsConfig;
+import com.hazelcast.config.CRDTReplicationConfig;
 import com.hazelcast.config.CachePartitionLostListenerConfig;
 import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.CacheSimpleConfig.ExpiryPolicyFactoryConfig;
@@ -311,6 +312,8 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
                         handleHotRestartPersistence(node);
                     } else if ("reliable-id-generator".equals(nodeName)) {
                         handleReliableIdGenerator(node);
+                    } else if ("crdt-replication".equals(nodeName)) {
+                        handleCRDTReplication(node);
                     }
                 }
             }
@@ -337,6 +340,12 @@ public class HazelcastConfigBeanDefinitionParser extends AbstractHazelcastBeanDe
             fillAttributeValues(node, configBuilder);
             String name = getAttribute(node, "name");
             reliableIdGeneratorConfigMap.put(name, configBuilder.getBeanDefinition());
+        }
+
+        private void handleCRDTReplication(Node node) {
+            final BeanDefinitionBuilder crdtReplicationConfigBuilder = createBeanBuilder(CRDTReplicationConfig.class);
+            fillAttributeValues(node, crdtReplicationConfigBuilder);
+            configBuilder.addPropertyValue("CRDTReplicationConfig", crdtReplicationConfigBuilder.getBeanDefinition());
         }
 
         private void handleQuorum(Node node) {

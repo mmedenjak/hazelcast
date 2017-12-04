@@ -149,6 +149,8 @@ public class Config {
 
     private UserCodeDeploymentConfig userCodeDeploymentConfig = new UserCodeDeploymentConfig();
 
+    private CRDTReplicationConfig crdtReplicationConfig = new CRDTReplicationConfig();
+
     private String licenseKey;
 
     private boolean liteMember;
@@ -3202,6 +3204,24 @@ public class Config {
         return this;
     }
 
+    public CRDTReplicationConfig getCRDTReplicationConfig() {
+        return crdtReplicationConfig;
+    }
+
+    /**
+     * Sets the replication configuration for {@link com.hazelcast.crdt.CRDT}
+     * implementations.
+     *
+     * @param crdtReplicationConfig the replication configuration
+     * @return this config instance
+     * @throws NullPointerException if the {@code crdtReplicationConfig} parameter is {@code null}
+     */
+    public Config setCRDTReplicationConfig(CRDTReplicationConfig crdtReplicationConfig) {
+        checkNotNull(crdtReplicationConfig, "The CRDT replication config cannot be null!");
+        this.crdtReplicationConfig = crdtReplicationConfig;
+        return this;
+    }
+
     /**
      * Returns the external managed context. This context is used to
      * initialize user supplied objects.
@@ -3414,6 +3434,7 @@ public class Config {
                 + ", managementCenterConfig=" + managementCenterConfig
                 + ", securityConfig=" + securityConfig
                 + ", liteMember=" + liteMember
+                + ", crdtReplicationConfig=" + crdtReplicationConfig
                 + '}';
     }
 }

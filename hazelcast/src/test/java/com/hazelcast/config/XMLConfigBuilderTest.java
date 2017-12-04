@@ -1728,6 +1728,20 @@ public class XMLConfigBuilderTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void testCRDTReplicationConfig() {
+        final String xml = HAZELCAST_START_TAG
+                + "<crdt-replication>\n" +
+                "        <max-concurrent-replication-targets>10</max-concurrent-replication-targets>\n" +
+                "        <replication-period-millis>2000</replication-period-millis>\n" +
+                "    </crdt-replication>"
+                + HAZELCAST_END_TAG;
+        final Config config = new InMemoryXmlConfig(xml);
+        final CRDTReplicationConfig replicationConfig = config.getCRDTReplicationConfig();
+        assertEquals(10, replicationConfig.getMaxConcurrentReplicationTargets());
+        assertEquals(2000, replicationConfig.getReplicationPeriodMillis());
+    }
+
+    @Test
     public void testGlobalSerializer() {
         String name = randomName();
         String val = "true";

@@ -286,4 +286,25 @@
 
     <lite-member enabled="false"/>
 
+    <crdt-replication>
+        <!--
+           The period between two replications of CRDT states in milliseconds.
+           A lower value will increase the speed at which changes are disseminated
+           to other cluster members at the expense of burst-like behaviour - less
+           updates will be batched together in one replication message and one
+           update to a CRDT may cause a sudden burst of replication messages in a
+           short time interval.
+           The value must be a positive non-null integer.
+        -->
+        <replication-period-millis>1000</replication-period-millis>
+        <!--
+           The maximum number of target members that we replicate the CRDT states
+           to in one period. A higher count will lead to states being disseminated
+           more rapidly at the expense of burst-like behaviour - one update to a
+           CRDT will lead to a sudden burst in the number of replication messages
+           in a short time interval.
+        -->
+        <max-concurrent-replication-targets>1</max-concurrent-replication-targets>
+    </crdt-replication>
+
 </hazelcast>

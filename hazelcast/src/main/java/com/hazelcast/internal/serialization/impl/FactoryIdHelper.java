@@ -143,6 +143,9 @@ public final class FactoryIdHelper {
     public static final String RELIABLE_ID_GENERATOR_DS_FACTORY = "hazelcast.serialization.ds.reliable_id_generator";
     public static final int RELIABLE_ID_GENERATOR_DS_FACTORY_ID = -46;
 
+    public static final String PN_COUNTER_DS_FACTORY = "hazelcast.serialization.ds.pn_counter";
+    public static final int PN_COUNTER_DS_FACTORY_ID = -47;
+
     // =========================== portables =============================================
 
     public static final String SPI_PORTABLE_FACTORY = "hazelcast.serialization.portable.spi";

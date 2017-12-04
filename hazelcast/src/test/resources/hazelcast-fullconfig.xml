@@ -711,4 +711,9 @@
         <quorum-size>3</quorum-size>
         <quorum-type>READ_WRITE</quorum-type>
     </quorum>
+
+    <crdt-replication>
+        <replication-period-millis>1000</replication-period-millis>
+        <max-concurrent-replication-targets>1</max-concurrent-replication-targets>
+    </crdt-replication>
 </hazelcast>

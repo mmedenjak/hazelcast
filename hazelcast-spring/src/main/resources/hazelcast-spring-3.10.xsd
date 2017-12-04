@@ -1460,6 +1460,7 @@
                         </xs:element>
                         <xs:element name="hot-restart-persistence" type="hot-restart-persistence" minOccurs="0" maxOccurs="1"/>
                         <xs:element name="reliable-id-generator" type="reliable-id-generator" minOccurs="0" maxOccurs="1"/>
+                        <xs:element name="crdt-replication" type="crdt-replication" minOccurs="0" maxOccurs="1"/>
                     </xs:sequence>
                 </xs:extension>
             </xs:complexContent>
@@ -1816,6 +1817,18 @@
             <xs:appinfo>
                 <tool:annotation>
                     <tool:exports type="com.hazelcast.core.ILock"/>
+                </tool:annotation>
+            </xs:appinfo>
+        </xs:annotation>
+    </xs:element>
+    <xs:element name="PNCounter" type="hazelcast-type">
+        <xs:annotation>
+            <xs:documentation>
+                Retrieve a Hazelcast PNCounter instance
+            </xs:documentation>
+            <xs:appinfo>
+                <tool:annotation>
+                    <tool:exports type="com.hazelcast.crdt.pncounter.PNCounter"/>
                 </tool:annotation>
             </xs:appinfo>
         </xs:annotation>
@@ -3146,6 +3159,33 @@
         <xs:union memberTypes="wan-queue-full-behavior-format-enum non-space-string"/>
     </xs:simpleType>
 
+    <xs:complexType name="crdt-replication">
+        <xs:attribute name="replication-period-millis" type="parameterized-unsigned-int">
+            <xs:annotation>
+                <xs:documentation>
+                    The period between two replications of CRDT states in milliseconds.
+                    A lower value will increase the speed at which changes are disseminated
+                    to other cluster members at the expense of burst-like behaviour - less
+                    updates will be batched together in one replication message and one
+                    update to a CRDT may cause a sudden burst of replication messages in a
+                    short time interval.
+                    The value must be a positive non-null integer.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="max-concurrent-replication-targets" type="parameterized-unsigned-int">
+            <xs:annotation>
+                <xs:documentation>
+                    The maximum number of target members that we replicate the CRDT states
+                    to in one period. A higher count will lead to states being disseminated
+                    more rapidly at the expense of burst-like behaviour - one update to a
+                    CRDT will lead to a sudden burst in the number of replication messages
+                    in a short time interval.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+
     <xs:complexType name="hot-restart-persistence">
         <xs:sequence>
             <xs:element name="base-dir" type="xs:string" minOccurs="0" maxOccurs="1" default="hot-restart">
@@ -3212,6 +3252,7 @@
             </xs:simpleType>
         </xs:attribute>
     </xs:complexType>
+
     <xs:complexType name="hot-restart">
         <xs:attribute name="fsync" type="parameterized-boolean" default="false">
             <xs:annotation>

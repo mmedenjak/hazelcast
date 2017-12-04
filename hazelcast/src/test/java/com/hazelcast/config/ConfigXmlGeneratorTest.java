@@ -261,6 +261,20 @@ public class ConfigXmlGeneratorTest {
     }
 
     @Test
+    public void testCRDTReplication() {
+        final CRDTReplicationConfig replicationConfig = new CRDTReplicationConfig()
+                .setMaxConcurrentReplicationTargets(10)
+                .setReplicationPeriodMillis(2000);
+        final Config config = new Config().setCRDTReplicationConfig(replicationConfig);
+        final Config xmlConfig = getNewConfigViaXMLGenerator(config);
+        final CRDTReplicationConfig xmlReplicationConfig = xmlConfig.getCRDTReplicationConfig();
+
+        assertNotNull(xmlReplicationConfig);
+        assertEquals(10, xmlReplicationConfig.getMaxConcurrentReplicationTargets());
+        assertEquals(2000, xmlReplicationConfig.getReplicationPeriodMillis());
+    }
+
+    @Test
     public void testMapAttributesConfig() {
         MapAttributeConfig attrConfig = new MapAttributeConfig()
                 .setName("power")

@@ -18,6 +18,7 @@ package com.hazelcast.internal.dynamicconfig;
 
 import com.hazelcast.config.AtomicLongConfig;
 import com.hazelcast.config.AtomicReferenceConfig;
+import com.hazelcast.config.CRDTReplicationConfig;
 import com.hazelcast.config.CacheSimpleConfig;
 import com.hazelcast.config.CardinalityEstimatorConfig;
 import com.hazelcast.config.Config;
@@ -1287,6 +1288,16 @@ public class DynamicConfigurationAwareConfig extends Config {
 
     @Override
     public Config setHotRestartPersistenceConfig(HotRestartPersistenceConfig hrConfig) {
+        throw new UnsupportedOperationException("Unsupported operation");
+    }
+
+    @Override
+    public CRDTReplicationConfig getCRDTReplicationConfig() {
+        return staticConfig.getCRDTReplicationConfig();
+    }
+
+    @Override
+    public Config setCRDTReplicationConfig(CRDTReplicationConfig crdtReplicationConfig) {
         throw new UnsupportedOperationException("Unsupported operation");
     }
 

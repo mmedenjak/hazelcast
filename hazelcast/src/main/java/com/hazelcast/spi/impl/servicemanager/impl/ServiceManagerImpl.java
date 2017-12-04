@@ -34,6 +34,8 @@ import com.hazelcast.concurrent.semaphore.SemaphoreService;
 import com.hazelcast.config.ServiceConfig;
 import com.hazelcast.config.ServicesConfig;
 import com.hazelcast.core.HazelcastException;
+import com.hazelcast.crdt.CRDTReplicationService;
+import com.hazelcast.crdt.pncounter.PNCounterService;
 import com.hazelcast.durableexecutor.impl.DistributedDurableExecutorService;
 import com.hazelcast.executor.impl.DistributedExecutorService;
 import com.hazelcast.instance.Node;
@@ -163,6 +165,8 @@ public final class ServiceManagerImpl implements ServiceManager {
         registerService(RingbufferService.SERVICE_NAME, new RingbufferService(nodeEngine));
         registerService(XAService.SERVICE_NAME, new XAService(nodeEngine));
         registerService(CardinalityEstimatorService.SERVICE_NAME, new CardinalityEstimatorService());
+        registerService(PNCounterService.SERVICE_NAME, new PNCounterService());
+        registerService(CRDTReplicationService.SERVICE_NAME, new CRDTReplicationService());
         registerService(DistributedScheduledExecutorService.SERVICE_NAME, new DistributedScheduledExecutorService());
         registerCacheServiceIfAvailable();
         readServiceDescriptors();

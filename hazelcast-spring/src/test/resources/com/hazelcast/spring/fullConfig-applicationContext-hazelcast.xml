@@ -568,6 +568,8 @@
             </hz:hot-restart-persistence>
 
             <hz:reliable-id-generator name="reliableIdGenerator*" prefetchCount="3" prefetchValidityMillis="10"/>
+
+            <hz:crdt-replication max-concurrent-replication-targets="10" replication-period-millis="2000" />
         </hz:config>
     </hz:hazelcast>
 
@@ -591,6 +593,7 @@
     <hz:countDownLatch id="countDownLatch" instance-ref="instance" name="countDownLatch"/>
     <hz:semaphore id="semaphore" instance-ref="instance" name="semaphore"/>
     <hz:lock id="lock" instance-ref="instance" name="lock"/>
+    <hz:PNCounter id="pnCounter" instance-ref="instance" name="pnCounter"/>
 
     <bean id="dummyMapStore" class="com.hazelcast.spring.DummyStore"/>
     <bean id="dummyMapStoreFactory" class="com.hazelcast.spring.DummyStoreFactory"/>

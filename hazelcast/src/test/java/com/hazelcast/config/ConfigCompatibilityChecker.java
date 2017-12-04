@@ -73,6 +73,7 @@ class ConfigCompatibilityChecker {
         checkCompatibleConfigs("services", c1.getServicesConfig(), c2.getServicesConfig(), new ServicesConfigChecker());
         checkCompatibleConfigs("management center", c1.getManagementCenterConfig(), c2.getManagementCenterConfig(), new ManagementCenterConfigChecker());
         checkCompatibleConfigs("hot restart", c1.getHotRestartPersistenceConfig(), c2.getHotRestartPersistenceConfig(), new HotRestartConfigChecker());
+        checkCompatibleConfigs("CRDT replication", c1.getCRDTReplicationConfig(), c2.getCRDTReplicationConfig(), new CRDTReplicationConfigChecker());
         checkCompatibleConfigs("network", c1.getNetworkConfig(), c2.getNetworkConfig(), new NetworkConfigChecker());
         checkCompatibleConfigs("map", c1, c2, c1.getMapConfigs(), c2.getMapConfigs(), new MapConfigChecker());
         checkCompatibleConfigs("ringbuffer", c1, c2, c1.getRingbufferConfigs(), c2.getRingbufferConfigs(), new RingbufferConfigChecker());
@@ -1005,6 +1006,16 @@ class ConfigCompatibilityChecker {
                     && nullSafeEqual(c1.getValidationTimeoutSeconds(), c2.getValidationTimeoutSeconds())
                     && nullSafeEqual(c1.getDataLoadTimeoutSeconds(), c2.getDataLoadTimeoutSeconds())
                     && nullSafeEqual(c1.getClusterDataRecoveryPolicy(), c2.getClusterDataRecoveryPolicy()));
+        }
+    }
+
+    private static class CRDTReplicationConfigChecker extends ConfigChecker<CRDTReplicationConfig> {
+        @Override
+        boolean check(CRDTReplicationConfig c1, CRDTReplicationConfig c2) {
+            return c1 == c2 ||
+                    (c1 != null && c2 != null
+                            && nullSafeEqual(c1.getMaxConcurrentReplicationTargets(), c2.getMaxConcurrentReplicationTargets())
+                            && nullSafeEqual(c1.getReplicationPeriodMillis(), c2.getReplicationPeriodMillis()));
         }
     }
 }

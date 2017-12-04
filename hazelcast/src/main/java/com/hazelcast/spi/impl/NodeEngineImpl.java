@@ -368,11 +368,7 @@ public class NodeEngineImpl implements NodeEngine {
         return node.getVersion();
     }
 
-    /**
-     * Returns a list of services matching provides service class/interface.
-     * <p>
-     * <b>Note:</b> CoreServices will be placed at the beginning of the list.
-     */
+    @Override
     public <S> Collection<S> getServices(Class<S> serviceClass) {
         return serviceManager.getServices(serviceClass);
     }

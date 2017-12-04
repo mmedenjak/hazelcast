@@ -131,6 +131,7 @@ public class ConfigXmlGenerator {
         servicesXmlGenerator(gen, config);
         hotRestartXmlGenerator(gen, config);
         reliableIdGeneratorXmlGenerator(gen, config);
+        crdtReplicationXmlGenerator(gen, config);
 
         xml.append("</hazelcast>");
 
@@ -1007,6 +1008,16 @@ public class ConfigXmlGenerator {
                .node("prefetch-validity-millis", m.getPrefetchValidityMillis());
             gen.close();
         }
+    }
+
+    private static void crdtReplicationXmlGenerator(XmlGenerator gen, Config config) {
+        CRDTReplicationConfig replicationConfig = config.getCRDTReplicationConfig();
+        gen.open("crdt-replication");
+        if (replicationConfig != null) {
+            gen.node("replication-period-millis", replicationConfig.getReplicationPeriodMillis())
+               .node("max-concurrent-replication-targets", replicationConfig.getMaxConcurrentReplicationTargets());
+        }
+        gen.close();
     }
 
     private static void nativeMemoryXmlGenerator(XmlGenerator gen, Config config) {

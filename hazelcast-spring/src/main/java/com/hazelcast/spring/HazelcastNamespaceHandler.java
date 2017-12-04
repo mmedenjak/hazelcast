@@ -47,6 +47,7 @@ public class HazelcastNamespaceHandler extends NamespaceHandlerSupport {
                 "countDownLatch",
                 "semaphore",
                 "lock",
+                "PNCounter",
         };
         for (String type : types) {
             registerBeanDefinitionParser(type, new HazelcastTypeBeanDefinitionParser(type));
