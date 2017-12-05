@@ -30,7 +30,7 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
                                           @From(OperationsGenerator.class)
                                           @Size(min = 50, max = 100)
                                           @OperationTypes({AddAndGet.class, GetAndAdd.class, GetAndSubtract.class, SubtractAndGet.class})
-                                                  Operation<PNCounterImpl, MutableLong>[] operations) {
+                                                  Operation[] operations) {
         super.strongEventualConsistency(counterCount, operations);
     }
 

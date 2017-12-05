@@ -23,6 +23,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.util.MapUtil;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -76,6 +77,7 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
      * @param delta the value to add
      * @return the previous value
      */
+    @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
     public long getAndAdd(long delta) {
         writeLock.lock();
         try {
@@ -99,6 +101,7 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
      * @param delta the value to add
      * @return the updated value
      */
+    @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
     public long addAndGet(long delta) {
         writeLock.lock();
         try {
@@ -121,6 +124,7 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
      * @param delta the value to add
      * @return the previous value
      */
+    @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
     public long getAndSubtract(long delta) {
         writeLock.lock();
         try {
@@ -144,6 +148,7 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
      * @param delta the value to subtract
      * @return the updated value
      */
+    @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
     public long subtractAndGet(long delta) {
         writeLock.lock();
         try {
@@ -161,6 +166,7 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
     }
 
     @Override
+    @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
     public void merge(PNCounterImpl other) {
         writeLock.lock();
         try {

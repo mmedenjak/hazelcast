@@ -48,7 +48,6 @@ public class CRDTReplicationService implements ManagedService {
     /** The name of this service */
     public static final String SERVICE_NAME = "hz:impl:CRDTReplicationService";
     private ScheduledFuture<?> replicationTask;
-    private volatile Exception initializationException;
     private NodeEngine nodeEngine;
     private int maxTargets;
     private ILogger logger;
@@ -72,15 +71,6 @@ public class CRDTReplicationService implements ManagedService {
         this.replicationTask = nodeEngine.getExecutionService().scheduleWithRepetition(
                 CRDTReplicationTask.TASK_NAME, new CRDTReplicationTask(nodeEngine, maxTargets, this),
                 replicationPeriod, replicationPeriod, TimeUnit.MILLISECONDS);
-    }
-
-    /**
-     * Returns the exception that occurred on initialization of this service
-     * or {@code null} if the service has not yet been initialized or there
-     * was no exception.
-     */
-    public Exception getInitializationException() {
-        return initializationException;
     }
 
     @Override

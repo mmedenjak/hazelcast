@@ -16,10 +16,8 @@
 
 package com.hazelcast.crdt.pncounter;
 
-import com.hazelcast.config.ConfigurationException;
 import com.hazelcast.crdt.CRDTReplicationAwareService;
 import com.hazelcast.crdt.CRDTReplicationOperation;
-import com.hazelcast.crdt.CRDTReplicationService;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
@@ -79,12 +77,6 @@ public class PNCounterService implements ManagedService, RemoteService,
 
     @Override
     public PNCounterProxy createDistributedObject(String objectName) {
-        final CRDTReplicationService replicationService = nodeEngine.getService(CRDTReplicationService.SERVICE_NAME);
-        final Exception initException = replicationService.getInitializationException();
-        if (initException != null) {
-            throw new ConfigurationException("CRDT replication service isn't started because of a configuration exception",
-                    initException);
-        }
         return new PNCounterProxy(objectName, nodeEngine, this);
     }
 
