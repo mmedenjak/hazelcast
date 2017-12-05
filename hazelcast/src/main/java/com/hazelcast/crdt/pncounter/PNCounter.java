@@ -17,21 +17,32 @@
 package com.hazelcast.crdt.pncounter;
 
 import com.hazelcast.core.DistributedObject;
+import com.hazelcast.internal.cluster.ClusterService;
 
 /**
  * PN (Positive-Negative) CRDT counter.
  * <p>
  * The counter supports adding and subtracting values as well as
  * retrieving the current counter value.
- * <p>
  * Each replica of this counter can perform operations locally without
  * coordination with the other replicas, thus increasing availability.
- * <p>
  * The counter guarantees that whenever two nodes have received the
  * same set of updates, possibly in a different order, their state is
  * identical, and any conflicting updates are merged automatically.
  * If no new updates are made to the shared state, all nodes that can
  * communicate will eventually have the same data.
+ * <p>
+ * Each replica is identified by an integer. This identifier should be
+ * unique and there should not be any other replica with the same ID, even
+ * if the member with that ID is no longer alive. For this identifier, we
+ * use the {@link ClusterService#getMemberListJoinVersion()} which should
+ * be unique with some exceptions.
+ * <p>
+ * The updates to this counter are applied locally when invoked on a member.
+ * When invoking updates from a hazelcast client, the invocation is remote.
+ * This may lead to indeterminate state - the update may be applied but the
+ * response has not been received. In this case, the caller will be notified
+ * with a {@link com.hazelcast.spi.exception.TargetDisconnectedException}.
  *
  * @since 3.10
  */
