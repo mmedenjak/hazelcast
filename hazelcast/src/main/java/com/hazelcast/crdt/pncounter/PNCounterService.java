@@ -35,15 +35,13 @@ import static com.hazelcast.util.ConcurrencyUtil.getOrPutIfAbsent;
 /**
  * Service responsible for {@link PNCounter} proxies and replication operation.
  */
-public class PNCounterService implements ManagedService, RemoteService,
-        CRDTReplicationAwareService<PNCounterImpl> {
+public class PNCounterService implements ManagedService, RemoteService, CRDTReplicationAwareService<PNCounterImpl> {
     /** The name under which this service is registered */
     public static final String SERVICE_NAME = "hz:impl:PNCounterService";
 
     private NodeEngine nodeEngine;
     /** Map from counter name to counter implementations */
-    private final ConcurrentMap<String, PNCounterImpl> counters =
-            new ConcurrentHashMap<String, PNCounterImpl>();
+    private final ConcurrentMap<String, PNCounterImpl> counters = new ConcurrentHashMap<String, PNCounterImpl>();
     /** Constructor function for counter implementations */
     private final ConstructorFunction<String, PNCounterImpl> counterConstructorFn =
             new ConstructorFunction<String, PNCounterImpl>() {
