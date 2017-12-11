@@ -18,6 +18,7 @@ package com.hazelcast.core;
 
 import com.hazelcast.cardinality.CardinalityEstimator;
 import com.hazelcast.config.Config;
+import com.hazelcast.crdt.orset.ORSet;
 import com.hazelcast.crdt.pncounter.PNCounter;
 import com.hazelcast.durableexecutor.DurableExecutorService;
 import com.hazelcast.logging.LoggingService;
@@ -469,6 +470,19 @@ public interface HazelcastInstance {
      * @return a {@link com.hazelcast.crdt.pncounter.PNCounter}
      */
     PNCounter getPNCounter(String name);
+
+    /**
+     * Obtain a {@link ORSet} with the given name.
+     * <p>
+     * The OR set can be used as a set with strong eventual consistency
+     * guarantees - if operations to the set stop, the set contents
+     * of all replicas that can communicate with each other should eventually
+     * converge to the same state.
+     *
+     * @param name the name of the OR set
+     * @return a {@link ORSet}
+     */
+    <T> ORSet<T> getORSet(String name);
 
     /**
      * Returns the {@link IScheduledExecutorService} scheduled executor service for the given name.

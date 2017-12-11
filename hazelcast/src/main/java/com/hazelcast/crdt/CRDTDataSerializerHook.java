@@ -16,6 +16,8 @@
 
 package com.hazelcast.crdt;
 
+import com.hazelcast.crdt.orset.ORSetImpl;
+import com.hazelcast.crdt.orset.ORSetReplicationOperation;
 import com.hazelcast.crdt.pncounter.PNCounterImpl;
 import com.hazelcast.crdt.pncounter.PNCounterReplicationOperation;
 import com.hazelcast.crdt.pncounter.operations.AddOperation;
@@ -42,6 +44,10 @@ public final class CRDTDataSerializerHook implements DataSerializerHook {
     public static final int PN_COUNTER_ADD_OPERATION = 3;
     /** The constant for the PNCounter {@link com.hazelcast.crdt.pncounter.operations.GetOperation} */
     public static final int PN_COUNTER_GET_OPERATION = 4;
+    /** The (de)serialization constant for a ORSet replication operation */
+    public static final int OR_SET_REPLICATION = 5;
+    /** The (de)serialization constant for a ORSet implementation */
+    public static final int OR_SET = 6;
 
     @Override
     public int getFactoryId() {
@@ -62,6 +68,10 @@ public final class CRDTDataSerializerHook implements DataSerializerHook {
                         return new AddOperation();
                     case PN_COUNTER_GET_OPERATION:
                         return new GetOperation();
+                    case OR_SET_REPLICATION:
+                        return new ORSetReplicationOperation();
+                    case OR_SET:
+                        return new ORSetImpl<Object>();
                     default:
                         return null;
                 }

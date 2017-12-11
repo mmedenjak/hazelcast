@@ -24,6 +24,7 @@ import com.hazelcast.core.Cluster;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.DistributedObjectListener;
 import com.hazelcast.core.Endpoint;
+import com.hazelcast.crdt.orset.ORSet;
 import com.hazelcast.reliableidgen.ReliableIdGenerator;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IAtomicLong;
@@ -282,6 +283,11 @@ class HazelcastOSGiInstanceImpl
     @Override
     public PNCounter getPNCounter(String name) {
         return delegatedInstance.getPNCounter(name);
+    }
+
+    @Override
+    public <T> ORSet<T> getORSet(String name) {
+        return delegatedInstance.getORSet(name);
     }
 
     @Override

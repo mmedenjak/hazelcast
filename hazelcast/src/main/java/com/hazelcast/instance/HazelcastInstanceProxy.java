@@ -22,6 +22,7 @@ import com.hazelcast.core.ClientService;
 import com.hazelcast.core.Cluster;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.core.DistributedObjectListener;
+import com.hazelcast.crdt.orset.ORSet;
 import com.hazelcast.reliableidgen.ReliableIdGenerator;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
@@ -292,6 +293,11 @@ public final class HazelcastInstanceProxy implements HazelcastInstance, Serializ
     @Override
     public PNCounter getPNCounter(String name) {
         return getOriginal().getPNCounter(name);
+    }
+
+    @Override
+    public <T> ORSet<T> getORSet(String name) {
+        return getOriginal().getORSet(name);
     }
 
     @Override

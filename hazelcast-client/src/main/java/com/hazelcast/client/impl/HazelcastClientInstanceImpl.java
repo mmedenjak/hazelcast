@@ -67,6 +67,8 @@ import com.hazelcast.collection.impl.set.SetService;
 import com.hazelcast.concurrent.atomiclong.AtomicLongService;
 import com.hazelcast.concurrent.atomicreference.AtomicReferenceService;
 import com.hazelcast.concurrent.countdownlatch.CountDownLatchService;
+import com.hazelcast.crdt.orset.ORSet;
+import com.hazelcast.crdt.orset.ORSetService;
 import com.hazelcast.reliableidgen.impl.ReliableIdGeneratorService;
 import com.hazelcast.concurrent.idgen.IdGeneratorService;
 import com.hazelcast.concurrent.lock.LockServiceImpl;
@@ -614,6 +616,12 @@ public class HazelcastClientInstanceImpl implements HazelcastInstance, Serializa
     public PNCounter getPNCounter(String name) {
         checkNotNull(name, "Retrieving a PN counter instance with a null name is not allowed!");
         return getDistributedObject(PNCounterService.SERVICE_NAME, name);
+    }
+
+    @Override
+    public <T> ORSet<T> getORSet(String name) {
+        checkNotNull(name, "Retrieving a OR set instance with a null name is not allowed!");
+        return getDistributedObject(ORSetService.SERVICE_NAME, name);
     }
 
     @Override
