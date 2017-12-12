@@ -33,10 +33,10 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * OR (Observed-Remove) CRDT set where each replica is identified by an
  * integer.
  *
- * @param <T> set item type
+ * @param <E> the type of elements maintained by this set
  * @see ClusterService#getMemberListJoinVersion()
  */
-public class ORSetImpl<T> implements CRDT<ORSetImpl<T>>, IdentifiedDataSerializable {
+public class ORSetImpl<E> implements CRDT<ORSetImpl<E>>, IdentifiedDataSerializable {
     private int replicaId;
     private volatile long version = Long.MIN_VALUE;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
@@ -50,7 +50,7 @@ public class ORSetImpl<T> implements CRDT<ORSetImpl<T>>, IdentifiedDataSerializa
     public ORSetImpl() {
     }
 
-    public T get() {
+    public E get() {
         readLock.lock();
         try {
             return null;
@@ -60,7 +60,7 @@ public class ORSetImpl<T> implements CRDT<ORSetImpl<T>>, IdentifiedDataSerializa
     }
 
     @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
-    public T add(T item) {
+    public E add(E item) {
         writeLock.lock();
         try {
             version++;
@@ -72,7 +72,7 @@ public class ORSetImpl<T> implements CRDT<ORSetImpl<T>>, IdentifiedDataSerializa
 
     @Override
     @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
-    public void merge(ORSetImpl<T> other) {
+    public void merge(ORSetImpl<E> other) {
         writeLock.lock();
         try {
         } finally {

@@ -19,6 +19,9 @@ package com.hazelcast.crdt.orset;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.internal.cluster.ClusterService;
 
+import java.util.Collection;
+import java.util.Set;
+
 /**
  * OR (Observed-Remove) CRDT set.
  * <p>
@@ -44,9 +47,18 @@ import com.hazelcast.internal.cluster.ClusterService;
  * response has not been received. In this case, the caller will be notified
  * with a {@link com.hazelcast.spi.exception.TargetDisconnectedException}.
  *
- * @param <T> set item type
+ * @param <E> the type of elements maintained by this set
  * @since 3.10
  */
-public interface ORSet<T> extends DistributedObject {
+public interface ORSet<E> extends DistributedObject {
+
+
+    boolean contains(Object o);
+
+    Collection<E> elements();
+
+    boolean add(E e);
+
+    boolean remove(Object o);
 
 }

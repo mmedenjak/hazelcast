@@ -54,11 +54,11 @@ public class ORSetService implements ManagedService, RemoteService, CRDTReplicat
 
     /**
      * Returns the set with the given {@code name}.
-     * @param <T> set item type
+     * @param <E> the type of elements maintained by this set
      */
     @SuppressWarnings("unchecked")
-    public <T> ORSetImpl<T> getSet(String name) {
-        return (ORSetImpl<T>) getOrPutIfAbsent(sets, name, setConstructorFn);
+    public <E> ORSetImpl<E> getSet(String name) {
+        return (ORSetImpl<E>) getOrPutIfAbsent(sets, name, setConstructorFn);
     }
 
     @Override

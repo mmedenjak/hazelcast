@@ -26,9 +26,9 @@ import static com.hazelcast.crdt.orset.ORSetService.SERVICE_NAME;
 /**
  * Member proxy implementation for a {@link ORSet}.
  *
- * @param <T> set item type
+ * @param <E> the type of elements maintained by this set
  */
-public class ORSetProxy<T> extends AbstractDistributedObject<ORSetService> implements ORSet<T> {
+public class ORSetProxy<E> extends AbstractDistributedObject<ORSetService> implements ORSet<E> {
     /** The set name */
     private final String name;
 

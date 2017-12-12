@@ -32,12 +32,12 @@ import static com.hazelcast.crdt.orset.ORSetService.SERVICE_NAME;
  * serialization and deserialization invocations as CRDT operations must
  * be invoked locally on a member.
  *
- * @param <T> set item type
+ * @param <E> the type of elements maintained by this set
  * @since 3.10
  */
-public abstract class AbstractORSetOperation<T> extends Operation {
+public abstract class AbstractORSetOperation<E> extends Operation {
     protected String name;
-    private ORSetImpl<T> set;
+    private ORSetImpl<E> set;
 
     AbstractORSetOperation(String name) {
         this.name = name;
@@ -48,7 +48,7 @@ public abstract class AbstractORSetOperation<T> extends Operation {
         return SERVICE_NAME;
     }
 
-    ORSetImpl<T> getORSet() {
+    ORSetImpl<E> getORSet() {
         if (set != null) {
             return set;
         }
