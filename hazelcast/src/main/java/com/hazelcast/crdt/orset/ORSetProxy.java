@@ -21,6 +21,8 @@ import com.hazelcast.spi.InternalCompletableFuture;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
 
+import java.util.Collection;
+
 import static com.hazelcast.crdt.orset.ORSetService.SERVICE_NAME;
 
 /**
@@ -68,5 +70,25 @@ public class ORSetProxy<E> extends AbstractDistributedObject<ORSetService> imple
     @Override
     public String toString() {
         return "ORSet{name='" + name + "\'}";
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return false;
+    }
+
+    @Override
+    public Collection<E> elements() {
+        return null;
+    }
+
+    @Override
+    public boolean add(E e) {
+        return false;
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return false;
     }
 }

@@ -25,6 +25,11 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -37,34 +42,84 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @see ClusterService#getMemberListJoinVersion()
  */
 public class ORSetImpl<E> implements CRDT<ORSetImpl<E>>, IdentifiedDataSerializable {
-    private int replicaId;
+    private int localReplicaId;
     private volatile long version = Long.MIN_VALUE;
+    private Map<E, ReplicaTimestamps> localState = new ConcurrentHashMap<E, ReplicaTimestamps>();
+    private ReplicaTimestamps lastObservedReplicaTimestamps = new ReplicaTimestamps();
+
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
 
-    public ORSetImpl(int replicaId) {
-        this.replicaId = replicaId;
+    public ORSetImpl(int localReplicaId) {
+        this.localReplicaId = localReplicaId;
+        this.lastObservedReplicaTimestamps.setReplicaTimestamp(localReplicaId, Long.MIN_VALUE);
     }
 
     public ORSetImpl() {
     }
 
-    public E get() {
+    public int size() {
         readLock.lock();
         try {
-            return null;
+            return localState.size();
         } finally {
             readLock.unlock();
         }
     }
 
+    public boolean isEmpty() {
+        readLock.lock();
+        try {
+            return localState.isEmpty();
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public boolean contains(Object o) {
+        readLock.lock();
+        try {
+            return localState.containsKey(o);
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+    public Collection<E> getAll() {
+        readLock.lock();
+        try {
+            return localState.keySet();
+        } finally {
+            readLock.unlock();
+        }
+    }
+
+
     @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
-    public E add(E item) {
+    public boolean add(E item) {
         writeLock.lock();
         try {
             version++;
-            return item;
+            final long nextTimestamp = lastObservedReplicaTimestamps.getTimestampForReplica(localReplicaId) + 1;
+            final boolean newItem = !localState.containsKey(item);
+            if (newItem) {
+                localState.put(item, new ReplicaTimestamps());
+            }
+            localState.get(item).setReplicaTimestamp(localReplicaId, nextTimestamp);
+            lastObservedReplicaTimestamps.setReplicaTimestamp(localReplicaId, nextTimestamp);
+            return newItem;
+        } finally {
+            writeLock.unlock();
+        }
+    }
+
+    @SuppressFBWarnings(value = "VO_VOLATILE_INCREMENT", justification = "The field is updated under lock and read with no lock")
+    boolean remove(Object o) {
+        writeLock.lock();
+        try {
+            version++;
+            return localState.remove(o) != null;
         } finally {
             writeLock.unlock();
         }
@@ -75,6 +130,29 @@ public class ORSetImpl<E> implements CRDT<ORSetImpl<E>>, IdentifiedDataSerializa
     public void merge(ORSetImpl<E> other) {
         writeLock.lock();
         try {
+            version++;
+            for (Entry<E, ReplicaTimestamps> remoteEntry : other.localState.entrySet()) {
+                final E item = remoteEntry.getKey();
+                final ReplicaTimestamps remoteTimestamps = remoteEntry.getValue();
+                final ReplicaTimestamps localTimestamps = localState.get(item);
+
+                if (localTimestamps != null) {
+                    localTimestamps.merge(remoteTimestamps);
+                }
+
+            }
+            final Iterator<Entry<E, ReplicaTimestamps>> localStateIterator = localState.entrySet().iterator();
+
+            while (localStateIterator.hasNext()) {
+                final Entry<E, ReplicaTimestamps> localEntry = localStateIterator.next();
+                final E item = localEntry.getKey();
+                final ReplicaTimestamps localTimestamps = localEntry.getValue();
+                if (!other.localState.containsKey(item)
+                        && localTimestamps.isBefore(other.lastObservedReplicaTimestamps)) {
+                    localStateIterator.remove();
+                }
+            }
+            this.lastObservedReplicaTimestamps.merge(other.lastObservedReplicaTimestamps);
         } finally {
             writeLock.unlock();
         }
@@ -106,5 +184,33 @@ public class ORSetImpl<E> implements CRDT<ORSetImpl<E>>, IdentifiedDataSerializa
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
+    }
+
+
+    private static class ReplicaTimestamps {
+        private final Map<Integer, Long> replicaTimestamps = new ConcurrentHashMap<Integer, Long>();
+
+        public Long getTimestampForReplica(int replicaId) {
+            return replicaTimestamps.get(replicaId);
+        }
+
+        public void setReplicaTimestamp(int replicaId, long timestamp) {
+            replicaTimestamps.put(replicaId, timestamp);
+        }
+
+        public void merge(ReplicaTimestamps other) {
+            for (Entry<Integer, Long> entry : other.replicaTimestamps.entrySet()) {
+                final Integer replicaId = entry.getKey();
+                final Long mergingTimestamp = entry.getValue();
+                final long localTimestamp = replicaTimestamps.containsKey(replicaId)
+                        ? replicaTimestamps.get(replicaId)
+                        : Long.MIN_VALUE;
+                replicaTimestamps.put(replicaId, Math.max(localTimestamp, mergingTimestamp));
+            }
+        }
+
+        public boolean isBefore(ReplicaTimestamps other) {
+            return false;
+        }
     }
 }
