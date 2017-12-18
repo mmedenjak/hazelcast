@@ -16,21 +16,29 @@
 
 package com.hazelcast.crdt.pncounter.operations;
 
+import com.hazelcast.crdt.CRDTDataSerializerHook;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+
+import java.io.IOException;
+
 /**
  * Query operation to retrieve the current value of the
  * {@link com.hazelcast.crdt.pncounter.PNCounter}.
- * The operation is meant to be invoked locally and will throw exceptions
- * when being (de)serialized.
  */
 public class GetOperation extends AbstractPNCounterOperation {
     private long result;
 
     /**
-     * Constructs the
+     * Constructs the operation.
+     *
      * @param name name of the {@link com.hazelcast.crdt.pncounter.PNCounter}
      */
     public GetOperation(String name) {
         super(name);
+    }
+
+    public GetOperation() {
     }
 
     @Override
@@ -41,5 +49,20 @@ public class GetOperation extends AbstractPNCounterOperation {
     @Override
     public Long getResponse() {
         return result;
+    }
+
+    @Override
+    protected void writeInternal(ObjectDataOutput out) throws IOException {
+        out.writeUTF(name);
+    }
+
+    @Override
+    protected void readInternal(ObjectDataInput in) throws IOException {
+        name = in.readUTF();
+    }
+
+    @Override
+    public int getId() {
+        return CRDTDataSerializerHook.PN_COUNTER_GET_OPERATION;
     }
 }

@@ -16,17 +16,20 @@
 
 package com.hazelcast.crdt.pncounter.operations;
 
+import com.hazelcast.crdt.CRDTDataSerializerHook;
 import com.hazelcast.crdt.pncounter.PNCounterImpl;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+
+import java.io.IOException;
 
 /**
  * Addition/subtraction operation for a
  * {@link com.hazelcast.crdt.pncounter.PNCounter}.
- * The operation is meant to be invoked locally and will throw exceptions
- * when being (de)serialized.
  */
 public class AddOperation extends AbstractPNCounterOperation {
-    private final boolean getBeforeUpdate;
-    private final long delta;
+    private boolean getBeforeUpdate;
+    private long delta;
     private long result;
 
     /**
@@ -44,6 +47,9 @@ public class AddOperation extends AbstractPNCounterOperation {
         this.getBeforeUpdate = getBeforeUpdate;
     }
 
+    public AddOperation() {
+    }
+
     @Override
     public void run() throws Exception {
         final PNCounterImpl counter = getPNCounter();
@@ -53,5 +59,24 @@ public class AddOperation extends AbstractPNCounterOperation {
     @Override
     public Long getResponse() {
         return result;
+    }
+
+    @Override
+    protected void writeInternal(ObjectDataOutput out) throws IOException {
+        out.writeUTF(name);
+        out.writeBoolean(getBeforeUpdate);
+        out.writeLong(delta);
+    }
+
+    @Override
+    protected void readInternal(ObjectDataInput in) throws IOException {
+        name = in.readUTF();
+        getBeforeUpdate = in.readBoolean();
+        delta = in.readLong();
+    }
+
+    @Override
+    public int getId() {
+        return CRDTDataSerializerHook.PN_COUNTER_ADD_OPERATION;
     }
 }

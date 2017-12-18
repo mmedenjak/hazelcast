@@ -18,6 +18,8 @@ package com.hazelcast.crdt;
 
 import com.hazelcast.crdt.pncounter.PNCounterImpl;
 import com.hazelcast.crdt.pncounter.PNCounterReplicationOperation;
+import com.hazelcast.crdt.pncounter.operations.AddOperation;
+import com.hazelcast.crdt.pncounter.operations.GetOperation;
 import com.hazelcast.internal.serialization.DataSerializerHook;
 import com.hazelcast.internal.serialization.impl.FactoryIdHelper;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
@@ -36,6 +38,10 @@ public final class CRDTDataSerializerHook implements DataSerializerHook {
     public static final int PN_COUNTER_REPLICATION = 1;
     /** The (de)serialization constant for a PNCounter implementation */
     public static final int PN_COUNTER = 2;
+    /** The constant for the PNCounter {@link com.hazelcast.crdt.pncounter.operations.AddOperation} */
+    public static final int PN_COUNTER_ADD_OPERATION = 3;
+    /** The constant for the PNCounter {@link com.hazelcast.crdt.pncounter.operations.GetOperation} */
+    public static final int PN_COUNTER_GET_OPERATION = 4;
 
     @Override
     public int getFactoryId() {
@@ -52,6 +58,10 @@ public final class CRDTDataSerializerHook implements DataSerializerHook {
                         return new PNCounterReplicationOperation();
                     case PN_COUNTER:
                         return new PNCounterImpl();
+                    case PN_COUNTER_ADD_OPERATION:
+                        return new AddOperation();
+                    case PN_COUNTER_GET_OPERATION:
+                        return new GetOperation();
                     default:
                         return null;
                 }

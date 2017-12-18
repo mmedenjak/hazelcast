@@ -18,7 +18,6 @@ package com.hazelcast.crdt.pncounter;
 
 import com.hazelcast.crdt.CRDT;
 import com.hazelcast.crdt.CRDTDataSerializerHook;
-import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -26,28 +25,26 @@ import com.hazelcast.util.MapUtil;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * PN (Positive-Negative) CRDT counter where each replica is identified by
- * an integer.
- *
- * @see ClusterService#getMemberListJoinVersion()
+ * a String.
  */
 public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSerializable {
-    private int replicaId;
-    private Map<Integer, long[]> state = new HashMap<Integer, long[]>();
+    private String replicaId;
+    private Map<String, long[]> state = new ConcurrentHashMap<String, long[]>();
     private volatile long version = Long.MIN_VALUE;
     private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
     private final Lock readLock = readWriteLock.readLock();
     private final Lock writeLock = readWriteLock.writeLock();
 
-    public PNCounterImpl(int replicaId) {
+    PNCounterImpl(String replicaId) {
         this.replicaId = replicaId;
     }
 
@@ -170,8 +167,8 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
     public void merge(PNCounterImpl other) {
         writeLock.lock();
         try {
-            for (Entry<Integer, long[]> pnCounterEntry : other.state.entrySet()) {
-                final Integer replicaId = pnCounterEntry.getKey();
+            for (Entry<String, long[]> pnCounterEntry : other.state.entrySet()) {
+                final String replicaId = pnCounterEntry.getKey();
                 final long[] pnOtherValues = pnCounterEntry.getValue();
                 final long[] pnValues = state.containsKey(replicaId) ? state.get(replicaId) : new long[]{0, 0};
                 pnValues[0] = Math.max(pnValues[0], pnOtherValues[0]);
@@ -204,10 +201,10 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
         readLock.lock();
         try {
             out.writeInt(state.size());
-            for (Entry<Integer, long[]> replicaState : state.entrySet()) {
-                final Integer replicaID = replicaState.getKey();
+            for (Entry<String, long[]> replicaState : state.entrySet()) {
+                final String replicaID = replicaState.getKey();
                 final long[] replicaCounts = replicaState.getValue();
-                out.writeInt(replicaID);
+                out.writeUTF(replicaID);
                 out.writeLong(replicaCounts[0]);
                 out.writeLong(replicaCounts[1]);
             }
@@ -221,7 +218,7 @@ public class PNCounterImpl implements CRDT<PNCounterImpl>, IdentifiedDataSeriali
         final int stateSize = in.readInt();
         state = MapUtil.createHashMap(stateSize);
         for (int i = 0; i < stateSize; i++) {
-            final Integer replicaID = in.readInt();
+            final String replicaID = in.readUTF();
             final long[] replicaCounts = {in.readLong(), in.readLong()};
             state.put(replicaID, replicaCounts);
         }

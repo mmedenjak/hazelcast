@@ -131,6 +131,6 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
 
     @Override
     protected PNCounterImpl getCRDT(int i) {
-        return new PNCounterImpl(i);
+        return new PNCounterImpl("replica " + i);
     }
 }

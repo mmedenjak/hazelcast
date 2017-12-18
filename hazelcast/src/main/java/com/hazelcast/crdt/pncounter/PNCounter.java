@@ -32,23 +32,32 @@ import com.hazelcast.internal.cluster.ClusterService;
  * If no new updates are made to the shared state, all nodes that can
  * communicate will eventually have the same data.
  * <p>
- * Each replica is identified by an integer. This identifier should be
+ * Each replica is identified by a UUID. This identifier should be
  * unique and there should not be any other replica with the same ID, even
- * if the member with that ID is no longer alive. For this identifier, we
- * use the {@link ClusterService#getMemberListJoinVersion()} which should
- * be unique with some exceptions.
+ * if the member with that ID is no longer alive.
  * <p>
- * The updates to this counter are applied locally when invoked on a member.
+ * The updates to this counter are applied locally when invoked on a
+ * non-lite member.
  * When invoking updates from a hazelcast client, the invocation is remote.
  * This may lead to indeterminate state - the update may be applied but the
  * response has not been received. In this case, the caller will be notified
  * with a {@link com.hazelcast.spi.exception.TargetDisconnectedException}.
+ * When invoking updates from a lite member, the invocation is remote as well.
+ * <p>
+ * <b>NOTE:</b>
+ * The CRDT state is kept entirely on non-lite (data) members. If there
+ * aren't any and the methods here are invoked on a lite member, they will
+ * fail with an {@link IllegalStateException}.
  *
  * @since 3.10
  */
 public interface PNCounter extends DistributedObject {
     /**
      * Returns the current value of the counter.
+     *
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long get();
 
@@ -57,6 +66,9 @@ public interface PNCounter extends DistributedObject {
      *
      * @param delta the value to add
      * @return the previous value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long getAndAdd(long delta);
 
@@ -65,6 +77,9 @@ public interface PNCounter extends DistributedObject {
      *
      * @param delta the value to add
      * @return the updated value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long addAndGet(long delta);
 
@@ -73,6 +88,9 @@ public interface PNCounter extends DistributedObject {
      *
      * @param delta the value to add
      * @return the previous value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long getAndSubtract(long delta);
 
@@ -81,6 +99,9 @@ public interface PNCounter extends DistributedObject {
      *
      * @param delta the value to subtract
      * @return the updated value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long subtractAndGet(long delta);
 
@@ -88,6 +109,9 @@ public interface PNCounter extends DistributedObject {
      * Decrements by one the current value.
      *
      * @return the updated value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long decrementAndGet();
 
@@ -95,6 +119,9 @@ public interface PNCounter extends DistributedObject {
      * Increments by one the current value.
      *
      * @return the updated value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long incrementAndGet();
 
@@ -102,6 +129,9 @@ public interface PNCounter extends DistributedObject {
      * Decrements by one the current value.
      *
      * @return the previous value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long getAndDecrement();
 
@@ -109,6 +139,9 @@ public interface PNCounter extends DistributedObject {
      * Increments by one the current value.
      *
      * @return the previous value
+     * @throws IllegalStateException         if the cluster does not contain any data members
+     * @throws UnsupportedOperationException if the cluster version is less than 3.10
+     * @see ClusterService#getClusterVersion()
      */
     long getAndIncrement();
 }

@@ -16,13 +16,11 @@
 
 package com.hazelcast.crdt.pncounter.operations;
 
+import com.hazelcast.crdt.CRDTDataSerializerHook;
 import com.hazelcast.crdt.pncounter.PNCounterImpl;
 import com.hazelcast.crdt.pncounter.PNCounterService;
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.Operation;
-
-import java.io.IOException;
 
 import static com.hazelcast.crdt.pncounter.PNCounterService.SERVICE_NAME;
 
@@ -32,9 +30,12 @@ import static com.hazelcast.crdt.pncounter.PNCounterService.SERVICE_NAME;
  * serialization and deserialization invocations as CRDT operations must
  * be invoked locally on a member.
  */
-public abstract class AbstractPNCounterOperation extends Operation {
+public abstract class AbstractPNCounterOperation extends Operation implements IdentifiedDataSerializable {
     protected String name;
     private PNCounterImpl counter;
+
+    AbstractPNCounterOperation() {
+    }
 
     AbstractPNCounterOperation(String name) {
         this.name = name;
@@ -55,18 +56,13 @@ public abstract class AbstractPNCounterOperation extends Operation {
     }
 
     @Override
-    protected void writeInternal(ObjectDataOutput out) throws IOException {
-        throw new IllegalStateException("Operation is intended to be run locally");
-    }
-
-    @Override
-    protected void readInternal(ObjectDataInput in) throws IOException {
-        throw new IllegalStateException("Operation is intended to be run locally");
-    }
-
-    @Override
     protected void toString(StringBuilder sb) {
         super.toString(sb);
         sb.append(", name=").append(name);
+    }
+
+    @Override
+    public int getFactoryId() {
+        return CRDTDataSerializerHook.F_ID;
     }
 }

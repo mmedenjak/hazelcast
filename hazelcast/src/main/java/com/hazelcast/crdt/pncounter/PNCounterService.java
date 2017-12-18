@@ -22,6 +22,7 @@ import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.RemoteService;
 import com.hazelcast.util.ConstructorFunction;
+import com.hazelcast.util.UuidUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,7 +48,7 @@ public class PNCounterService implements ManagedService, RemoteService, CRDTRepl
             new ConstructorFunction<String, PNCounterImpl>() {
                 @Override
                 public PNCounterImpl createNew(String name) {
-                    return new PNCounterImpl(nodeEngine.getClusterService().getMemberListJoinVersion());
+                    return new PNCounterImpl(UuidUtil.newUnsecureUuidString());
                 }
             };
 
