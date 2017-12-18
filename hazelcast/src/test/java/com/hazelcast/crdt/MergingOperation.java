@@ -1,13 +1,12 @@
 package com.hazelcast.crdt;
 
-import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-
 import java.util.List;
+import java.util.Random;
 
 public class MergingOperation<C extends CRDT<C>, S> extends Operation<C, S> {
     private final int sourceIdx;
 
-    MergingOperation(SourceOfRandomness rnd) {
+    MergingOperation(Random rnd) {
         super(rnd);
         this.sourceIdx = rnd.nextInt();
     }

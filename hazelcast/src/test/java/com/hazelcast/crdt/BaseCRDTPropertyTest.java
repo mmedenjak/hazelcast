@@ -1,22 +1,65 @@
 package com.hazelcast.crdt;
 
+import org.junit.Before;
+import org.junit.Test;
+
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertArrayEquals;
 
 public abstract class BaseCRDTPropertyTest<C extends CRDT<C>, H, S> {
+    private final Random random = new Random();
+    private int numCounters;
 
-    protected void strongEventualConsistency(int counterCount, Operation<C, H>[] operations) {
-        final List<C> crdts = setupCRDTs(counterCount);
-        final H state = getStateHolder();
-        for (Operation<C, H> operation : operations) {
-            operation.perform(crdts, state);
-        }
-        mergeAll(crdts);
-        assertState(crdts, state, counterCount, operations);
+    @Before
+    public void init() {
+        this.numCounters = 2 + random.nextInt(3);
     }
+
+    @Test
+    public void strongEventualConsistency() {
+        final int rounds = 1000;
+        for (int i = 0; i < rounds; i++) {
+            final int operationCount = 50 + random.nextInt(50);
+            final List<C> crdts = setupCRDTs(numCounters);
+            final H state = getStateHolder();
+            final Operation<C, H>[] operations = generateOperations(operationCount);
+
+            for (Operation<C, H> operation : operations) {
+                operation.perform(crdts, state);
+            }
+            mergeAll(crdts);
+            assertState(crdts, state, numCounters, operations);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Operation<C, H>[] generateOperations(int operationCount) {
+        final List<Class<? extends Operation<C, H>>> operationClasses = getOperationClasses();
+        final int size = random.nextInt(operationCount);
+        final Operation[] operations = new Operation[size];
+        for (int i = 0; i < size; i++) {
+            if (random.nextDouble() < 0.1) {
+                operations[i] = new MergingOperation(random);
+            } else {
+                try {
+                    final Class operationClass = operationClasses.get(random.nextInt(operationClasses.size()));
+                    final Constructor<Operation> c = operationClass.getConstructor(Random.class);
+                    operations[i] = c.newInstance(random);
+                } catch (Exception e) {
+                    throw new RuntimeException("Error instantiating the operation ", e);
+                }
+            }
+        }
+
+        return operations;
+    }
+
+    protected abstract List<Class<? extends Operation<C, H>>> getOperationClasses();
 
     protected abstract C getCRDT(int i);
 

@@ -2,37 +2,20 @@ package com.hazelcast.crdt.pncounter;
 
 import com.hazelcast.crdt.BaseCRDTPropertyTest;
 import com.hazelcast.crdt.Operation;
-import com.hazelcast.crdt.OperationTypes;
-import com.hazelcast.crdt.OperationsGenerator;
-import com.hazelcast.logging.ILogger;
-import com.hazelcast.logging.Logger;
+import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.util.MutableLong;
-import com.pholser.junit.quickcheck.From;
-import com.pholser.junit.quickcheck.Property;
-import com.pholser.junit.quickcheck.generator.InRange;
-import com.pholser.junit.quickcheck.generator.Size;
-import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-import com.pholser.junit.quickcheck.runner.JUnitQuickcheck;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
-@RunWith(JUnitQuickcheck.class)
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+
+@RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
 public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImpl, MutableLong, Long> {
-
-    private final ILogger logger = Logger.getLogger(PNCounterImplPropertyTest.class);
-
-    @Property
-    public void strongEventualConsistency(@InRange(minInt = 2, maxInt = 5)
-                                                  int counterCount,
-                                          @From(OperationsGenerator.class)
-                                          @Size(min = 50, max = 100)
-                                          @OperationTypes({AddAndGet.class, GetAndAdd.class, GetAndSubtract.class, SubtractAndGet.class})
-                                                  Operation[] operations) {
-        super.strongEventualConsistency(counterCount, operations);
-    }
 
     @Override
     protected MutableLong getStateHolder() {
@@ -52,9 +35,9 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
     public static class AddAndGet extends Operation<PNCounterImpl, MutableLong> {
         private final int delta;
 
-        public AddAndGet(SourceOfRandomness rnd) {
+        public AddAndGet(Random rnd) {
             super(rnd);
-            delta = rnd.nextInt(-100, 100);
+            delta = rnd.nextInt(200) - 100;
         }
 
         @Override
@@ -72,9 +55,9 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
     public static class GetAndAdd extends Operation<PNCounterImpl, MutableLong> {
         private final int delta;
 
-        public GetAndAdd(SourceOfRandomness rnd) {
+        public GetAndAdd(Random rnd) {
             super(rnd);
-            delta = rnd.nextInt(-100, 100);
+            delta = rnd.nextInt(200) - 100;
         }
 
         @Override
@@ -92,9 +75,9 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
     public static class GetAndSubtract extends Operation<PNCounterImpl, MutableLong> {
         private final int delta;
 
-        public GetAndSubtract(SourceOfRandomness rnd) {
+        public GetAndSubtract(Random rnd) {
             super(rnd);
-            delta = rnd.nextInt(-100, 100);
+            delta = rnd.nextInt(200) - 100;
         }
 
         @Override
@@ -112,9 +95,9 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
     public static class SubtractAndGet extends Operation<PNCounterImpl, MutableLong> {
         private final int delta;
 
-        public SubtractAndGet(SourceOfRandomness rnd) {
+        public SubtractAndGet(Random rnd) {
             super(rnd);
-            this.delta = rnd.nextInt(-100, 100);
+            this.delta = rnd.nextInt(200) - 100;
         }
 
         @Override
@@ -127,6 +110,12 @@ public class PNCounterImplPropertyTest extends BaseCRDTPropertyTest<PNCounterImp
         public String toString() {
             return "SubtractAndGet(" + crdtIndex + "," + delta + ")";
         }
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected List<Class<? extends Operation<PNCounterImpl, MutableLong>>> getOperationClasses() {
+        return Arrays.asList(AddAndGet.class, GetAndAdd.class, GetAndSubtract.class, SubtractAndGet.class);
     }
 
     @Override

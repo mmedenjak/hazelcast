@@ -1,16 +1,15 @@
 package com.hazelcast.crdt;
 
-import com.pholser.junit.quickcheck.random.SourceOfRandomness;
-
 import java.util.List;
+import java.util.Random;
 
 public class Operation<T, S> {
-    protected final SourceOfRandomness rnd;
+    protected final Random rnd;
     protected final int crdtIndex;
 
-    public Operation(SourceOfRandomness rnd) {
+    public Operation(Random rnd) {
         this.rnd = rnd;
-        this.crdtIndex = rnd.nextInt(0, 10000);
+        this.crdtIndex = rnd.nextInt(10000);
     }
 
     protected T getCRDT(List<T> crdts) {
