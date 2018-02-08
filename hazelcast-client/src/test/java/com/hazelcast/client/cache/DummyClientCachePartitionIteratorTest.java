@@ -30,32 +30,34 @@ import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
 @RunWith(Parameterized.class)
-@Parameterized.UseParametersRunnerFactory(HazelcastParametersRunnerFactory.class)
+@UseParametersRunnerFactory(HazelcastParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelTest.class})
 public class DummyClientCachePartitionIteratorTest extends AbstractClientCachePartitionIteratorTest {
+
+    private static ClientConfig getClientConfig(HazelcastInstance instance) {
+        Address address = instance.getCluster().getLocalMember().getAddress();
+        String addressString = address.getHost() + ":" + address.getPort();
+
+        ClientNetworkConfig networkConfig = new ClientNetworkConfig()
+                .setSmartRouting(false)
+                .addAddress(addressString);
+
+        return new ClientConfig()
+                .setNetworkConfig(networkConfig);
+    }
 
     @Before
     public void setup() {
         factory = new TestHazelcastFactory();
 
-        Config config = getConfig();
+        Config config = toDefaultProperties(getConfig());
         server = factory.newHazelcastInstance(config);
         factory.newHazelcastInstance(config);
 
         HazelcastInstance client = factory.newHazelcastClient(getClientConfig(server));
         cachingProvider = HazelcastClientCachingProvider.createCachingProvider(client);
-    }
-
-    private static ClientConfig getClientConfig(HazelcastInstance instance) {
-        Address address = instance.getCluster().getLocalMember().getAddress();
-        String addressString = address.getHost() + ":" + address.getPort();
-        ClientConfig clientConfig = new ClientConfig();
-        ClientNetworkConfig networkConfig = new ClientNetworkConfig();
-        networkConfig.setSmartRouting(false);
-        networkConfig.addAddress(addressString);
-        clientConfig.setNetworkConfig(networkConfig);
-        return clientConfig;
     }
 }
