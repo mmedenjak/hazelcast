@@ -24,9 +24,9 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.merge.DiscardMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
 import com.hazelcast.spi.merge.PassThroughMergePolicy;
 import com.hazelcast.spi.merge.PutIfAbsentMergePolicy;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.test.HazelcastParallelParametersRunnerFactory;
 import com.hazelcast.test.SplitBrainTestSupport;
 import com.hazelcast.test.annotation.ParallelTest;
@@ -85,9 +85,9 @@ public class AtomicLongSplitBrainTest extends SplitBrainTestSupport {
 
         Config config = super.config();
         config.getAtomicLongConfig(atomicLongNameA)
-                .setMergePolicyConfig(mergePolicyConfig);
+              .setMergePolicyConfig(mergePolicyConfig);
         config.getAtomicLongConfig(atomicLongNameB)
-                .setMergePolicyConfig(mergePolicyConfig);
+              .setMergePolicyConfig(mergePolicyConfig);
         return config;
     }
 
@@ -206,10 +206,10 @@ public class AtomicLongSplitBrainTest extends SplitBrainTestSupport {
         assertEquals(42, backupAtomicLongA.get());
     }
 
-    private static class MergeGreaterValueMergePolicy implements SplitBrainMergePolicy {
+    private static class MergeGreaterValueMergePolicy<T> implements SplitBrainMergePolicy<T, ValueHolder<T>> {
 
         @Override
-        public <T> T merge(MergingValueHolder<T> mergingValue, MergingValueHolder<T> existingValue) {
+        public T merge(ValueHolder<T> mergingValue, ValueHolder<T> existingValue) {
             if ((Long) mergingValue.getValue() > (Long) existingValue.getValue()) {
                 return mergingValue.getValue();
             }

@@ -16,6 +16,7 @@
 
 package com.hazelcast.cardinality.impl;
 
+import com.hazelcast.cardinality.impl.hyperloglog.HyperLogLog;
 import com.hazelcast.cardinality.impl.operations.MergeOperation;
 import com.hazelcast.cardinality.impl.operations.ReplicationOperation;
 import com.hazelcast.config.CardinalityEstimatorConfig;
@@ -212,7 +213,7 @@ public class CardinalityEstimatorService
         return quorumName == NULL_OBJECT ? null : (String) quorumName;
     }
 
-    private SplitBrainMergePolicy getMergePolicy(String name) {
+    private SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogMergingItem> getMergePolicy(String name) {
         String mergePolicyName = nodeEngine.getConfig().findCardinalityEstimatorConfig(name).getMergePolicyConfig().getPolicy();
         return mergePolicyProvider.getMergePolicy(mergePolicyName);
     }

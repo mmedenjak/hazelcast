@@ -53,7 +53,7 @@ import com.hazelcast.spi.StatisticsAwareService;
 import com.hazelcast.spi.TaskScheduler;
 import com.hazelcast.spi.TransactionalService;
 import com.hazelcast.spi.merge.DiscardMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.merge.SplitBrainMergePolicyProvider;
 import com.hazelcast.spi.partition.IPartition;
 import com.hazelcast.spi.partition.IPartitionService;
@@ -461,7 +461,7 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
 
             int itemCount = 0;
             int operationCount = 0;
-            List<MergingValueHolder<Data>> mergingValues;
+            List<ValueHolder<Data>> mergingValues;
             for (Entry<Integer, Map<QueueContainer, List<QueueItem>>> partitionMap : itemMap.entrySet()) {
                 int partitionId = partitionMap.getKey();
                 Map<QueueContainer, List<QueueItem>> containerMap = partitionMap.getValue();
@@ -473,15 +473,15 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
                     SplitBrainMergePolicy mergePolicy = getMergePolicy(container);
                     String name = container.getName();
 
-                    mergingValues = new ArrayList<MergingValueHolder<Data>>(batchSize);
+                    mergingValues = new ArrayList<ValueHolder<Data>>(batchSize);
                     for (QueueItem item : itemList) {
-                        MergingValueHolder<Data> mergingValue = createMergeHolder(item);
+                        ValueHolder<Data> mergingValue = createMergeHolder(item);
                         mergingValues.add(mergingValue);
                         itemCount++;
 
                         if (mergingValues.size() == batchSize) {
                             sendBatch(partitionId, name, mergePolicy, mergingValues, mergeCallback);
-                            mergingValues = new ArrayList<MergingValueHolder<Data>>(batchSize);
+                            mergingValues = new ArrayList<ValueHolder<Data>>(batchSize);
                             operationCount++;
                         }
                     }
@@ -505,7 +505,7 @@ public class QueueService implements ManagedService, MigrationAwareService, Tran
         }
 
         private void sendBatch(int partitionId, String name, SplitBrainMergePolicy mergePolicy,
-                               List<MergingValueHolder<Data>> mergingValues, ExecutionCallback<Object> mergeCallback) {
+                               List<ValueHolder<Data>> mergingValues, ExecutionCallback<Object> mergeCallback) {
             QueueMergeOperation operation = new QueueMergeOperation(name, mergePolicy, mergingValues);
             try {
                 nodeEngine.getOperationService()

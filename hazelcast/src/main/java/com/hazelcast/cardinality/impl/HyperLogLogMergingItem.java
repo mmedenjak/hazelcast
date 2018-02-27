@@ -14,30 +14,24 @@
  * limitations under the License.
  */
 
-package com.hazelcast.spi.merge;
+package com.hazelcast.cardinality.impl;
 
+import com.hazelcast.cardinality.impl.hyperloglog.HyperLogLog;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.spi.impl.merge.MergingEntryHolderImpl;
 import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
 
-/**
- * Merges data structure entries from source to destination directly unless the merging entry is {@code null}.
- *
- * @since 3.10
- */
-public class PassThroughMergePolicy<V> extends AbstractSplitBrainMergePolicy<V, ValueHolder<V>> {
+public class HyperLogLogMergingItem extends MergingEntryHolderImpl<String, HyperLogLog>
+        implements IdentifiedDataSerializable {
 
-    public PassThroughMergePolicy() {
-    }
 
     @Override
-    public V merge(ValueHolder<V> mergingValue, ValueHolder<V> existingValue) {
-        if (mergingValue == null) {
-            return existingValue.getValue();
-        }
-        return mergingValue.getValue();
+    public int getFactoryId() {
+        return SplitBrainDataSerializerHook.F_ID;
     }
 
     @Override
     public int getId() {
-        return SplitBrainDataSerializerHook.PASS_THROUGH;
+        return SplitBrainDataSerializerHook.MERGE_DATA_HOLDER;
     }
 }

@@ -35,7 +35,7 @@ import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.ServiceNamespace;
 import com.hazelcast.spi.ServiceNamespaceAware;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class MergeOperation extends Operation implements IdentifiedDataSerializa
 
     private ObjectNamespace namespace;
     private SplitBrainMergePolicy mergePolicy;
-    private List<MergingValueHolder<Object>> mergingValues;
+    private List<ValueHolder<Object>> mergingValues;
 
     private transient RingbufferConfig config;
     private transient RingbufferContainer<Object, Object> ringbuffer;
@@ -66,7 +66,7 @@ public class MergeOperation extends Operation implements IdentifiedDataSerializa
     }
 
     public MergeOperation(ObjectNamespace namespace, SplitBrainMergePolicy mergePolicy,
-                          List<MergingValueHolder<Object>> mergingValues) {
+                          List<ValueHolder<Object>> mergingValues) {
         this.namespace = namespace;
         this.mergePolicy = mergePolicy;
         this.mergingValues = mergingValues;
@@ -82,7 +82,7 @@ public class MergeOperation extends Operation implements IdentifiedDataSerializa
     @Override
     public void run() throws Exception {
         valueMap = createHashMap(mergingValues.size());
-        for (MergingValueHolder<Object> mergingValue : mergingValues) {
+        for (ValueHolder<Object> mergingValue : mergingValues) {
             long resultSequence = ringbuffer.merge(mergingValue, mergePolicy);
             if (resultSequence != -1) {
                 valueMap.put(resultSequence, ringbuffer.readAsData(resultSequence));
@@ -170,7 +170,7 @@ public class MergeOperation extends Operation implements IdentifiedDataSerializa
         out.writeObject(namespace);
         out.writeObject(mergePolicy);
         out.writeInt(mergingValues.size());
-        for (MergingValueHolder<Object> mergingValue : mergingValues) {
+        for (ValueHolder<Object> mergingValue : mergingValues) {
             out.writeObject(mergingValue);
         }
     }
@@ -181,9 +181,9 @@ public class MergeOperation extends Operation implements IdentifiedDataSerializa
         namespace = in.readObject();
         mergePolicy = in.readObject();
         int size = in.readInt();
-        mergingValues = new ArrayList<MergingValueHolder<Object>>(size);
+        mergingValues = new ArrayList<ValueHolder<Object>>(size);
         for (int i = 0; i < size; i++) {
-            MergingValueHolder<Object> mergingValue = in.readObject();
+            ValueHolder<Object> mergingValue = in.readObject();
             mergingValues.add(mergingValue);
         }
     }

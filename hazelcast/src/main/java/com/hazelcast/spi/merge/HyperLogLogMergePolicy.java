@@ -28,21 +28,20 @@ import static com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook.HYPER_LO
  *
  * @since 3.10
  */
-public class HyperLogLogMergePolicy extends AbstractSplitBrainMergePolicy {
+public class HyperLogLogMergePolicy extends AbstractSplitBrainMergePolicy<
+        HyperLogLog, ValueHolder<HyperLogLog>> {
 
     public HyperLogLogMergePolicy() {
     }
 
     @Override
-    public <V> V merge(MergingValueHolder<V> mergingValue, MergingValueHolder<V> existingValue) {
-        if (!(mergingValue.getValue() instanceof HyperLogLog)) {
-            throw new IllegalArgumentException("Unsupported merging data");
-        }
+    public HyperLogLog merge(ValueHolder<HyperLogLog> mergingValue,
+                             ValueHolder<HyperLogLog> existingValue) {
         if (existingValue == null) {
             return mergingValue.getValue();
         }
 
-        ((HyperLogLog) mergingValue.getValue()).merge((HyperLogLog) existingValue.getValue());
+        mergingValue.getValue().merge(existingValue.getValue());
         return mergingValue.getValue();
     }
 

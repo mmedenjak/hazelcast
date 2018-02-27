@@ -16,14 +16,12 @@
 
 package com.hazelcast.spi.merge;
 
-import com.hazelcast.nio.serialization.DataSerializable;
-
 /**
  * Represents a read-only view a creation time for the merging process after a split-brain.
  *
  * @since 3.10
  */
-public interface CreationTimeHolder extends DataSerializable {
+public interface CreationTimeHolder<V> extends ValueHolder<V> {
 
     /**
      * Returns the creation time of the merge data.

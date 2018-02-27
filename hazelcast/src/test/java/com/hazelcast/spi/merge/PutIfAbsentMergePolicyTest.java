@@ -47,30 +47,30 @@ public class PutIfAbsentMergePolicyTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void merge_existingValueAbsent() {
-        MergingValueHolder existing = null;
-        MergingValueHolder merging = mergingValueWithGivenValue(MERGING);
+        ValueHolder existing = null;
+        ValueHolder merging = mergingValueWithGivenValue(MERGING);
 
         assertEquals(MERGING, mergePolicy.merge(merging, existing));
     }
 
     @Test
     public void merge_existingValuePresent() {
-        MergingValueHolder existing = mergingValueWithGivenValue(EXISTING);
-        MergingValueHolder merging = mergingValueWithGivenValue(MERGING);
+        ValueHolder existing = mergingValueWithGivenValue(EXISTING);
+        ValueHolder merging = mergingValueWithGivenValue(MERGING);
 
         assertEquals(EXISTING, mergePolicy.merge(merging, existing));
     }
 
     @Test
     public void merge_bothValuesNull() {
-        MergingValueHolder existing = mergingValueWithGivenValue(null);
-        MergingValueHolder merging = mergingValueWithGivenValue(null);
+        ValueHolder existing = mergingValueWithGivenValue(null);
+        ValueHolder merging = mergingValueWithGivenValue(null);
 
         assertNull(mergePolicy.merge(merging, existing));
     }
 
-    private MergingValueHolder mergingValueWithGivenValue(String value) {
-        MergingValueHolder mergingValue = mock(MergingValueHolder.class);
+    private ValueHolder mergingValueWithGivenValue(String value) {
+        ValueHolder mergingValue = mock(ValueHolder.class);
         try {
             when(mergingValue.getValue()).thenReturn(value);
             return mergingValue;

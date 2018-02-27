@@ -16,11 +16,13 @@
 
 package com.hazelcast.cardinality.impl.operations;
 
+import com.hazelcast.cardinality.impl.HyperLogLogMergingItem;
 import com.hazelcast.cardinality.impl.hyperloglog.HyperLogLog;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.SplitBrainMergePolicy;
+import com.hazelcast.spi.merge.HyperLogLogMergePolicy;
 
 import java.io.IOException;
 
@@ -35,7 +37,7 @@ import static com.hazelcast.spi.impl.merge.MergingHolders.createMergeHolder;
 public class MergeOperation
         extends CardinalityEstimatorBackupAwareOperation {
 
-    private SplitBrainMergePolicy mergePolicy;
+    private SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogMergingItem> mergePolicy;
     private HyperLogLog value;
 
     private transient HyperLogLog backupValue;
@@ -43,7 +45,9 @@ public class MergeOperation
     public MergeOperation() {
     }
 
-    public MergeOperation(String name, SplitBrainMergePolicy mergePolicy, HyperLogLog value) {
+    public MergeOperation(String name,
+                          SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogMergingItem> mergePolicy,
+                          HyperLogLog value) {
         super(name);
         this.mergePolicy = mergePolicy;
         this.value = value;

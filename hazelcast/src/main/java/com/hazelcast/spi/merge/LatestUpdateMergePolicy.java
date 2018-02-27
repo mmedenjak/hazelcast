@@ -26,13 +26,13 @@ import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
  *
  * @since 3.10
  */
-public class LatestUpdateMergePolicy extends AbstractSplitBrainMergePolicy {
+public class LatestUpdateMergePolicy<V> extends AbstractSplitBrainMergePolicy<V, LastUpdateTimeHolder<V>> {
 
     public LatestUpdateMergePolicy() {
     }
 
     @Override
-    public <V> V merge(MergingValueHolder<V> mergingValue, MergingValueHolder<V> existingValue) {
+    public V merge(LastUpdateTimeHolder<V> mergingValue, LastUpdateTimeHolder<V> existingValue) {
         checkInstanceOf(mergingValue, LastUpdateTimeHolder.class);
         checkInstanceOf(existingValue, LastUpdateTimeHolder.class);
         if (mergingValue == null) {

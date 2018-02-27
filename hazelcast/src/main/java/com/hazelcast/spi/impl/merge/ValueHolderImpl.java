@@ -16,22 +16,25 @@
 
 package com.hazelcast.spi.impl.merge;
 
+import com.hazelcast.instance.Node;
 import com.hazelcast.nio.IOUtil;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.NodeAware;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.io.IOException;
 
 /**
- * Implementation of {@link MergingValueHolder}.
+ * Implementation of {@link ValueHolder}.
  *
  * @param <V> the type of value
  * @since 3.10
  */
-public class MergingValueHolderImpl<V> implements MergingValueHolder<V>, IdentifiedDataSerializable {
+public class ValueHolderImpl<V>
+        implements ValueHolder<V>, IdentifiedDataSerializable, NodeAware {
 
     private V value;
 
@@ -42,19 +45,14 @@ public class MergingValueHolderImpl<V> implements MergingValueHolder<V>, Identif
         return value;
     }
 
-    @Override
-    public Object getDeserializedValue() {
-        return serializationService.toObject(value);
-    }
-
-    public MergingValueHolderImpl<V> setValue(V value) {
+    public ValueHolderImpl<V> setValue(V value) {
         this.value = value;
         return this;
     }
 
     @Override
-    public void setSerializationService(SerializationService serializationService) {
-        this.serializationService = serializationService;
+    public Object getDeserializedValue() {
+        return serializationService.toObject(value);
     }
 
     @Override
@@ -82,11 +80,11 @@ public class MergingValueHolderImpl<V> implements MergingValueHolder<V>, Identif
         if (this == o) {
             return true;
         }
-        if (!(o instanceof MergingValueHolderImpl)) {
+        if (!(o instanceof ValueHolderImpl)) {
             return false;
         }
 
-        MergingValueHolderImpl<?> that = (MergingValueHolderImpl<?>) o;
+        ValueHolderImpl<?> that = (ValueHolderImpl<?>) o;
         return value != null ? value.equals(that.value) : that.value == null;
     }
 
@@ -100,5 +98,10 @@ public class MergingValueHolderImpl<V> implements MergingValueHolder<V>, Identif
         return "MergeDataHolder{"
                 + "value=" + value
                 + '}';
+    }
+
+    @Override
+    public void setNode(Node node) {
+        this.serializationService = node.getSerializationService();
     }
 }

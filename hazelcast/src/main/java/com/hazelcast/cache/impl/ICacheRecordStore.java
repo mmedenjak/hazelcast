@@ -24,7 +24,7 @@ import com.hazelcast.map.impl.MapEntries;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.ObjectNamespace;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 
 import javax.cache.expiry.ExpiryPolicy;
 import javax.cache.processor.EntryProcessor;
@@ -498,11 +498,11 @@ public interface ICacheRecordStore {
                       String caller, String origin, int completionId);
 
     /**
-     * Merges the given {@link MergingEntryHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link EntryHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingEntry the {@link MergingEntryHolder} instance to merge
+     * @param mergingEntry the {@link EntryHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the used {@link CacheRecord} if merge is applied, otherwise {@code null}
      */
-    CacheRecord merge(MergingEntryHolder<Data, Data> mergingEntry, SplitBrainMergePolicy mergePolicy);
+    CacheRecord merge(EntryHolder<Data, Data> mergingEntry, SplitBrainMergePolicy<Data, EntryHolder<Data, Data>> mergePolicy);
 }

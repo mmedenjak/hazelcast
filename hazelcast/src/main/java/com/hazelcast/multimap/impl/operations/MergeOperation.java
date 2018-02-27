@@ -28,7 +28,7 @@ import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.BackupAwareOperation;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class MergeOperation extends MultiMapOperation implements BackupAwareOper
                 continue;
             }
 
-            MergingEntryHolder<Data, MultiMapMergeContainer> dataHolder = createMergeHolder(key, mergeContainer);
+            EntryHolder<Data, MultiMapMergeContainer> dataHolder = createMergeHolder(key, mergeContainer);
             MultiMapValue result = container.merge(dataHolder, mergePolicy);
             if (result != null) {
                 resultMap.put(key, result.getCollection(false));

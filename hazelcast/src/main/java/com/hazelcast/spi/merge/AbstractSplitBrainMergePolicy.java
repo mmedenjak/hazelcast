@@ -30,9 +30,10 @@ import com.hazelcast.spi.serialization.SerializationService;
  *
  * @since 3.10
  */
-public abstract class AbstractSplitBrainMergePolicy implements SplitBrainMergePolicy, IdentifiedDataSerializable {
+public abstract class AbstractSplitBrainMergePolicy<V, T extends ValueHolder<V>>
+        implements SplitBrainMergePolicy<V, T>, IdentifiedDataSerializable {
 
-    protected void checkInstanceOf(MergingValueHolder dataHolder, Class<?> clazz) {
+    protected void checkInstanceOf(ValueHolder dataHolder, Class<?> clazz) {
         if (dataHolder != null && !clazz.isInstance(dataHolder)) {
             throw new IllegalArgumentException("Expected MergeDataHolder to be an instance of " + clazz.getName());
         }
@@ -52,7 +53,7 @@ public abstract class AbstractSplitBrainMergePolicy implements SplitBrainMergePo
     }
 
     @Override
-    public <V> V merge(MergingValueHolder<V> mergingValue, MergingValueHolder<V> existingValue) {
+    public V merge(T mergingValue, T existingValue) {
         return null;
     }
 }

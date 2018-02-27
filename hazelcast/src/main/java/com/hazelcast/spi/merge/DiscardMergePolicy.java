@@ -23,21 +23,21 @@ import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
  *
  * @since 3.10
  */
-public class DiscardMergePolicy extends AbstractSplitBrainMergePolicy {
+public class DiscardMergePolicy<V> extends AbstractSplitBrainMergePolicy<V, ValueHolder<V>> {
 
     public DiscardMergePolicy() {
     }
 
     @Override
-    public <T> T merge(MergingValueHolder<T> mergingValue, MergingValueHolder<T> existingValue) {
+    public int getId() {
+        return SplitBrainDataSerializerHook.DISCARD;
+    }
+
+    @Override
+    public V merge(ValueHolder<V> mergingValue, ValueHolder<V> existingValue) {
         if (existingValue == null) {
             return null;
         }
         return existingValue.getValue();
-    }
-
-    @Override
-    public int getId() {
-        return SplitBrainDataSerializerHook.DISCARD;
     }
 }

@@ -39,7 +39,7 @@ import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.SplitBrainHandlerService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.merge.DiscardMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.spi.partition.IPartitionService;
 import com.hazelcast.util.Clock;
 import com.hazelcast.util.MutableLong;
@@ -224,19 +224,19 @@ class MapSplitBrainHandlerService implements SplitBrainHandlerService {
 
             // sort the entries per partition and send out batch operations (multiple partitions per member)
             //noinspection unchecked
-            List<MergingEntryHolder<Data, Data>>[] entriesPerPartition = new List[partitionCount];
+            List<EntryHolder<Data, Data>>[] entriesPerPartition = new List[partitionCount];
             int recordCount = 0;
             for (Record record : recordList) {
                 recordCount++;
                 int partitionId = partitionService.getPartitionId(record.getKey());
-                List<MergingEntryHolder<Data, Data>> entries = entriesPerPartition[partitionId];
+                List<EntryHolder<Data, Data>> entries = entriesPerPartition[partitionId];
                 if (entries == null) {
-                    entries = new LinkedList<MergingEntryHolder<Data, Data>>();
+                    entries = new LinkedList<EntryHolder<Data, Data>>();
                     entriesPerPartition[partitionId] = entries;
                 }
 
                 Data dataValue = mapServiceContext.toData(record.getValue());
-                MergingEntryHolder<Data, Data> mergingEntry = createMergeHolder(record, dataValue);
+                EntryHolder<Data, Data> mergingEntry = createMergeHolder(record, dataValue);
                 entries.add(mergingEntry);
 
                 long currentSize = ++counterPerMember[partitionId].value;
@@ -288,7 +288,7 @@ class MapSplitBrainHandlerService implements SplitBrainHandlerService {
         }
 
         private void sendBatch(String name, List<Integer> memberPartitions,
-                               List<MergingEntryHolder<Data, Data>>[] entriesPerPartition,
+                               List<EntryHolder<Data, Data>>[] entriesPerPartition,
                                SplitBrainMergePolicy mergePolicy) {
             int size = memberPartitions.size();
             int[] partitions = new int[size];
@@ -308,7 +308,7 @@ class MapSplitBrainHandlerService implements SplitBrainHandlerService {
             }
 
             //noinspection unchecked
-            List<MergingEntryHolder<Data, Data>>[] entries = new List[size];
+            List<EntryHolder<Data, Data>>[] entries = new List[size];
             index = 0;
             int totalSize = 0;
             for (int partitionId : partitions) {
@@ -325,7 +325,7 @@ class MapSplitBrainHandlerService implements SplitBrainHandlerService {
         }
 
         private void invokeMergeOperationFactory(String name, SplitBrainMergePolicy mergePolicy, int[] partitions,
-                                                 List<MergingEntryHolder<Data, Data>>[] entries, int totalSize) {
+                                                 List<EntryHolder<Data, Data>>[] entries, int totalSize) {
             try {
                 MapOperationProvider operationProvider = mapServiceContext.getMapOperationProvider(name);
                 OperationFactory factory = operationProvider.createMergeOperationFactory(name, partitions, entries, mergePolicy);

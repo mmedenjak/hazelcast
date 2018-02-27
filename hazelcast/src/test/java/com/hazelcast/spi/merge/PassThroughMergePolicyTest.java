@@ -45,8 +45,8 @@ public class PassThroughMergePolicyTest {
 
     @Test
     public void merge_mergingNotNull() {
-        MergingValueHolder existing = mergingValueWithGivenValue(EXISTING);
-        MergingValueHolder merging = mergingValueWithGivenValue(MERGING);
+        ValueHolder existing = mergingValueWithGivenValue(EXISTING);
+        ValueHolder merging = mergingValueWithGivenValue(MERGING);
 
         assertEquals(MERGING, mergePolicy.merge(merging, existing));
     }
@@ -54,14 +54,14 @@ public class PassThroughMergePolicyTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void merge_mergingNull() {
-        MergingValueHolder existing = mergingValueWithGivenValue(EXISTING);
-        MergingValueHolder merging = null;
+        ValueHolder existing = mergingValueWithGivenValue(EXISTING);
+        ValueHolder merging = null;
 
         assertEquals(EXISTING, mergePolicy.merge(merging, existing));
     }
 
-    private MergingValueHolder mergingValueWithGivenValue(String value) {
-        MergingValueHolder mergingValue = mock(MergingValueHolder.class);
+    private ValueHolder mergingValueWithGivenValue(String value) {
+        ValueHolder mergingValue = mock(ValueHolder.class);
         try {
             when(mergingValue.getValue()).thenReturn(value);
             return mergingValue;

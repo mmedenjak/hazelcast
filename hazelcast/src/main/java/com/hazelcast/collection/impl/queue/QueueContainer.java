@@ -28,7 +28,7 @@ import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.transaction.TransactionException;
 import com.hazelcast.util.Clock;
@@ -1096,16 +1096,16 @@ public class QueueContainer implements IdentifiedDataSerializable {
     }
 
     /**
-     * Merges the given {@link MergingValueHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link ValueHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingValue the {@link MergingValueHolder} instance to merge
+     * @param mergingValue the {@link ValueHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the used {@link QueueItem} if merge is applied, otherwise {@code null}
      */
-    public QueueItem merge(MergingValueHolder<Data> mergingValue, SplitBrainMergePolicy mergePolicy) {
+    public QueueItem merge(ValueHolder<Data> mergingValue,
+                           SplitBrainMergePolicy<Data, ValueHolder<Data>> mergePolicy) {
         SerializationService serializationService = nodeEngine.getSerializationService();
         serializationService.getManagedContext().initialize(mergePolicy);
-        mergingValue.setSerializationService(serializationService);
         // try to find an existing item with the same value
         QueueItem existingItem = null;
         for (QueueItem item : getItemQueue()) {
@@ -1125,8 +1125,7 @@ public class QueueContainer implements IdentifiedDataSerializable {
                 }
             }
         } else {
-            MergingValueHolder<Data> existingValue = createMergeHolder(existingItem);
-            existingValue.setSerializationService(serializationService);
+            ValueHolder<Data> existingValue = createMergeHolder(existingItem);
             Data newValue = mergePolicy.merge(mergingValue, existingValue);
             if (newValue != null && !newValue.equals(existingValue.getValue())) {
                 existingItem.setData(newValue);

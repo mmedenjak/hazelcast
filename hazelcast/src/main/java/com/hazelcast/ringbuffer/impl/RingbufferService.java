@@ -43,7 +43,7 @@ import com.hazelcast.spi.SplitBrainHandlerService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.merge.DiscardMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.merge.SplitBrainMergePolicyProvider;
 import com.hazelcast.spi.partition.IPartitionService;
 import com.hazelcast.spi.serialization.SerializationService;
@@ -429,7 +429,7 @@ public class RingbufferService implements ManagedService, RemoteService, Fragmen
 
             int itemCount = 0;
             int operationCount = 0;
-            List<MergingValueHolder<Object>> mergingValues;
+            List<ValueHolder<Object>> mergingValues;
             for (Entry<Integer, List<RingbufferContainer>> entry : partitionContainerMap.entrySet()) {
                 int partitionId = entry.getKey();
                 List<RingbufferContainer> containerList = entry.getValue();
@@ -439,16 +439,16 @@ public class RingbufferService implements ManagedService, RemoteService, Fragmen
                     int batchSize = container.getConfig().getMergePolicyConfig().getBatchSize();
                     SplitBrainMergePolicy mergePolicy = getMergePolicy(container);
 
-                    mergingValues = new ArrayList<MergingValueHolder<Object>>(batchSize);
+                    mergingValues = new ArrayList<ValueHolder<Object>>(batchSize);
                     for (long sequence = ringbuffer.headSequence(); sequence <= ringbuffer.tailSequence(); sequence++) {
                         Object item = ringbuffer.read(sequence);
-                        MergingValueHolder<Object> mergingValue = createMergeHolder(sequence, item);
+                        ValueHolder<Object> mergingValue = createMergeHolder(sequence, item);
                         mergingValues.add(mergingValue);
                         itemCount++;
 
                         if (mergingValues.size() == batchSize) {
                             sendBatch(partitionId, container.getNamespace(), mergePolicy, mergingValues, mergeCallback);
-                            mergingValues = new ArrayList<MergingValueHolder<Object>>(batchSize);
+                            mergingValues = new ArrayList<ValueHolder<Object>>(batchSize);
                             operationCount++;
                         }
                     }
@@ -471,7 +471,7 @@ public class RingbufferService implements ManagedService, RemoteService, Fragmen
         }
 
         private void sendBatch(int partitionId, ObjectNamespace namespace, SplitBrainMergePolicy mergePolicy,
-                               List<MergingValueHolder<Object>> mergingValues, ExecutionCallback<Object> mergeCallback) {
+                               List<ValueHolder<Object>> mergingValues, ExecutionCallback<Object> mergeCallback) {
             MergeOperation operation = new MergeOperation(namespace, mergePolicy, mergingValues);
             try {
                 nodeEngine.getOperationService()

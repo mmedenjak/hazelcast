@@ -24,27 +24,25 @@ import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
  *
  * @since 3.10
  */
-public class HigherHitsMergePolicy extends AbstractSplitBrainMergePolicy {
+public class HigherHitsMergePolicy<V> extends AbstractSplitBrainMergePolicy<V, HitsHolder<V>> {
 
     public HigherHitsMergePolicy() {
     }
 
     @Override
-    public <V> V merge(MergingValueHolder<V> mergingValue, MergingValueHolder<V> existingValue) {
-        checkInstanceOf(mergingValue, HitsHolder.class);
-        checkInstanceOf(existingValue, HitsHolder.class);
-        if (mergingValue == null) {
-            return existingValue.getValue();
+    public V merge(HitsHolder<V> merging, HitsHolder<V> existing) {
+        checkInstanceOf(merging, HitsHolder.class);
+        checkInstanceOf(existing, HitsHolder.class);
+        if (merging == null) {
+            return existing.getValue();
         }
-        if (existingValue == null) {
-            return mergingValue.getValue();
+        if (existing == null) {
+            return merging.getValue();
         }
-        HitsHolder merging = (HitsHolder) mergingValue;
-        HitsHolder existing = (HitsHolder) existingValue;
         if (merging.getHits() >= existing.getHits()) {
-            return mergingValue.getValue();
+            return merging.getValue();
         }
-        return existingValue.getValue();
+        return existing.getValue();
     }
 
     @Override

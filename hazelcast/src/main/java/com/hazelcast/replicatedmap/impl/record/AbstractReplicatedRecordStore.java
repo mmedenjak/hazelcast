@@ -27,7 +27,7 @@ import com.hazelcast.replicatedmap.impl.operation.VersionResponsePair;
 import com.hazelcast.replicatedmap.merge.ReplicatedMapMergePolicy;
 import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.util.Clock;
 
 import java.util.ArrayList;
@@ -342,9 +342,8 @@ public abstract class AbstractReplicatedRecordStore<K, V> extends AbstractBaseRe
 
     @Override
     @SuppressWarnings("unchecked")
-    public boolean merge(MergingEntryHolder<Object, Object> mergingEntry, SplitBrainMergePolicy mergePolicy) {
+    public boolean merge(EntryHolder<Object, Object> mergingEntry, SplitBrainMergePolicy mergePolicy) {
         serializationService.getManagedContext().initialize(mergePolicy);
-        mergingEntry.setSerializationService(serializationService);
 
         K marshalledKey = (K) marshall(mergingEntry.getKey());
         InternalReplicatedMapStorage<K, V> storage = getStorage();
@@ -362,8 +361,7 @@ public abstract class AbstractReplicatedRecordStore<K, V> extends AbstractBaseRe
             VersionResponsePair responsePair = new VersionResponsePair(mergingEntry.getValue(), getVersion());
             sendReplicationOperation(false, name, dataKey, dataValue, record.getTtlMillis(), responsePair);
         } else {
-            MergingEntryHolder<Object, Object> existingEntry = createMergeHolder(record);
-            existingEntry.setSerializationService(serializationService);
+            EntryHolder<Object, Object> existingEntry = createMergeHolder(record);
             V newValue = (V) mergePolicy.merge(mergingEntry, existingEntry);
             if (newValue == null) {
                 storage.remove(marshalledKey, record);

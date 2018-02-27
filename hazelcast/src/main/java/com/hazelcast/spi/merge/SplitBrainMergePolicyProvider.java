@@ -85,7 +85,7 @@ public final class SplitBrainMergePolicyProvider {
      * @return the resolved {@link SplitBrainMergePolicy} class
      * @throws InvalidConfigurationException when the classname could not be resolved
      */
-    public SplitBrainMergePolicy getMergePolicy(String className) {
+    public <V,H extends ValueHolder<V>> SplitBrainMergePolicy<V,H> getMergePolicy(String className) {
         if (className == null) {
             throw new InvalidConfigurationException("Class name is mandatory!");
         }

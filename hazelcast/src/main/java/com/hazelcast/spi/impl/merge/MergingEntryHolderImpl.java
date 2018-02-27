@@ -21,19 +21,19 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.merge.CreationTimeHolder;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.io.IOException;
 
 /**
- * Implementation of {@link MergingEntryHolder}.
+ * Implementation of {@link EntryHolder}.
  *
  * @param <K> the type of key
  * @param <V> the type of value
  * @since 3.10
  */
-public class MergingEntryHolderImpl<K, V> implements MergingEntryHolder<K, V>, CreationTimeHolder, IdentifiedDataSerializable {
+public class MergingEntryHolderImpl<K, V> implements EntryHolder<K, V>, CreationTimeHolder<V>, IdentifiedDataSerializable {
 
     private K key;
     private V value;
@@ -64,11 +64,6 @@ public class MergingEntryHolderImpl<K, V> implements MergingEntryHolder<K, V>, C
     @Override
     public Object getDeserializedValue() {
         return serializationService.toObject(value);
-    }
-
-    @Override
-    public void setSerializationService(SerializationService serializationService) {
-        this.serializationService = serializationService;
     }
 
     public MergingEntryHolderImpl<K, V> setValue(V value) {

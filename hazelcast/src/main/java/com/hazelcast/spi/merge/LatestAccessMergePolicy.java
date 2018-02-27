@@ -26,27 +26,23 @@ import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
  *
  * @since 3.10
  */
-public class LatestAccessMergePolicy extends AbstractSplitBrainMergePolicy {
+public class LatestAccessMergePolicy<V> extends AbstractSplitBrainMergePolicy<V, LastAccessTimeHolder<V>> {
 
     public LatestAccessMergePolicy() {
     }
 
     @Override
-    public <V> V merge(MergingValueHolder<V> mergingValue, MergingValueHolder<V> existingValue) {
-        checkInstanceOf(mergingValue, LastAccessTimeHolder.class);
-        checkInstanceOf(existingValue, LastAccessTimeHolder.class);
-        if (mergingValue == null) {
-            return existingValue.getValue();
+    public V merge(LastAccessTimeHolder<V> merging, LastAccessTimeHolder<V> existing) {
+        if (merging == null) {
+            return existing.getValue();
         }
-        if (existingValue == null) {
-            return mergingValue.getValue();
+        if (existing == null) {
+            return merging.getValue();
         }
-        LastAccessTimeHolder merging = (LastAccessTimeHolder) mergingValue;
-        LastAccessTimeHolder existing = (LastAccessTimeHolder) existingValue;
         if (merging.getLastAccessTime() >= existing.getLastAccessTime()) {
-            return mergingValue.getValue();
+            return merging.getValue();
         }
-        return existingValue.getValue();
+        return existing.getValue();
     }
 
     @Override

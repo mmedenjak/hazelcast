@@ -26,7 +26,7 @@ import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.ReplicationSupportingService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.wan.WanReplicationEvent;
 
 import java.util.concurrent.Future;
@@ -78,7 +78,7 @@ class MapReplicationSupportingService implements ReplicationSupportingService {
 
         MapOperation operation;
         if (mergePolicy instanceof SplitBrainMergePolicy) {
-            MergingEntryHolder<Data, Data> mergingEntry = createMergeHolder(replicationUpdate.getEntryView());
+            EntryHolder<Data, Data> mergingEntry = createMergeHolder(replicationUpdate.getEntryView());
             operation = operationProvider.createMergeOperation(mapName, mergingEntry, (SplitBrainMergePolicy) mergePolicy, true);
         } else {
             EntryView<Data, Data> entryView = replicationUpdate.getEntryView();

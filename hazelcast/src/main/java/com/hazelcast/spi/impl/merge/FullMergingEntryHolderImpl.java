@@ -27,8 +27,8 @@ import com.hazelcast.spi.merge.HitsHolder;
 import com.hazelcast.spi.merge.LastAccessTimeHolder;
 import com.hazelcast.spi.merge.LastStoredTimeHolder;
 import com.hazelcast.spi.merge.LastUpdateTimeHolder;
-import com.hazelcast.spi.merge.MergingEntryHolder;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.EntryHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.merge.TtlHolder;
 import com.hazelcast.spi.merge.VersionHolder;
 import com.hazelcast.spi.serialization.SerializationService;
@@ -36,16 +36,16 @@ import com.hazelcast.spi.serialization.SerializationService;
 import java.io.IOException;
 
 /**
- * Complete implementation of {@link MergingValueHolder} and all other data holder interfaces.
+ * Complete implementation of {@link ValueHolder} and all other data holder interfaces.
  *
  * @param <K> the type of key
  * @param <V> the type of value
  * @since 3.10
  */
 @SuppressWarnings("checkstyle:methodcount")
-public class FullMergingEntryHolderImpl<K, V> implements MergingEntryHolder<K, V>, CostHolder, CreationTimeHolder,
-        ExpirationTimeHolder, HitsHolder, LastAccessTimeHolder, LastStoredTimeHolder, LastUpdateTimeHolder, VersionHolder,
-        TtlHolder, IdentifiedDataSerializable {
+public class FullMergingEntryHolderImpl<K, V> implements EntryHolder<K, V>, CostHolder<V>, CreationTimeHolder<V>,
+        ExpirationTimeHolder<V>, HitsHolder<V>, LastAccessTimeHolder<V>, LastStoredTimeHolder<V>, LastUpdateTimeHolder<V>, VersionHolder<V>,
+        TtlHolder<V>, IdentifiedDataSerializable {
 
     private V value;
     private K key;
@@ -72,11 +72,6 @@ public class FullMergingEntryHolderImpl<K, V> implements MergingEntryHolder<K, V
     @Override
     public Object getDeserializedValue() {
         return serializationService.toObject(value);
-    }
-
-    @Override
-    public void setSerializationService(SerializationService serializationService) {
-        this.serializationService = serializationService;
     }
 
     public FullMergingEntryHolderImpl<K, V> setValue(V value) {

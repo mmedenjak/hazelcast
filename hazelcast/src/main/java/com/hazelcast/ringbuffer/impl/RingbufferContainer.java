@@ -32,7 +32,7 @@ import com.hazelcast.spi.Notifier;
 import com.hazelcast.spi.ObjectNamespace;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.WaitNotifyKey;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.io.IOException;
@@ -615,13 +615,13 @@ public class RingbufferContainer<T, E> implements IdentifiedDataSerializable, No
     }
 
     /**
-     * Merges the given {@link MergingValueHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link ValueHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingValue the {@link MergingValueHolder} instance to merge
+     * @param mergingValue the {@link ValueHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the sequence ID of the merged item or {@code -1} if no item was merged
      */
-    public long merge(MergingValueHolder<E> mergingValue, SplitBrainMergePolicy mergePolicy) {
+    public long merge(ValueHolder<E> mergingValue, SplitBrainMergePolicy mergePolicy) {
         return ringbuffer.merge(mergingValue, mergePolicy, remainingCapacity());
     }
 }

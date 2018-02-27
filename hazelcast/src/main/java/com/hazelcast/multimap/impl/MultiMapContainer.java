@@ -22,7 +22,7 @@ import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.DistributedObjectNamespace;
 import com.hazelcast.spi.ObjectNamespace;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.util.Collection;
@@ -220,16 +220,15 @@ public class MultiMapContainer extends MultiMapContainerSupport {
     }
 
     /**
-     * Merges the given {@link MergingEntryHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link EntryHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingEntry the {@link MergingEntryHolder} instance to merge
+     * @param mergingEntry the {@link EntryHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the used {@link MultiMapValue} if merge is applied, otherwise {@code null}
      */
-    public MultiMapValue merge(MergingEntryHolder<Data, MultiMapMergeContainer> mergingEntry, SplitBrainMergePolicy mergePolicy) {
+    public MultiMapValue merge(EntryHolder<Data, MultiMapMergeContainer> mergingEntry, SplitBrainMergePolicy mergePolicy) {
         SerializationService serializationService = nodeEngine.getSerializationService();
         serializationService.getManagedContext().initialize(mergePolicy);
-        mergingEntry.setSerializationService(serializationService);
 
         Data key = mergingEntry.getKey();
         MultiMapMergeContainer mergingContainer = mergingEntry.getValue();
@@ -247,7 +246,7 @@ public class MultiMapContainer extends MultiMapContainerSupport {
 
         MultiMapValue mergedValue = null;
         for (MultiMapRecord mergeRecord : mergingContainer.getRecords()) {
-            MergingEntryHolder<Data, Object> mergingEntry = createMergeHolder(mergingContainer, mergeRecord);
+            EntryHolder<Data, Object> mergingEntry = createMergeHolder(mergingContainer, mergeRecord);
             Object newValue = mergePolicy.merge(mergingEntry, null);
             if (newValue != null) {
                 MultiMapRecord newRecord = new MultiMapRecord(nextId(), isBinary ? newValue : ss.toObject(newValue));
@@ -268,13 +267,12 @@ public class MultiMapContainer extends MultiMapContainerSupport {
         Collection<MultiMapRecord> existingRecords = existingValue.getCollection(false);
         int existingHits = existingValue.getHits();
         for (MultiMapRecord mergeRecord : mergingContainer.getRecords()) {
-            MergingEntryHolder<Data, Object> mergingEntry = createMergeHolder(mergingContainer, mergeRecord);
-            MergingEntryHolder<Data, Object> existingEntry = null;
+            EntryHolder<Data, Object> mergingEntry = createMergeHolder(mergingContainer, mergeRecord);
+            EntryHolder<Data, Object> existingEntry = null;
             MultiMapRecord existingRecord = null;
             for (MultiMapRecord record : existingRecords) {
                 if (record.getObject().equals(mergeRecord.getObject())) {
                     existingEntry = createMergeHolder(this, key, record, existingHits);
-                    existingEntry.setSerializationService(ss);
                     existingRecord = record;
                 }
             }

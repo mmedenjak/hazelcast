@@ -28,7 +28,7 @@ import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.impl.executionservice.InternalExecutionService;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.util.Collection;
@@ -234,17 +234,16 @@ public class ScheduledExecutorContainer {
     }
 
     /**
-     * Merges the given {@link MergingValueHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link ValueHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingValue the {@link MergingValueHolder} instance to merge
+     * @param mergingValue the {@link ValueHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the used {@link ScheduledTaskDescriptor} if merge is applied, otherwise {@code null}
      */
-    public ScheduledTaskDescriptor merge(MergingValueHolder<ScheduledTaskDescriptor> mergingValue,
-                                         SplitBrainMergePolicy mergePolicy) {
+    public ScheduledTaskDescriptor merge(ValueHolder<ScheduledTaskDescriptor> mergingValue,
+                                         SplitBrainMergePolicy<ScheduledTaskDescriptor, ValueHolder<ScheduledTaskDescriptor>> mergePolicy) {
         SerializationService serializationService = nodeEngine.getSerializationService();
         serializationService.getManagedContext().initialize(mergePolicy);
-        mergingValue.setSerializationService(serializationService);
 
         // try to find an existing item with the same value
         ScheduledTaskDescriptor match = null;
@@ -264,8 +263,7 @@ public class ScheduledExecutorContainer {
             }
         } else {
             // Found a match -> real merge
-            MergingValueHolder<ScheduledTaskDescriptor> existingValue = createMergeHolder(match);
-            existingValue.setSerializationService(serializationService);
+            ValueHolder<ScheduledTaskDescriptor> existingValue = createMergeHolder(match);
             merged = mergePolicy.merge(mergingValue, existingValue);
             if (merged != null && !merged.equals(match)) {
                 // Cancel matched one, before replacing it

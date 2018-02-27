@@ -23,13 +23,13 @@ import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
  *
  * @since 3.10
  */
-public class PutIfAbsentMergePolicy extends AbstractSplitBrainMergePolicy {
+public class PutIfAbsentMergePolicy<V> extends AbstractSplitBrainMergePolicy<V, ValueHolder<V>> {
 
     public PutIfAbsentMergePolicy() {
     }
 
     @Override
-    public <V> V merge(MergingValueHolder<V> mergingValue, MergingValueHolder<V> existingValue) {
+    public V merge(ValueHolder<V> mergingValue, ValueHolder<V> existingValue) {
         if (existingValue == null) {
             return mergingValue.getValue();
         }

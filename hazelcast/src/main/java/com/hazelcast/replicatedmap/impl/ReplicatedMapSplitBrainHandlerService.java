@@ -33,7 +33,7 @@ import com.hazelcast.spi.OperationFactory;
 import com.hazelcast.spi.SplitBrainHandlerService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.merge.DiscardMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.spi.partition.IPartitionService;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.MutableLong;
@@ -169,18 +169,18 @@ class ReplicatedMapSplitBrainHandlerService implements SplitBrainHandlerService 
 
             // sort the entries per partition and send out batch operations (multiple partitions per member)
             //noinspection unchecked
-            List<MergingEntryHolder<Object, Object>>[] entriesPerPartition = new List[partitionCount];
+            List<EntryHolder<Object, Object>>[] entriesPerPartition = new List[partitionCount];
             int recordCount = 0;
             for (ReplicatedRecord record : recordList) {
                 recordCount++;
                 int partitionId = partitionService.getPartitionId(record.getKeyInternal());
-                List<MergingEntryHolder<Object, Object>> entries = entriesPerPartition[partitionId];
+                List<EntryHolder<Object, Object>> entries = entriesPerPartition[partitionId];
                 if (entries == null) {
-                    entries = new LinkedList<MergingEntryHolder<Object, Object>>();
+                    entries = new LinkedList<EntryHolder<Object, Object>>();
                     entriesPerPartition[partitionId] = entries;
                 }
 
-                MergingEntryHolder<Object, Object> mergingEntry = createMergeHolder(record);
+                EntryHolder<Object, Object> mergingEntry = createMergeHolder(record);
                 entries.add(mergingEntry);
 
                 long currentSize = ++counterPerMember[partitionId].value;
@@ -197,7 +197,7 @@ class ReplicatedMapSplitBrainHandlerService implements SplitBrainHandlerService 
         }
 
         private void sendBatch(String name, List<Integer> memberPartitions,
-                               List<MergingEntryHolder<Object, Object>>[] entriesPerPartition,
+                               List<EntryHolder<Object, Object>>[] entriesPerPartition,
                                SplitBrainMergePolicy mergePolicy) {
             int size = memberPartitions.size();
             int[] partitions = new int[size];
@@ -217,7 +217,7 @@ class ReplicatedMapSplitBrainHandlerService implements SplitBrainHandlerService 
             }
 
             //noinspection unchecked
-            List<MergingEntryHolder<Object, Object>>[] entries = new List[size];
+            List<EntryHolder<Object, Object>>[] entries = new List[size];
             index = 0;
             int totalSize = 0;
             for (int partitionId : partitions) {
@@ -234,7 +234,7 @@ class ReplicatedMapSplitBrainHandlerService implements SplitBrainHandlerService 
         }
 
         private void invokeMergeOperationFactory(String name, SplitBrainMergePolicy mergePolicy, int[] partitions,
-                                                 List<MergingEntryHolder<Object, Object>>[] entries, int totalSize) {
+                                                 List<EntryHolder<Object, Object>>[] entries, int totalSize) {
             try {
                 OperationFactory factory = new MergeOperationFactory(name, partitions, entries, mergePolicy);
                 nodeEngine.getOperationService()

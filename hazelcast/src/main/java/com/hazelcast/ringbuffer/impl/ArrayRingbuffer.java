@@ -18,7 +18,7 @@ package com.hazelcast.ringbuffer.impl;
 
 import com.hazelcast.ringbuffer.StaleSequenceException;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import static com.hazelcast.spi.impl.merge.MergingHolders.createMergeHolder;
@@ -159,9 +159,10 @@ public class ArrayRingbuffer<E> implements Ringbuffer<E> {
     }
 
     @Override
-    public long merge(MergingValueHolder<E> mergingValue, SplitBrainMergePolicy mergePolicy, long remainingCapacity) {
+    public long merge(ValueHolder<E> mergingValue,
+                      SplitBrainMergePolicy<E, ValueHolder<E>> mergePolicy,
+                      long remainingCapacity) {
         serializationService.getManagedContext().initialize(mergePolicy);
-        mergingValue.setSerializationService(serializationService);
 
         // try to find an existing item with the same value
         E existingItem = null;
@@ -186,8 +187,7 @@ public class ArrayRingbuffer<E> implements Ringbuffer<E> {
                 return add(newValue);
             }
         } else {
-            MergingValueHolder<E> existingValue = createMergeHolder(existingSequence, existingItem);
-            existingValue.setSerializationService(serializationService);
+            ValueHolder<E> existingValue = createMergeHolder(existingSequence, existingItem);
             E newValue = mergePolicy.merge(mergingValue, existingValue);
             if (newValue != null && !newValue.equals(existingItem)) {
                 set(existingSequence, newValue);

@@ -20,7 +20,7 @@ import com.hazelcast.config.AtomicReferenceConfig;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import static com.hazelcast.spi.impl.merge.MergingHolders.createMergeHolder;
@@ -81,19 +81,18 @@ public class AtomicReferenceContainer {
     }
 
     /**
-     * Merges the given {@link MergingValueHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link ValueHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingValue the {@link MergingValueHolder} instance to merge
+     * @param mergingValue the {@link ValueHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the new value if merge is applied, otherwise {@code null}
      */
-    public Data merge(MergingValueHolder<Data> mergingValue, SplitBrainMergePolicy mergePolicy, boolean isExistingContainer) {
+    public Data merge(ValueHolder<Data> mergingValue, SplitBrainMergePolicy<Data, ValueHolder<Data>> mergePolicy,
+                      boolean isExistingContainer) {
         serializationService.getManagedContext().initialize(mergePolicy);
-        mergingValue.setSerializationService(serializationService);
 
         if (isExistingContainer) {
-            MergingValueHolder<Data> existingValue = createMergeHolder(value);
-            existingValue.setSerializationService(serializationService);
+            ValueHolder<Data> existingValue = createMergeHolder(value);
             Data newValue = mergePolicy.merge(mergingValue, existingValue);
             if (newValue != null && !newValue.equals(value)) {
                 value = newValue;

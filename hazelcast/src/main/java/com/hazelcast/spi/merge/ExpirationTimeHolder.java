@@ -21,7 +21,7 @@ package com.hazelcast.spi.merge;
  *
  * @since 3.10
  */
-public interface ExpirationTimeHolder {
+public interface ExpirationTimeHolder<V> extends ValueHolder<V> {
 
     /**
      * Returns the expiration time of the merge data.

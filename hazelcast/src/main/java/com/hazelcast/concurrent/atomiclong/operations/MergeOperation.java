@@ -21,7 +21,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 
 import java.io.IOException;
 
@@ -54,7 +54,7 @@ public class MergeOperation extends AtomicLongBackupAwareOperation {
         AtomicLongService service = getService();
         boolean isExistingContainer = service.containsAtomicLong(name);
 
-        MergingValueHolder<Long> mergingValue = createMergeHolder(this.mergingValue);
+        ValueHolder<Long> mergingValue = createMergeHolder(this.mergingValue);
         backupValue = getLongContainer().merge(mergingValue, mergePolicy, isExistingContainer);
     }
 

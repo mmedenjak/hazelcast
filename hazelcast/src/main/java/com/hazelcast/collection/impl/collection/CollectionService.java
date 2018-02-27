@@ -43,7 +43,7 @@ import com.hazelcast.spi.SplitBrainHandlerService;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.TransactionalService;
 import com.hazelcast.spi.merge.DiscardMergePolicy;
-import com.hazelcast.spi.merge.MergingValueHolder;
+import com.hazelcast.spi.merge.ValueHolder;
 import com.hazelcast.spi.merge.SplitBrainMergePolicyProvider;
 import com.hazelcast.spi.partition.IPartitionService;
 import com.hazelcast.spi.partition.MigrationEndpoint;
@@ -266,7 +266,7 @@ public abstract class CollectionService implements ManagedService, RemoteService
 
             int itemCount = 0;
             int operationCount = 0;
-            List<MergingValueHolder<Data>> mergingValues;
+            List<ValueHolder<Data>> mergingValues;
             for (Map.Entry<Integer, Map<CollectionContainer, List<CollectionItem>>> partitionEntry : itemMap.entrySet()) {
                 int partitionId = partitionEntry.getKey();
                 Map<CollectionContainer, List<CollectionItem>> containerMap = partitionEntry.getValue();
@@ -278,15 +278,15 @@ public abstract class CollectionService implements ManagedService, RemoteService
                     int batchSize = container.getConfig().getMergePolicyConfig().getBatchSize();
                     SplitBrainMergePolicy mergePolicy = getMergePolicy(container);
 
-                    mergingValues = new ArrayList<MergingValueHolder<Data>>();
+                    mergingValues = new ArrayList<ValueHolder<Data>>();
                     for (CollectionItem item : itemList) {
-                        MergingValueHolder<Data> mergingValue = createMergeHolder(item);
+                        ValueHolder<Data> mergingValue = createMergeHolder(item);
                         mergingValues.add(mergingValue);
                         itemCount++;
 
                         if (mergingValues.size() == batchSize) {
                             sendBatch(partitionId, name, mergePolicy, mergingValues, mergeCallback);
-                            mergingValues = new ArrayList<MergingValueHolder<Data>>(batchSize);
+                            mergingValues = new ArrayList<ValueHolder<Data>>(batchSize);
                             operationCount++;
                         }
                     }
@@ -310,7 +310,7 @@ public abstract class CollectionService implements ManagedService, RemoteService
         }
 
         private void sendBatch(int partitionId, String name, SplitBrainMergePolicy mergePolicy,
-                               List<MergingValueHolder<Data>> mergingValues, ExecutionCallback<Object> mergeCallback) {
+                               List<ValueHolder<Data>> mergingValues, ExecutionCallback<Object> mergeCallback) {
             CollectionOperation operation = new CollectionMergeOperation(name, mergePolicy, mergingValues);
             try {
                 nodeEngine.getOperationService()

@@ -72,7 +72,7 @@ public final class SplitBrainDataSerializerHook implements DataSerializerHook {
 
         constructors[MERGE_DATA_HOLDER] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
             public IdentifiedDataSerializable createNew(Integer arg) {
-                return new MergingValueHolderImpl();
+                return new ValueHolderImpl();
             }
         };
         constructors[KEY_MERGE_DATA_HOLDER] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {

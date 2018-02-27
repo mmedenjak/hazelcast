@@ -42,24 +42,24 @@ public abstract class AbstractSplitBrainMergePolicyTest {
 
     @Test
     public void merge_mergingWins() {
-        MergingValueHolder existing = mergingValueWithGivenPropertyAndValue(1, EXISTING);
-        MergingValueHolder merging = mergingValueWithGivenPropertyAndValue(333, MERGING);
+        ValueHolder existing = mergingValueWithGivenPropertyAndValue(1, EXISTING);
+        ValueHolder merging = mergingValueWithGivenPropertyAndValue(333, MERGING);
 
         assertEquals(MERGING, mergePolicy.merge(merging, existing));
     }
 
     @Test
     public void merge_existingWins() {
-        MergingValueHolder existing = mergingValueWithGivenPropertyAndValue(333, EXISTING);
-        MergingValueHolder merging = mergingValueWithGivenPropertyAndValue(1, MERGING);
+        ValueHolder existing = mergingValueWithGivenPropertyAndValue(333, EXISTING);
+        ValueHolder merging = mergingValueWithGivenPropertyAndValue(1, MERGING);
 
         assertEquals(EXISTING, mergePolicy.merge(merging, existing));
     }
 
     @Test
     public void merge_draw_mergingWins() {
-        MergingValueHolder existing = mergingValueWithGivenPropertyAndValue(1, EXISTING);
-        MergingValueHolder merging = mergingValueWithGivenPropertyAndValue(1, MERGING);
+        ValueHolder existing = mergingValueWithGivenPropertyAndValue(1, EXISTING);
+        ValueHolder merging = mergingValueWithGivenPropertyAndValue(1, MERGING);
 
         assertEquals(MERGING, mergePolicy.merge(merging, existing));
     }
@@ -67,8 +67,8 @@ public abstract class AbstractSplitBrainMergePolicyTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void merge_mergingWins_sinceExistingIsNotExist() {
-        MergingValueHolder existing = null;
-        MergingValueHolder merging = mergingValueWithGivenPropertyAndValue(1, MERGING);
+        ValueHolder existing = null;
+        ValueHolder merging = mergingValueWithGivenPropertyAndValue(1, MERGING);
 
         assertEquals(MERGING, mergePolicy.merge(merging, existing));
     }
@@ -76,13 +76,13 @@ public abstract class AbstractSplitBrainMergePolicyTest {
     @Test
     @SuppressWarnings("ConstantConditions")
     public void merge_existingWins_sinceMergingIsNotExist() {
-        MergingValueHolder existing = mergingValueWithGivenPropertyAndValue(1, EXISTING);
-        MergingValueHolder merging = null;
+        ValueHolder existing = mergingValueWithGivenPropertyAndValue(1, EXISTING);
+        ValueHolder merging = null;
 
         assertEquals(EXISTING, mergePolicy.merge(merging, existing));
     }
 
-    private MergingValueHolder mergingValueWithGivenPropertyAndValue(long testedProperty, String value) {
+    private ValueHolder mergingValueWithGivenPropertyAndValue(long testedProperty, String value) {
         FullMergingEntryHolderImpl mergingEntry = mock(FullMergingEntryHolderImpl.class);
         try {
             if (mergePolicy instanceof HigherHitsMergePolicy) {

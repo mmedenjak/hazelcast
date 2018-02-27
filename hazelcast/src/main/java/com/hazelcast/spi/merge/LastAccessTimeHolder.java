@@ -16,14 +16,12 @@
 
 package com.hazelcast.spi.merge;
 
-import com.hazelcast.nio.serialization.DataSerializable;
-
 /**
  * Represents a read-only view of a last access time for the merging process after a split-brain.
  *
  * @since 3.10
  */
-public interface LastAccessTimeHolder extends DataSerializable {
+public interface LastAccessTimeHolder<V> extends ValueHolder<V> {
 
     /**
      * Returns the last access time of the merge data.

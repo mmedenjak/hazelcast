@@ -47,7 +47,7 @@ import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.eventservice.InternalEventService;
 import com.hazelcast.spi.merge.ExpirationTimeHolder;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.Clock;
 import com.hazelcast.util.EmptyStatement;
@@ -1447,12 +1447,12 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     @Override
-    public CacheRecord merge(MergingEntryHolder<Data, Data> mergingEntry, SplitBrainMergePolicy mergePolicy) {
+    public CacheRecord merge(EntryHolder<Data, Data> mergingEntry,
+                             SplitBrainMergePolicy<Data, EntryHolder<Data, Data>> mergePolicy) {
         final long now = Clock.currentTimeMillis();
         final long start = isStatisticsEnabled() ? System.nanoTime() : 0;
 
         injectDependencies(mergePolicy);
-        mergingEntry.setSerializationService(nodeEngine.getSerializationService());
 
         boolean merged = false;
         Data key = mergingEntry.getKey();
@@ -1469,8 +1469,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             }
         } else {
             Data oldValue = nodeEngine.getSerializationService().toData(record.getValue());
-            MergingEntryHolder<Data, Data> existingEntry = createMergeHolder(key, oldValue, record);
-            existingEntry.setSerializationService(nodeEngine.getSerializationService());
+            EntryHolder<Data, Data> existingEntry = createMergeHolder(key, oldValue, record);
             Data newValue = mergePolicy.merge(mergingEntry, existingEntry);
             if (newValue != null && newValue != oldValue) {
                 merged = updateRecordWithExpiry(key, newValue, record, expiryTime, now, true, IGNORE_COMPLETION);

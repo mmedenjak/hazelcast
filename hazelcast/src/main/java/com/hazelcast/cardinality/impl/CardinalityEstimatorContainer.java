@@ -22,7 +22,7 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.SplitBrainMergePolicy;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 
 import java.io.IOException;
 
@@ -69,16 +69,17 @@ public class CardinalityEstimatorContainer
     }
 
     /**
-     * Merges the given {@link MergingEntryHolder} via the given {@link SplitBrainMergePolicy}.
+     * Merges the given {@link EntryHolder} via the given {@link SplitBrainMergePolicy}.
      *
-     * @param mergingEntry the {@link MergingEntryHolder} instance to merge
+     * @param mergingEntry the {@link EntryHolder} instance to merge
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the used {@link HyperLogLog} if merge is applied, otherwise {@code null}
      */
-    public HyperLogLog merge(MergingEntryHolder<String, HyperLogLog> mergingEntry, SplitBrainMergePolicy mergePolicy) {
+    public HyperLogLog merge(HyperLogLogMergingItem mergingEntry,
+                             SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogMergingItem> mergePolicy) {
         String name = mergingEntry.getKey();
         if (hll.estimate() != 0) {
-            MergingEntryHolder<String, HyperLogLog> existingEntry = createMergeHolder(name, hll);
+            HyperLogLogMergingItem existingEntry = createMergeHolder(name, hll);
             HyperLogLog newValue = mergePolicy.merge(mergingEntry, existingEntry);
             if (newValue != null && !newValue.equals(hll)) {
                 setValue(newValue);

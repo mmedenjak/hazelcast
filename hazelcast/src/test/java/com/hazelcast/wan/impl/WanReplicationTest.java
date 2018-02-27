@@ -39,7 +39,7 @@ import com.hazelcast.spi.OperationFactory;
 import com.hazelcast.spi.SplitBrainMergePolicy;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.operationservice.InternalOperationService;
-import com.hazelcast.spi.merge.MergingEntryHolder;
+import com.hazelcast.spi.merge.EntryHolder;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastParallelClassRunner;
@@ -283,7 +283,7 @@ public class WanReplicationTest extends HazelcastTestSupport {
             op = operationProvider.createLegacyMergeOperation(mapName, entryView, new PassThroughMergePolicy(),
                     !enableWANReplicationEvent);
         } else {
-            MergingEntryHolder<Data, Data> mergingEntry = createMergeHolder(entryView);
+            EntryHolder<Data, Data> mergingEntry = createMergeHolder(entryView);
             SplitBrainMergePolicy mergePolicy = new com.hazelcast.spi.merge.PassThroughMergePolicy();
             op = operationProvider.createMergeOperation(mapName, mergingEntry, mergePolicy, !enableWANReplicationEvent);
         }
