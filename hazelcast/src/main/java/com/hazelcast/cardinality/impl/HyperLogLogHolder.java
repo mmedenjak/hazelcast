@@ -21,9 +21,8 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.impl.merge.MergingEntryHolderImpl;
 import com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook;
 
-public class HyperLogLogMergingItem extends MergingEntryHolderImpl<String, HyperLogLog>
+public class HyperLogLogHolder extends MergingEntryHolderImpl<String, HyperLogLog>
         implements IdentifiedDataSerializable {
-
 
     @Override
     public int getFactoryId() {

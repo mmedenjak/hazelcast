@@ -49,17 +49,5 @@ import com.hazelcast.spi.merge.ValueHolder;
  * @since 3.10
  */
 public interface SplitBrainMergePolicy<VALUE, HOLDER extends ValueHolder<VALUE>> extends DataSerializable {
-
-    /**
-     * Selects the value of either the merging or the existing {@link ValueHolder} which should be merged.
-     * <p>
-     * Note that the existing {@link ValueHolder} instance may be {@code null}
-     * if no matching data could be found to the merging {@link ValueHolder}.
-     *
-     * @param mergingValue  {@link ValueHolder} instance that has the merging data of the smaller sub-cluster
-     * @param existingValue {@link ValueHolder} instance that has the existing data
-     *                      or {@code null} if no matching data exists
-     * @return the selected value for merging
-     */
     VALUE merge(HOLDER mergingValue, HOLDER existingValue);
 }

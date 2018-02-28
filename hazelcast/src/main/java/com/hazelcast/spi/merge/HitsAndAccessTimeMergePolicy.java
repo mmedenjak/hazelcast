@@ -18,8 +18,7 @@ package com.hazelcast.spi.merge;
 
 import com.hazelcast.cardinality.impl.HyperLogLogHolder;
 import com.hazelcast.cardinality.impl.hyperloglog.HyperLogLog;
-
-import static com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook.HYPER_LOG_LOG;
+import com.hazelcast.spi.impl.merge.FullMergingEntryHolderImpl;
 
 /**
  * Only available for HyperLogLog backed {@link com.hazelcast.cardinality.CardinalityEstimator}.
@@ -29,25 +28,21 @@ import static com.hazelcast.spi.impl.merge.SplitBrainDataSerializerHook.HYPER_LO
  *
  * @since 3.10
  */
-public class HyperLogLogMergePolicy extends AbstractSplitBrainMergePolicy<
-        HyperLogLog, HyperLogLogHolder> {
-
-    public HyperLogLogMergePolicy() {
-    }
+public class HitsAndAccessTimeMergePolicy<K, V> extends AbstractSplitBrainMergePolicy<V, FullMergingEntryHolderImpl<K,V>> {
 
     @Override
-    public HyperLogLog merge(HyperLogLogHolder mergingValue,
-                             HyperLogLogHolder existingValue) {
-        if (existingValue == null) {
-            return mergingValue.getValue();
-        }
-
-        mergingValue.getValue().merge(existingValue.getValue());
-        return mergingValue.getValue();
+    public V merge(FullMergingEntryHolderImpl<K, V> mergingValue,
+                   FullMergingEntryHolderImpl<K, V> existingValue) {
+        final long mergingHits = mergingValue.getHits();
+        final long existingHits = existingValue.getHits();
+        final long mergingAccessTime = mergingValue.getLastAccessTime();
+        final long existingAccessTime = existingValue.getLastAccessTime();
+        // TODO
+        return null;
     }
 
     @Override
     public int getId() {
-        return HYPER_LOG_LOG;
+        return 0;
     }
 }

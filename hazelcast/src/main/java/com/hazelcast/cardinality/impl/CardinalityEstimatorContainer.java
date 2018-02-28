@@ -75,11 +75,11 @@ public class CardinalityEstimatorContainer
      * @param mergePolicy  the {@link SplitBrainMergePolicy} instance to apply
      * @return the used {@link HyperLogLog} if merge is applied, otherwise {@code null}
      */
-    public HyperLogLog merge(HyperLogLogMergingItem mergingEntry,
-                             SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogMergingItem> mergePolicy) {
+    public HyperLogLog merge(HyperLogLogHolder mergingEntry,
+                             SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogHolder> mergePolicy) {
         String name = mergingEntry.getKey();
         if (hll.estimate() != 0) {
-            HyperLogLogMergingItem existingEntry = createMergeHolder(name, hll);
+            HyperLogLogHolder existingEntry = createMergeHolder(name, hll);
             HyperLogLog newValue = mergePolicy.merge(mergingEntry, existingEntry);
             if (newValue != null && !newValue.equals(hll)) {
                 setValue(newValue);

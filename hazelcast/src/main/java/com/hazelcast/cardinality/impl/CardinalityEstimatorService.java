@@ -213,7 +213,7 @@ public class CardinalityEstimatorService
         return quorumName == NULL_OBJECT ? null : (String) quorumName;
     }
 
-    private SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogMergingItem> getMergePolicy(String name) {
+    private SplitBrainMergePolicy<HyperLogLog, ? super HyperLogLogHolder> getMergePolicy(String name) {
         String mergePolicyName = nodeEngine.getConfig().findCardinalityEstimatorConfig(name).getMergePolicyConfig().getPolicy();
         return mergePolicyProvider.getMergePolicy(mergePolicyName);
     }

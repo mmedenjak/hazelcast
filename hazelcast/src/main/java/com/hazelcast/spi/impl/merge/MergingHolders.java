@@ -18,7 +18,7 @@ package com.hazelcast.spi.impl.merge;
 
 import com.hazelcast.cache.CacheEntryView;
 import com.hazelcast.cache.impl.record.CacheRecord;
-import com.hazelcast.cardinality.impl.HyperLogLogMergingItem;
+import com.hazelcast.cardinality.impl.HyperLogLogHolder;
 import com.hazelcast.cardinality.impl.hyperloglog.HyperLogLog;
 import com.hazelcast.collection.impl.collection.CollectionItem;
 import com.hazelcast.collection.impl.queue.QueueItem;
@@ -161,8 +161,8 @@ public final class MergingHolders {
                 .setTtl(record.getTtlMillis());
     }
 
-    public static HyperLogLogMergingItem createMergeHolder(String name, HyperLogLog item) {
-        final HyperLogLogMergingItem i = new HyperLogLogMergingItem();
+    public static HyperLogLogHolder createMergeHolder(String name, HyperLogLog item) {
+        final HyperLogLogHolder i = new HyperLogLogHolder();
         i.setKey(name)
          .setValue(item)
          .setCreationTime(Clock.currentTimeMillis());
