@@ -344,7 +344,7 @@
                                         -Dhazelcast.test.multiple.jvm=true
                                         -Dlog4j.configurationFile=log4j2-info.xml
                                         -XX:+UnlockCommercialFeatures -XX:+FlightRecorder
-                                        -XX:StartFlightRecording=duration=1800s,filename=prbuilder.jfr
+                                        -XX:StartFlightRecording=filename=prbuilder.jfr
                                         ${extraVmArgs}
                                     </argLine>
                                     <includes>
@@ -384,6 +384,8 @@
                                         -Dhazelcast.logging.type=none
                                         -Dhazelcast.test.use.network=false
                                         -Dlog4j.configurationFile=log4j2-info.xml
+                                        -XX:+UnlockCommercialFeatures -XX:+FlightRecorder
+                                        -XX:StartFlightRecording=filename=prbuilder.jfr
                                         ${extraVmArgs}
                                     </argLine>
                                     <includes>
