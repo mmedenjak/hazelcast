@@ -141,7 +141,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void async_whenLongRunningOperation() throws InterruptedException, ExecutionException, TimeoutException {
-        long callTimeout = 10000;
+        long callTimeout = 1000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeout);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
