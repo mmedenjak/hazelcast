@@ -57,7 +57,7 @@ public class Invocation_OnMemberLeftTest extends HazelcastTestSupport {
     @Before
     public void setup() {
         instanceFactory = createHazelcastInstanceFactory();
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         config.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "5");
 
         HazelcastInstance[] cluster = instanceFactory.newInstances(config, 2);
@@ -103,7 +103,7 @@ public class Invocation_OnMemberLeftTest extends HazelcastTestSupport {
             @Override
             public void run() {
                 StaticMemberNodeContext nodeContext = new StaticMemberNodeContext(instanceFactory, remoteMember);
-                remote = newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), remoteMember.toString(), nodeContext);
+                remote = newHazelcastInstance(new Config(), remoteMember.toString(), nodeContext);
             }
         });
     }

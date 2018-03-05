@@ -106,7 +106,7 @@ public class QueryCacheCreateDestroyTest extends HazelcastTestSupport {
         queryCacheConfig.getPredicateConfig().setImplementation(new TruePredicate());
         queryCacheConfig.setPopulate(true);
 
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         config.getMapConfig(mapName).addQueryCacheConfig(queryCacheConfig);
 
         return config;

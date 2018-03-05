@@ -86,7 +86,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     private static Config newConfig() {
-        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
+        return new Config()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "6")
                 .setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "1");
     }
@@ -114,14 +114,14 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
     @Test
     public void shutdownSingleLiteMember() {
-        HazelcastInstance hz = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz = factory.newHazelcastInstance(new Config().setLiteMember(true));
         hz.shutdown();
     }
 
     @Test
     @SuppressWarnings("unused")
     public void shutdownSlaveMember_whilePartitionsMigrating() {
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
+        Config config = new Config()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "12")
                 .setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "1");
 
@@ -177,7 +177,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     @Test
     public void shutdownSlaveLiteMember() {
         HazelcastInstance hz1 = factory.newHazelcastInstance();
-        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
         HazelcastInstance hz3 = factory.newHazelcastInstance();
 
         warmUpPartitions(hz1, hz2, hz3);
@@ -198,7 +198,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
     @Test
     public void shutdownMasterLiteMember() {
-        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config().setLiteMember(true));
         HazelcastInstance hz2 = factory.newHazelcastInstance();
         HazelcastInstance hz3 = factory.newHazelcastInstance();
 
@@ -229,7 +229,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     private void shutdownAllMembers(boolean initializePartitions) {
-        final HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 4);
+        final HazelcastInstance[] instances = factory.newInstances(new Config(), 4);
 
         if (initializePartitions) {
             warmUpPartitions(instances);
@@ -280,7 +280,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     private void shutdownMultipleMembers(boolean includeMaster, boolean initializePartitions) {
-        final HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 6);
+        final HazelcastInstance[] instances = factory.newInstances(new Config(), 6);
 
         if (initializePartitions) {
             warmUpPartitions(instances);
@@ -307,7 +307,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
     @Test
     public void shutdownAndTerminateSlaveMembers_concurrently() {
-        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 5);
+        HazelcastInstance[] instances = factory.newInstances(new Config(), 5);
         int shutdownIndex = RandomPicker.getInt(1, instances.length);
         int terminateIndex;
         do {
@@ -319,7 +319,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
     @Test
     public void shutdownMasterAndTerminateSlaveMember_concurrently() {
-        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 5);
+        HazelcastInstance[] instances = factory.newInstances(new Config(), 5);
         int shutdownIndex = 0;
         int terminateIndex = RandomPicker.getInt(1, instances.length);
 
@@ -392,7 +392,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
     @Test
     public void shutdownSlaveAndTerminateMasterMember_concurrently() {
-        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 5);
+        HazelcastInstance[] instances = factory.newInstances(new Config(), 5);
         int shutdownIndex = RandomPicker.getInt(1, instances.length);
         int terminateIndex = 0;
 
@@ -410,7 +410,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     private void shutdownMember_whenClusterNotActive(boolean shutdownMaster, boolean initializePartitions, ClusterState state) {
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         HazelcastInstance master = factory.newHazelcastInstance(config);
         HazelcastInstance[] slaves = factory.newInstances(config, 3);
 
@@ -443,7 +443,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     private void shutdownMemberAndCluster(boolean initializePartitions) {
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         HazelcastInstance master = factory.newHazelcastInstance(config);
         HazelcastInstance[] slaves = factory.newInstances(config, 3);
 
@@ -488,7 +488,7 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     private void shutdownMemberAndCluster_concurrently(boolean initializePartitions) throws Exception {
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
 
         final HazelcastInstance master = factory.newHazelcastInstance(config);
         final HazelcastInstance[] slaves = factory.newInstances(config, 3);

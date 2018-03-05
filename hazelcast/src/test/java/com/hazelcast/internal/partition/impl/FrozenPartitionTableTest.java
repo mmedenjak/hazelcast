@@ -59,7 +59,7 @@ public class FrozenPartitionTableTest extends HazelcastTestSupport {
 
     @Test
     public void partitionTable_isFrozen_whenMemberReJoins_duringClusterStateIsFrozen() {
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(4);
         HazelcastInstance[] instances = factory.newInstances(config, 3);
         HazelcastInstance hz1 = instances[0];

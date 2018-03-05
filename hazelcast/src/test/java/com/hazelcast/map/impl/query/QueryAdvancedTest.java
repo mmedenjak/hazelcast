@@ -64,7 +64,7 @@ public class QueryAdvancedTest extends HazelcastTestSupport {
     public void testQueryOperationAreNotSentToLiteMembers() {
         TestHazelcastInstanceFactory nodeFactory = createHazelcastInstanceFactory(2);
         HazelcastInstance fullMember = nodeFactory.newHazelcastInstance();
-        HazelcastInstance liteMember = nodeFactory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance liteMember = nodeFactory.newHazelcastInstance(new Config().setLiteMember(true));
 
         assertClusterSizeEventually(2, fullMember);
 

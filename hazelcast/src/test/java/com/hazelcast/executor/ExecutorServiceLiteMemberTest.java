@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
 public class ExecutorServiceLiteMemberTest
         extends ExecutorServiceTestSupport {
 
-    private Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
+    private Config liteConfig = new Config().setLiteMember(true);
 
     @Test(expected = RejectedExecutionException.class)
     public void test_executeRunnable_failsWhenNoLiteMemberExists() {

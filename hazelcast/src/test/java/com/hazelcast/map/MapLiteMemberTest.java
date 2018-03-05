@@ -48,7 +48,7 @@ import static org.junit.Assert.assertNull;
 public class MapLiteMemberTest
         extends HazelcastTestSupport {
 
-    private Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
+    private Config liteConfig = new Config().setLiteMember(true);
 
     private TestHazelcastInstanceFactory factory;
 

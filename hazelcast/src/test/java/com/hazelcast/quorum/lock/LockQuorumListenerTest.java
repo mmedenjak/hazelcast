@@ -42,7 +42,7 @@ public class LockQuorumListenerTest extends AbstractQuorumListenerTest {
     public void testQuorumFailureEventFiredWhenNodeCountBelowThreshold() {
         CountDownLatch quorumNotPresent = new CountDownLatch(1);
         String lockName = randomString();
-        Config config = addQuorum(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), lockName, quorumListener(null, quorumNotPresent));
+        Config config = addQuorum(new Config(), lockName, quorumListener(null, quorumNotPresent));
         HazelcastInstance instance = createHazelcastInstance(config);
         ILock q = instance.getLock(lockName);
         try {

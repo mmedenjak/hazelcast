@@ -48,7 +48,7 @@ public class MapQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testQuorumFailureEventFiredWhenNodeCountBelowThreshold() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {
@@ -76,7 +76,7 @@ public class MapQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testQuorumFailureEventFiredWhenNodeCountDropsBelowThreshold() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {
@@ -103,7 +103,7 @@ public class MapQuorumListenerTest extends HazelcastTestSupport {
     public void testQuorumEventsFiredWhenNodeCountBelowThenAboveThreshold() {
         final CountDownLatch belowLatch = new CountDownLatch(1);
         final CountDownLatch aboveLatch = new CountDownLatch(1);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {
@@ -156,7 +156,7 @@ public class MapQuorumListenerTest extends HazelcastTestSupport {
         MapConfig threeNodeMapConfig = new MapConfig("threeNode");
         threeNodeMapConfig.setQuorumName(threeNodeQuorumName);
 
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         config.addMapConfig(fourNodeMapConfig);
         config.addQuorumConfig(fourNodeQuorumConfig);
         config.addMapConfig(threeNodeMapConfig);
@@ -171,7 +171,7 @@ public class MapQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testCustomResolverFiresQuorumFailureEvent() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             @Override
@@ -205,7 +205,7 @@ public class MapQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testQuorumEventProvidesCorrectMemberListSize() {
         final CountDownLatch belowLatch = new CountDownLatch(2);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {
