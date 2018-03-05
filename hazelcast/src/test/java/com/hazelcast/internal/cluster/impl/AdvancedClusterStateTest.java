@@ -156,7 +156,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldFail_whenStateIsAlreadyLocked() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        HazelcastInstance[] instances = factory.newInstances();
+        HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[instances.length - 1];
 
@@ -179,7 +179,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldFail_whenInitiatorDies_beforePrepare() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        final HazelcastInstance[] instances = factory.newInstances();
+        final HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[instances.length - 1];
         TransactionManagerServiceImpl transactionManagerService = spyTransactionManagerService(hz);
@@ -204,7 +204,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldNotFail_whenInitiatorDies_afterPrepare() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        final HazelcastInstance[] instances = factory.newInstances();
+        final HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[instances.length - 1];
         TransactionManagerServiceImpl transactionManagerService = spyTransactionManagerService(hz);
@@ -229,7 +229,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldFail_withoutBackup_whenInitiatorDies_beforePrepare() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        final HazelcastInstance[] instances = factory.newInstances();
+        final HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[instances.length - 1];
         TransactionManagerServiceImpl transactionManagerService = spyTransactionManagerService(hz);
@@ -254,7 +254,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldFail_withoutBackup_whenInitiatorDies_afterPrepare() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        final HazelcastInstance[] instances = factory.newInstances();
+        final HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[instances.length - 1];
         TransactionManagerServiceImpl transactionManagerService = spyTransactionManagerService(hz);
@@ -279,7 +279,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldNotFail_whenNonInitiatorMemberDies_duringCommit() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        final HazelcastInstance[] instances = factory.newInstances();
+        final HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[2];
         TransactionManagerServiceImpl transactionManagerService = spyTransactionManagerService(hz);
@@ -307,7 +307,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void changeClusterState_shouldFail_whenNonInitiatorMemberDies_beforePrepare() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        final HazelcastInstance[] instances = factory.newInstances();
+        final HazelcastInstance[] instances = factory.newInstances(new Config());
 
         final HazelcastInstance hz = instances[2];
         TransactionManagerServiceImpl transactionManagerService = spyTransactionManagerService(hz);
@@ -368,7 +368,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     @Test
     public void clusterState_shouldBeTheSame_finally_onAllNodes() throws Exception {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        HazelcastInstance[] instances = factory.newInstances();
+        HazelcastInstance[] instances = factory.newInstances(new Config());
 
         CountDownLatch latch = new CountDownLatch(instances.length);
         int iteration = 20;
@@ -567,7 +567,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
 
     private void nodesCanShutDown_whenClusterState_changesTo(ClusterState state) {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
-        HazelcastInstance[] instances = factory.newInstances();
+        HazelcastInstance[] instances = factory.newInstances(new Config());
 
         HazelcastInstance hz = instances[instances.length - 1];
         hz.getMap(randomMapName()).put(1, 1); // for updating partition version

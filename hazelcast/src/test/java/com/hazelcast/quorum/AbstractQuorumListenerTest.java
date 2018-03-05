@@ -49,7 +49,7 @@ public abstract class AbstractQuorumListenerTest extends HazelcastTestSupport {
         CountDownLatch quorumNotPresent = new CountDownLatch(1);
         CountDownLatch quorumPresent = new CountDownLatch(1);
         String distributedObjectName = randomString();
-        Config config = addQuorum(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), distributedObjectName, quorumListener(quorumPresent, quorumNotPresent));
+        Config config = addQuorum(new Config(), distributedObjectName, quorumListener(quorumPresent, quorumNotPresent));
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         factory.newHazelcastInstance(config);
         factory.newHazelcastInstance(config);
@@ -63,7 +63,7 @@ public abstract class AbstractQuorumListenerTest extends HazelcastTestSupport {
     public void testDifferentQuorumsGetCorrectEvents() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         CountDownLatch quorumFailureLatch = new CountDownLatch(2);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config = new Config();
         addQuorum(config, "fourNode", quorumListener(null, quorumFailureLatch));
         addQuorum(config, "threeNode", quorumListener(null, quorumFailureLatch));
         factory.newHazelcastInstance(config);
@@ -88,7 +88,7 @@ public abstract class AbstractQuorumListenerTest extends HazelcastTestSupport {
                         return false;
                     }
                 });
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addQuorumConfig(quorumConfig);
+        Config config = new Config().addQuorumConfig(quorumConfig);
         addQuorumConfig(config, distributedObjectName, quorumName);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
@@ -114,7 +114,7 @@ public abstract class AbstractQuorumListenerTest extends HazelcastTestSupport {
         String quorumName = randomString();
         QuorumConfig quorumConfig = new QuorumConfig(quorumName, true, 3)
                 .addListenerConfig(listenerConfig);
-        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addQuorumConfig(quorumConfig);
+        Config config = new Config().addQuorumConfig(quorumConfig);
         addQuorumConfig(config, distributedObjectName, quorumName);
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
