@@ -121,7 +121,7 @@ public class OperationServiceImpl_invokeOnPartitionsTest extends HazelcastTestSu
 
                 @Override
                 public void run() throws Exception {
-                    sleepSeconds(5);
+                    sleepSeconds(1);
                     response = getPartitionId() * 2;
                 }
 
