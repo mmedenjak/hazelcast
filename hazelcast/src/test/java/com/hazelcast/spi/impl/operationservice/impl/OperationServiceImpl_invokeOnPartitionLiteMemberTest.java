@@ -53,7 +53,7 @@ import static org.junit.Assert.fail;
 public class OperationServiceImpl_invokeOnPartitionLiteMemberTest
         extends HazelcastTestSupport {
 
-    private Config liteMemberConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
+    private Config liteMemberConfig = new Config().setLiteMember(true);
 
     private Operation operation;
 

@@ -46,7 +46,7 @@ import static junit.framework.Assert.assertEquals;
 public class ClusterServiceMemberListTest
         extends HazelcastTestSupport {
 
-    private Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
+    private Config liteConfig = new Config().setLiteMember(true);
 
     private TestHazelcastInstanceFactory factory;
 
