@@ -42,7 +42,7 @@ public class PartitionMigrationListenerLiteMemberTest extends HazelcastTestSuppo
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         factory.newHazelcastInstance();
 
-        Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
+        Config liteConfig = new Config().setLiteMember(true);
         HazelcastInstance lite = factory.newHazelcastInstance(liteConfig);
 
         warmUpPartitions(lite);
