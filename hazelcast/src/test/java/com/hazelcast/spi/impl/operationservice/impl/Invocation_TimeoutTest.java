@@ -84,8 +84,8 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void whenMultipleThreadsCallGetOnSameLongRunningOperation() throws ExecutionException, InterruptedException {
-        long callTimeout = 1000;
-        Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeout);
+        long callTimeoutMs = 3000;
+        Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
         HazelcastInstance remote = factory.newHazelcastInstance(config);
@@ -94,7 +94,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
         OperationService opService = getOperationService(local);
         final Future future = opService.invokeOnPartition(
                 null,
-                new SlowOperation(callTimeout * 3, RESPONSE),
+                new SlowOperation(callTimeoutMs * 3, RESPONSE),
                 getPartitionId(remote));
 
         List<Future> futures = new LinkedList<Future>();
@@ -121,8 +121,8 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void sync_whenLongRunningOperation() throws InterruptedException, ExecutionException, TimeoutException {
-        long callTimeout = 1000;
-        Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeout);
+        long callTimeoutMs = 3000;
+        Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
         HazelcastInstance remote = factory.newHazelcastInstance(config);
@@ -132,7 +132,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
         Future future = opService.invokeOnPartition(
                 null,
-                new SlowOperation(6 * callTimeout, RESPONSE),
+                new SlowOperation(6 * callTimeoutMs, RESPONSE),
                 getPartitionId(remote));
 
         Object result = future.get(120, SECONDS);
@@ -141,8 +141,8 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void async_whenLongRunningOperation() throws InterruptedException, ExecutionException, TimeoutException {
-        long callTimeout = 1000;
-        Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeout);
+        long callTimeoutMs = 3000;
+        Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
         HazelcastInstance remote = factory.newHazelcastInstance(config);
@@ -151,7 +151,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
         OperationService opService = getOperationService(local);
         ICompletableFuture<Object> future = opService.invokeOnPartition(
                 null,
-                new SlowOperation(6 * callTimeout, RESPONSE),
+                new SlowOperation(6 * callTimeoutMs, RESPONSE),
                 getPartitionId(remote));
 
         final ExecutionCallback<Object> callback = getExecutionCallbackMock();
@@ -175,7 +175,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void sync_whenHeartbeatTimeout_thenOperationTimeoutException() throws Exception {
-        long callTimeoutMs = 1000;
+        long callTimeoutMs = 3000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
@@ -201,7 +201,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void async_whenHeartbeatTimeout_thenOperationTimeoutException() throws Exception {
-        long callTimeoutMs = 1000;
+        long callTimeoutMs = 3000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
@@ -231,7 +231,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void sync_whenEventuallyHeartbeatTimeout_thenOperationTimeoutException() throws Exception {
-        long callTimeoutMs = 1000;
+        long callTimeoutMs = 3000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
@@ -257,7 +257,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void async_whenEventuallyHeartbeatTimeout_thenOperationTimeoutException() throws Exception {
-        long callTimeoutMs = 1000;
+        long callTimeoutMs = 3000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
@@ -284,7 +284,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void sync_whenCallTimeout_thenOperationTimeoutException() throws Exception {
-        long callTimeoutMs = 1000;
+        long callTimeoutMs = 3000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
@@ -311,7 +311,7 @@ public class Invocation_TimeoutTest extends HazelcastTestSupport {
 
     @Test
     public void async_whenCallTimeout_thenOperationTimeoutException() throws Exception {
-        long callTimeoutMs = 1000;
+        long callTimeoutMs = 3000;
         Config config = new Config().setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + callTimeoutMs);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance(config);
