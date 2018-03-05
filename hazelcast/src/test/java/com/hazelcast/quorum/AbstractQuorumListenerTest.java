@@ -36,7 +36,7 @@ public abstract class AbstractQuorumListenerTest extends HazelcastTestSupport {
     public void testQuorumFailureEventFiredWhenNodeCountDropsBelowThreshold() {
         CountDownLatch quorumNotPresent = new CountDownLatch(1);
         String distributedObjectName = randomString();
-        Config config = addQuorum(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), distributedObjectName, quorumListener(null, quorumNotPresent));
+        Config config = addQuorum(new Config(), distributedObjectName, quorumListener(null, quorumNotPresent));
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
         factory.newHazelcastInstance(config);
         factory.newHazelcastInstance();
