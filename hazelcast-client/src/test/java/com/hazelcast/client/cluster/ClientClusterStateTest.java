@@ -63,7 +63,7 @@ public class ClientClusterStateTest {
     @Before
     public void before() {
         factory = new TestHazelcastFactory();
-        instances = factory.newInstances(new Config(), 4);
+        instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 4);
         for (HazelcastInstance instance : instances) {
             assertClusterSizeEventually(4, instance);
         }

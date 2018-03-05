@@ -166,7 +166,7 @@ public class BasicClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void changeClusterState_toNoMigration_shouldFail_whilePartitionsMigrating() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "10");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
@@ -180,7 +180,7 @@ public class BasicClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void changeClusterState_toFrozen_shouldFail_whilePartitionsMigrating() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "10");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
@@ -194,7 +194,7 @@ public class BasicClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void changeClusterState_toPassive_shouldFail_whilePartitionsMigrating() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "10");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
@@ -209,7 +209,7 @@ public class BasicClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void changeClusterState_toActive_isAllowed_whileReplicationInProgress() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "10");
         config.setProperty(GroupProperty.PARTITION_MAX_PARALLEL_REPLICATIONS.getName(), "1");
 
@@ -232,7 +232,7 @@ public class BasicClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void changeClusterState_toPassive_isAllowed_whileReplicationInProgress() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "10");
         config.setProperty(GroupProperty.PARTITION_MAX_PARALLEL_REPLICATIONS.getName(), "1");
 

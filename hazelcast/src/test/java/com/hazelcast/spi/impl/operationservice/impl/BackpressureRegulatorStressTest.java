@@ -74,7 +74,7 @@ public class BackpressureRegulatorStressTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(OPERATION_BACKUP_TIMEOUT_MILLIS.getName(), "60000")
                 .setProperty(BACKPRESSURE_ENABLED.getName(), "true")
                 .setProperty(BACKPRESSURE_SYNCWINDOW.getName(), "10")

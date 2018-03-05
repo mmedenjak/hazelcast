@@ -53,7 +53,7 @@ public class CacheClientListenerTest extends CacheListenerTest {
 
     @Override
     protected CachingProvider getCachingProvider() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
         joinConfig.getAwsConfig().setEnabled(false);
         joinConfig.getMulticastConfig().setEnabled(false);

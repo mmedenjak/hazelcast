@@ -204,7 +204,7 @@ public class CacheCreationTest extends HazelcastTestSupport {
     }
 
     private Config createBasicConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
         joinConfig.getMulticastConfig()
                 .setEnabled(false);

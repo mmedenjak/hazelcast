@@ -71,7 +71,7 @@ public class RecordStoreTest extends HazelcastTestSupport {
 
     private IMap<Object, Object> testRecordStoreReset() {
         String mapName = randomName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = config.getMapConfig(mapName);
         MapIndexConfig indexConfig = new MapIndexConfig("name", false);
         mapConfig.addMapIndexConfig(indexConfig);

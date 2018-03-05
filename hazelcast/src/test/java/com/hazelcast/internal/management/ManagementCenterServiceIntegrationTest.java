@@ -121,7 +121,7 @@ public class ManagementCenterServiceIntegrationTest extends HazelcastTestSupport
     }
 
     private Config getManagementCenterConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(clusterName).setPassword("1234");
         config.getManagementCenterConfig().setEnabled(true);
         config.getManagementCenterConfig().setUrl(format("http://localhost:%d%s/", portNum, "/mancen"));

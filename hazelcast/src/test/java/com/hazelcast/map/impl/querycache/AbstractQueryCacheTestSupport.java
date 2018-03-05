@@ -26,7 +26,7 @@ import org.junit.Before;
 
 public abstract class AbstractQueryCacheTestSupport extends HazelcastTestSupport {
 
-    protected Config config = new Config();
+    protected Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     protected String mapName = randomString();
 
     protected HazelcastInstance[] instances;

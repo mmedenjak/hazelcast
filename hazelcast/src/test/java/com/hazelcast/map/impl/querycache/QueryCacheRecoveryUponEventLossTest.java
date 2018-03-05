@@ -54,7 +54,7 @@ public class QueryCacheRecoveryUponEventLossTest extends HazelcastTestSupport {
         String mapName = randomString();
         String queryCacheName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "1");
 
         QueryCacheConfig queryCacheConfig = new QueryCacheConfig(queryCacheName);

@@ -99,7 +99,7 @@ public class ReplicatedMapLiteMemberTest extends HazelcastTestSupport {
     }
 
     private Config buildConfig(boolean liteMember) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setLiteMember(liteMember);
         return config;
     }

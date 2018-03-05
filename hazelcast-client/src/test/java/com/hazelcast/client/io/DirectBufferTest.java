@@ -69,7 +69,7 @@ public class DirectBufferTest extends HazelcastTestSupport {
 
     @Test
     public void test() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
         config.setProperty(SOCKET_BUFFER_DIRECT.getName(), "" + memberDirectBuffer);

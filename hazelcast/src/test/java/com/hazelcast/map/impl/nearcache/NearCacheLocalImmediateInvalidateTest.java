@@ -76,7 +76,7 @@ public class NearCacheLocalImmediateInvalidateTest extends HazelcastTestSupport 
         nearCacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
         nearCacheConfig.getEvictionConfig().setEvictionPolicy(EvictionPolicy.NONE);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = config.getMapConfig(MAP_NAME + "*");
         mapConfig.setNearCacheConfig(nearCacheConfig);
 

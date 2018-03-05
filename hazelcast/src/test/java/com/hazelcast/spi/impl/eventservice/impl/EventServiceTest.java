@@ -114,7 +114,7 @@ public class EventServiceTest extends HazelcastTestSupport {
     }
 
     private Config newConfigWithDummyService() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         ServiceConfig serviceConfig =
                 new ServiceConfig().setEnabled(true).setName(serviceName).setImplementation(new Object());
         config.getServicesConfig().addServiceConfig(serviceConfig);

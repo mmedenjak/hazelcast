@@ -35,6 +35,7 @@ import static com.hazelcast.spi.properties.GroupProperty.EVENT_THREAD_COUNT;
 import static com.hazelcast.spi.properties.GroupProperty.GENERIC_OPERATION_THREAD_COUNT;
 import static com.hazelcast.spi.properties.GroupProperty.PARTITION_COUNT;
 import static com.hazelcast.spi.properties.GroupProperty.PARTITION_OPERATION_THREAD_COUNT;
+import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static com.hazelcast.test.HazelcastTestSupport.warmUpPartitions;
 import static com.hazelcast.test.starter.Utils.rethrow;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -82,11 +83,7 @@ public abstract class AbstractEventJournalBounceTest {
     protected abstract <T> EventJournalReader<T> getEventJournalReader(HazelcastInstance instance);
 
     protected Config getConfig() {
-        return new Config()
-                .setProperty(PARTITION_COUNT.getName(), String.valueOf(TEST_PARTITION_COUNT))
-                .setProperty(PARTITION_OPERATION_THREAD_COUNT.getName(), "4")
-                .setProperty(GENERIC_OPERATION_THREAD_COUNT.getName(), "4")
-                .setProperty(EVENT_THREAD_COUNT.getName(), "1");
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     @SuppressWarnings("unchecked")

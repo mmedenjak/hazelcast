@@ -86,7 +86,7 @@ public class ClientBackpressureBouncingTest extends HazelcastTestSupport {
     public ClientBackpressureBouncingTest(int backoffTimeoutMillis) {
         this.backoff = backoffTimeoutMillis;
         this.bounceMemberRule = BounceMemberRule
-                .with(new Config())
+                .with(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig())
                 .driverFactory(new MultiSocketClientDriverFactory(
                         new ClientConfig()
                                 .setProperty(MAX_CONCURRENT_INVOCATIONS.getName(), valueOf(MAX_CONCURRENT_INVOCATION_CONFIG))

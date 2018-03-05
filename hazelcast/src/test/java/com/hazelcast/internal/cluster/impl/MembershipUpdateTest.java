@@ -397,7 +397,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListsConverge_whenMemberUpdateMissed() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
         HazelcastInstance hz2 = factory.newHazelcastInstance(config);
@@ -424,7 +424,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListsConverge_whenMemberUpdateMissed_withPeriodicUpdates() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -449,7 +449,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListsConverge_whenMembershipUpdatesSent_outOfOrder() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "1");
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -474,7 +474,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListsConverge_whenFinalizeJoinAndMembershipUpdatesSent_outOfOrder() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "1");
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -499,7 +499,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListsConverge_whenExistingMemberMissesMemberRemove_withPeriodicUpdates() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "1");
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -523,7 +523,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListsConverge_whenExistingMemberMissesMemberRemove_afterNewMemberJoins() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), String.valueOf(Integer.MAX_VALUE));
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -551,7 +551,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberReceives_memberUpdateNotContainingItself() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), String.valueOf(Integer.MAX_VALUE));
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -582,7 +582,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberReceives_memberUpdateFromInvalidMaster() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), String.valueOf(Integer.MAX_VALUE));
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -615,7 +615,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
 
     @Test
     public void memberListOrder_shouldBeSame_whenMemberRestartedWithSameIdentity() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
         config.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "5");
 
@@ -743,7 +743,7 @@ public class MembershipUpdateTest extends HazelcastTestSupport {
     }
 
     private Config getConfigWithService(Object service, String serviceName) {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         ServiceConfig serviceConfig = new ServiceConfig().setEnabled(true)
                 .setName(serviceName).setImplementation(service);
         config.getServicesConfig().addServiceConfig(serviceConfig);

@@ -77,7 +77,7 @@ public class FlakeIdGeneratorProxyTest {
         FlakeIdGeneratorService service = mock(FlakeIdGeneratorService.class);
         when(nodeEngine.getLogger(FlakeIdGeneratorProxy.class)).thenReturn(logger);
         when(nodeEngine.isRunning()).thenReturn(true);
-        when(nodeEngine.getConfig()).thenReturn(new Config().addFlakeIdGeneratorConfig(
+        when(nodeEngine.getConfig()).thenReturn(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addFlakeIdGeneratorConfig(
                 new FlakeIdGeneratorConfig("foo").setIdOffset(idOffset)
         ));
         when(nodeEngine.getClusterService()).thenReturn(clusterService);

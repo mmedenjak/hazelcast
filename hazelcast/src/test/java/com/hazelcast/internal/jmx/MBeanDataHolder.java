@@ -48,7 +48,7 @@ final class MBeanDataHolder {
      * Initialize with new hazelcast instance and MBean server
      */
     MBeanDataHolder(TestHazelcastInstanceFactory factory) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setInstanceName("hz:\",=*?" + ID_GEN.getAndIncrement());
         config.setProperty(GroupProperty.ENABLE_JMX.getName(), "true");
         hz = factory.newHazelcastInstance(config);

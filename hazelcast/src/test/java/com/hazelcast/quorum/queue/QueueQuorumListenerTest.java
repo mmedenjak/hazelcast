@@ -37,7 +37,7 @@ public class QueueQuorumListenerTest extends AbstractQuorumListenerTest {
     public void testQuorumFailureEventFiredWhenNodeCountBelowThreshold() {
         CountDownLatch quorumNotPresent = new CountDownLatch(1);
         String queueName = randomString();
-        Config config = addQuorum(new Config(), queueName, quorumListener(null, quorumNotPresent));
+        Config config = addQuorum(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), queueName, quorumListener(null, quorumNotPresent));
         HazelcastInstance instance = createHazelcastInstance(config);
         IQueue<Object> q = instance.getQueue(queueName);
         try {

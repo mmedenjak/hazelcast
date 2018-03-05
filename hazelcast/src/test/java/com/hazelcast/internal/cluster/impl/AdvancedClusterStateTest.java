@@ -342,7 +342,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
 
         final AtomicBoolean startupDone = new AtomicBoolean(false);
 
-        HazelcastInstance instance = HazelcastInstanceFactory.newHazelcastInstance(new Config(), randomName(),
+        HazelcastInstance instance = HazelcastInstanceFactory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), randomName(),
                 new MockNodeContext(factory.getRegistry(), new Address("127.0.0.1", 5555)) {
                     @Override
                     public NodeExtension createNodeExtension(Node node) {
@@ -383,7 +383,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void partitionTable_shouldBeFrozen_whenMemberLeaves_inFrozenState() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         HazelcastInstance[] instances = factory.newInstances(config);
         HazelcastInstance hz1 = instances[0];
@@ -426,7 +426,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     private void partitionAssignment_shouldFail_whenMigrationNotAllowed(ClusterState state) {
         assertFalse(state.isMigrationAllowed());
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         HazelcastInstance[] instances = factory.newInstances(config);
         HazelcastInstance hz1 = instances[0];
@@ -458,7 +458,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     private void partitionInvocation_shouldFail_whenPartitionsNotAssigned_whenMigrationNotAllowed(ClusterState state)
             throws InterruptedException {
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         HazelcastInstance[] instances = factory.newInstances(config);
         HazelcastInstance hz1 = instances[0];
@@ -485,7 +485,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
     public void test_eitherClusterStateChange_orPartitionInitialization_shouldBeSuccessful()
             throws Exception {
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         HazelcastInstance[] instances = factory.newInstances(config);
         HazelcastInstance hz1 = instances[0];
@@ -532,7 +532,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void clusterState_shouldBeFrozen_whenMemberReJoins_inFrozenState() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         HazelcastInstance[] instances = factory.newInstances(config);
         HazelcastInstance hz1 = instances[0];
@@ -586,7 +586,7 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
 
     @Test
     public void invocationShouldComplete_whenMemberReJoins_inFrozenState() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(3);
         HazelcastInstance[] instances = factory.newInstances(config);
         HazelcastInstance hz1 = instances[0];

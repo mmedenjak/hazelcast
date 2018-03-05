@@ -52,7 +52,7 @@ public class AtomicLongBackupTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(backupCount + 1);
         instances = factory.newInstances(config);

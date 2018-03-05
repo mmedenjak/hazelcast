@@ -37,7 +37,7 @@ public abstract class AbstractCollectionBackupTest extends HazelcastTestSupport 
     private static final ILogger LOGGER = Logger.getLogger(AbstractCollectionBackupTest.class);
 
     protected TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
-    protected Config config = new Config();
+    protected Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
     /**
      * Returns an instance of a Hazelcast collection, e.g. {@link com.hazelcast.core.ISet}.

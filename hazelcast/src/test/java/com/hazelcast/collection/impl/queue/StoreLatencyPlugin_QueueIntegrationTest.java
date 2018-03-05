@@ -55,7 +55,7 @@ public class StoreLatencyPlugin_QueueIntegrationTest extends HazelcastTestSuppor
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty("hazelcast.diagnostics.enabled", "true")
                 .setProperty("hazelcast.diagnostics.storeLatency.period.seconds", "1");
 

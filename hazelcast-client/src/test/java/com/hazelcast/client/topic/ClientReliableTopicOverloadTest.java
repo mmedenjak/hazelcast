@@ -44,7 +44,7 @@ public class ClientReliableTopicOverloadTest extends TopicOverloadAbstractTest {
 
     @Before
     public void setupCluster() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(new RingbufferConfig("when*")
                 .setCapacity(100).setTimeToLiveSeconds(Integer.MAX_VALUE));
         hazelcastFactory.newHazelcastInstance(config);

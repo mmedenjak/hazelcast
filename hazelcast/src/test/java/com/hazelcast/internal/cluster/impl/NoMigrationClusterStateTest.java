@@ -83,7 +83,7 @@ public class NoMigrationClusterStateTest extends HazelcastTestSupport {
     @Test
     public void promotions_shouldHappen_whenMemberLeaves() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
-        HazelcastInstance[] instances = factory.newInstances(new Config(), 3);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 3);
         warmUpPartitions(instances);
         waitAllForSafeState(instances);
 
@@ -102,7 +102,7 @@ public class NoMigrationClusterStateTest extends HazelcastTestSupport {
         int clusterSize = MAX_REPLICA_COUNT + 3;
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance[] instances = factory.newInstances(new Config(), clusterSize);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), clusterSize);
         warmUpPartitions(instances);
         waitAllForSafeState(instances);
 
@@ -122,13 +122,13 @@ public class NoMigrationClusterStateTest extends HazelcastTestSupport {
     public void lostPartitions_shouldBeAssigned_toNewMembers() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance[] instances = factory.newInstances(new Config(), MAX_REPLICA_COUNT);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), MAX_REPLICA_COUNT);
         warmUpPartitions(instances);
         waitAllForSafeState(instances);
 
         changeClusterStateEventually(instances[1], ClusterState.NO_MIGRATION);
 
-        HazelcastInstance[] newInstances = factory.newInstances(new Config(), 3);
+        HazelcastInstance[] newInstances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 3);
 
         for (HazelcastInstance instance : newInstances) {
             assertClusterSizeEventually(MAX_REPLICA_COUNT + newInstances.length, instance);
@@ -187,7 +187,7 @@ public class NoMigrationClusterStateTest extends HazelcastTestSupport {
     @Test
     public void rebalancing_shouldHappen_whenStateBecomesActive() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
-        HazelcastInstance[] instances = factory.newInstances(new Config(), 3);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 3);
         warmUpPartitions(instances);
         waitAllForSafeState(instances);
 
@@ -224,7 +224,7 @@ public class NoMigrationClusterStateTest extends HazelcastTestSupport {
     }
 
     private Config newConfigWithMigrationAwareService() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getServicesConfig().addServiceConfig(new ServiceConfig()
                 .setEnabled(true)
                 .setName("no-replication-service")

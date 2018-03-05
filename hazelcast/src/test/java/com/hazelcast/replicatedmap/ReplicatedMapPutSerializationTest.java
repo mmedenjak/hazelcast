@@ -46,7 +46,7 @@ public class ReplicatedMapPutSerializationTest extends HazelcastTestSupport {
     @Test
     public void testPutShouldNotDeserializeData() {
         String mapName = randomName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getReplicatedMapConfig(mapName).setInMemoryFormat(InMemoryFormat.BINARY);
         TestHazelcastInstanceFactory nodeFactory = createHazelcastInstanceFactory();
         HazelcastInstance instance1 = nodeFactory.newHazelcastInstance(config);

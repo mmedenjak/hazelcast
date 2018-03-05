@@ -52,7 +52,7 @@ public class QueryCacheEventLostListenerTest extends HazelcastTestSupport {
         String mapName = randomString();
         String queryCacheName = randomString();
         TestHazelcastInstanceFactory instanceFactory = createHazelcastInstanceFactory(3);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "1");
 

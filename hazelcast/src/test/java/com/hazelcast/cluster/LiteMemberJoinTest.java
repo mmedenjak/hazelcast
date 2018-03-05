@@ -60,7 +60,7 @@ public class LiteMemberJoinTest {
 
     @Test
     public void test_liteMemberIsCreated() {
-        final Config liteConfig = new Config().setLiteMember(true);
+        final Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
         final HazelcastInstance liteInstance = Hazelcast.newHazelcastInstance(liteConfig);
 
         assertTrue(getNode(liteInstance).isLiteMember());
@@ -202,7 +202,7 @@ public class LiteMemberJoinTest {
         TCP_CONFIG_CREATOR {
             @Override
             public Config create(String name, String pw, boolean liteMember) {
-                Config config = new Config();
+                Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
                 config.getGroupConfig().setName(name);
                 config.getGroupConfig().setPassword(pw);
 
@@ -222,7 +222,7 @@ public class LiteMemberJoinTest {
         MULTICAST_CONFIG_CREATOR {
             @Override
             public Config create(String name, String pw, boolean liteMember) {
-                Config config = new Config();
+                Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
                 config.getGroupConfig().setName(name);
                 config.getGroupConfig().setPassword(pw);
 

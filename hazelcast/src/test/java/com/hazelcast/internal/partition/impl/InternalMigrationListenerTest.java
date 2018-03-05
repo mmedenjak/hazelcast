@@ -45,7 +45,7 @@ public class InternalMigrationListenerTest extends HazelcastTestSupport {
 
     @Test
     public void shouldInvokeInternalMigrationListenerOnSuccessfulMigration() {
-        final Config config1 = new Config();
+        final Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.setProperty(GroupProperty.PARTITION_COUNT.getName(), String.valueOf(PARTITION_COUNT));
 
         // hold the migrations until all nodes join so that there will be no retries / failed migrations etc.
@@ -57,7 +57,7 @@ public class InternalMigrationListenerTest extends HazelcastTestSupport {
         warmUpPartitions(hz1);
 
         final InternalMigrationListenerImpl listener = new InternalMigrationListenerImpl();
-        final Config config2 = new Config();
+        final Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.setProperty(GroupProperty.PARTITION_COUNT.getName(), String.valueOf(PARTITION_COUNT));
         config2.addListenerConfig(new ListenerConfig(listener));
         final HazelcastInstance hz2 = factory.newHazelcastInstance(config2);

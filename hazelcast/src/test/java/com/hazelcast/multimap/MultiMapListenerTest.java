@@ -396,7 +396,7 @@ public class MultiMapListenerTest extends HazelcastTestSupport {
 
     @Test
     public void testConfigListenerRegistration() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "default";
         final CountDownLatch latch = new CountDownLatch(1);
         config.getMultiMapConfig(name).addEntryListenerConfig(new EntryListenerConfig().setImplementation(new EntryAdapter() {
@@ -484,7 +484,7 @@ public class MultiMapListenerTest extends HazelcastTestSupport {
     public void testListeners_local() {
         int count = 4;
         String name = randomMapName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(count);
         HazelcastInstance[] instances = factory.newInstances(config);
@@ -523,7 +523,7 @@ public class MultiMapListenerTest extends HazelcastTestSupport {
     public void testListeners_distributed() {
         int count = 4;
         String name = randomMapName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(count);
         HazelcastInstance[] instances = factory.newInstances(config);

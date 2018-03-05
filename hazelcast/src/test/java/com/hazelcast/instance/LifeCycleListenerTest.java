@@ -47,7 +47,7 @@ public class LifeCycleListenerTest extends HazelcastTestSupport {
     public void testListenerNoDeadLock() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);
         final CountDownLatch latch = new CountDownLatch(1);
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addListenerConfig(new ListenerConfig(new MyLifecycleListener(latch)));
         factory.newHazelcastInstance(config);
         assertTrue(latch.await(10, TimeUnit.SECONDS));
@@ -56,7 +56,7 @@ public class LifeCycleListenerTest extends HazelcastTestSupport {
     @Test
     public void testListenerInvocationWhenNodeStarts() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final EventCountingListener listener = new EventCountingListener();
         config.addListenerConfig(new ListenerConfig(listener));
         factory.newHazelcastInstance(config);
@@ -67,7 +67,7 @@ public class LifeCycleListenerTest extends HazelcastTestSupport {
     @Test
     public void testListenerInvocationWhenNodeShutsDown() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final EventCountingListener listener = new EventCountingListener();
         config.addListenerConfig(new ListenerConfig(listener));
         HazelcastInstance instance = factory.newHazelcastInstance(config);
@@ -81,7 +81,7 @@ public class LifeCycleListenerTest extends HazelcastTestSupport {
     @Test
     public void testListenerInvocationWhenNodeTerminates() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final EventCountingListener listener = new EventCountingListener();
         config.addListenerConfig(new ListenerConfig(listener));
         HazelcastInstance instance = factory.newHazelcastInstance(config);

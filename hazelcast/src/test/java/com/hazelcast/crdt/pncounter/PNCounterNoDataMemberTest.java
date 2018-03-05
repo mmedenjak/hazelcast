@@ -38,7 +38,7 @@ public class PNCounterNoDataMemberTest extends BasePNCounterNoDataMemberTest {
 
     @Before
     public void setup() {
-        final Config liteConfig = new Config()
+        final Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "5")
                 .setLiteMember(true);
 

@@ -54,7 +54,7 @@ public class RingbufferTest extends HazelcastTestSupport {
 
     @Before
     public void init() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(new RingbufferConfig("rb*").setCapacity(CAPACITY));
 
         server = hazelcastFactory.newHazelcastInstance(config);

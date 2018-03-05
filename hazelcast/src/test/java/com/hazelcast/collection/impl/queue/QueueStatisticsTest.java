@@ -201,7 +201,7 @@ public class QueueStatisticsTest extends HazelcastTestSupport {
 
     private IQueue<String> newQueue_WithMaxSizeConfig(int maxSize) {
         String name = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig(name).setMaxSize(maxSize);
         HazelcastInstance instance = createHazelcastInstance(config);
         return instance.getQueue(name);

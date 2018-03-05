@@ -63,7 +63,7 @@ public class IndeterminateOperationStateExceptionTest extends HazelcastTestSuppo
     private HazelcastInstance instance2;
 
     private void setup(boolean enableFailOnIndeterminateOperationState) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(OPERATION_BACKUP_TIMEOUT_MILLIS.getName(), String.valueOf(3000));
         if (enableFailOnIndeterminateOperationState) {
             config.setProperty(FAIL_ON_INDETERMINATE_OPERATION_STATE.getName(), String.valueOf(true));

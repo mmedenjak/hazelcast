@@ -43,7 +43,7 @@ public final class JsrClientTestUtil {
         assertThatIsNoParallelTest();
         setSystemProperties("client");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         Hazelcast.newHazelcastInstance(config);
     }

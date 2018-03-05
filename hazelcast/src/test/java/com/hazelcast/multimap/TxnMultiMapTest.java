@@ -96,7 +96,7 @@ public class TxnMultiMapTest extends HazelcastTestSupport {
 
     @Test
     public void testPutRemove() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "defMM";
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.SET);
 

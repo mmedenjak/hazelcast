@@ -44,7 +44,7 @@ public class SlowOperationPluginTest extends AbstractDiagnosticsPluginTest {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(SLOW_OPERATION_DETECTOR_ENABLED.getName(), "true")
                 .setProperty(SLOW_OPERATION_DETECTOR_THRESHOLD_MILLIS.getName(), "1000")
                 .setProperty(SlowOperationPlugin.PERIOD_SECONDS.getName(), "1");

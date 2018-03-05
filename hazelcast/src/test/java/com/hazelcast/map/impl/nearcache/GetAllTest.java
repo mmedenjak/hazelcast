@@ -46,7 +46,7 @@ public class GetAllTest extends HazelcastTestSupport {
         nearCacheConfig.setCacheLocalEntries(true);
         nearCacheConfig.setInvalidateOnChange(true);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(mapName).setNearCacheConfig(nearCacheConfig);
 
         HazelcastInstance node = createHazelcastInstance(config);

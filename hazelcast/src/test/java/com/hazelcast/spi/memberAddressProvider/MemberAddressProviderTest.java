@@ -58,7 +58,7 @@ public class MemberAddressProviderTest {
 
     @Test
     public void testPropertiesAreInjected() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getMemberAddressProviderConfig()
                 .setEnabled(true)
                 .setClassName(MemberAddressProviderWithStaticProperties.class.getName())
@@ -85,7 +85,7 @@ public class MemberAddressProviderTest {
 
     @Test(expected = ConfigurationException.class)
     public void testFailFastWhenNoMatchingConstructorIsFound() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getMemberAddressProviderConfig()
                 .setEnabled(true)
                 .setClassName(SimpleMemberAddressProvider.class.getName())
@@ -154,7 +154,7 @@ public class MemberAddressProviderTest {
     }
 
     private Config getConfig(Class memberAddressProviderClass) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getMemberAddressProviderConfig()
                 .setEnabled(true)
                 .setClassName(memberAddressProviderClass.getName());
@@ -164,7 +164,7 @@ public class MemberAddressProviderTest {
     }
 
     private Config getConfig(MemberAddressProvider implementation) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getMemberAddressProviderConfig()
                 .setEnabled(true)
                 .setImplementation(implementation);

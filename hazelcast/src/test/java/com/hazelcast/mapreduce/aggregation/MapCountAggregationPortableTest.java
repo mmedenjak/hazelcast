@@ -46,7 +46,7 @@ public class MapCountAggregationPortableTest extends HazelcastTestSupport {
 
     @Before
     public void before() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig().addPortableFactory(1, new FooPortableFactory());
         this.hazelcastInstance = Hazelcast.newHazelcastInstance(config);
     }

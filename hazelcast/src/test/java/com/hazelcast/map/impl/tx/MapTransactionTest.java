@@ -1294,7 +1294,7 @@ public class MapTransactionTest extends HazelcastTestSupport {
         final String mapName = randomMapName();
         final MapStoreAdapter mock = mock(MapStoreAdapter.class);
         when(mock.load(anyObject())).thenReturn(null);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapStoreConfig storeConfig = new MapStoreConfig();
         storeConfig.setEnabled(true).setImplementation(mock);
         config.getMapConfig(mapName).setMapStoreConfig(storeConfig);
@@ -1317,7 +1317,7 @@ public class MapTransactionTest extends HazelcastTestSupport {
         final String valueFromDB = randomString();
         final MapStoreAdapter mock = mock(MapStoreAdapter.class);
         when(mock.load(anyObject())).thenReturn(valueFromDB);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapStoreConfig storeConfig = new MapStoreConfig();
         storeConfig.setEnabled(true).setImplementation(mock);
         config.getMapConfig(mapName).setMapStoreConfig(storeConfig);

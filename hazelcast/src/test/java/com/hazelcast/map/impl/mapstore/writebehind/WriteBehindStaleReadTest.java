@@ -66,7 +66,7 @@ public class WriteBehindStaleReadTest extends HazelcastTestSupport {
     }
 
     private static Config createConfig(String mapName, WaitingMapStore mapStore) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = config.getMapConfig(mapName);
 
         MapStoreConfig mapStoreConfig = new MapStoreConfig();

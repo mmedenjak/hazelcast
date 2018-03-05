@@ -44,12 +44,12 @@ public class PNCounterConsistencyLostTest extends BasePNCounterConsistencyLostTe
 
     @Before
     public void setup() {
-        final Config dataConfig = new Config()
+        final Config dataConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "5")
                 .setCRDTReplicationConfig(new CRDTReplicationConfig()
                         .setReplicationPeriodMillis(Integer.MAX_VALUE)
                         .setMaxConcurrentReplicationTargets(Integer.MAX_VALUE));
-        final Config liteConfig = new Config()
+        final Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "5")
                 .setLiteMember(true);
 

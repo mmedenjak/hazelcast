@@ -89,7 +89,7 @@ public abstract class AbstractExtractionTest extends AbstractExtractionSpecifica
         mapConfig.setName("map");
         mapConfig.setInMemoryFormat(inMemoryFormat);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addMapConfig(mapConfig);
 
         if (configurator != null) {

@@ -73,7 +73,7 @@ public class ClientInvocationTest extends ClientTestSupport {
      */
     @Test
     public void executionCallback_TooLongThrowableStackTrace() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
         HazelcastInstance server = hazelcastFactory.newHazelcastInstance(config);

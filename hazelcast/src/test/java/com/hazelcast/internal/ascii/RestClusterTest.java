@@ -52,7 +52,7 @@ public class RestClusterTest extends HazelcastTestSupport {
 
     private static final String STATUS_FORBIDDEN = "{\"status\":\"forbidden\"}";
 
-    private Config config = new Config();
+    private Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
     @Before
     public void setup() {
@@ -72,7 +72,7 @@ public class RestClusterTest extends HazelcastTestSupport {
     @Test
     public void testDisabledRest() throws Exception {
         // REST should be disabled by default
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
         HTTPCommunicator communicator = new HTTPCommunicator(instance);
 

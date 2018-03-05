@@ -39,7 +39,7 @@ public class SlowOperationDetector_purgeTest extends SlowOperationDetectorAbstra
     private IMap<String, String> map;
 
     private void setup(String logRetentionSeconds) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.SLOW_OPERATION_DETECTOR_THRESHOLD_MILLIS.getName(), "1000");
         config.setProperty(GroupProperty.SLOW_OPERATION_DETECTOR_LOG_RETENTION_SECONDS.getName(), logRetentionSeconds);
         config.setProperty(GroupProperty.SLOW_OPERATION_DETECTOR_LOG_PURGE_INTERVAL_SECONDS.getName(), "1");

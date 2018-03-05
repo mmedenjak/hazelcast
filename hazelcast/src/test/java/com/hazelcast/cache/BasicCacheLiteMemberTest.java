@@ -69,7 +69,7 @@ public class BasicCacheLiteMemberTest
     public void init() {
         factory = new TestHazelcastInstanceFactory(2);
         final HazelcastInstance instance = factory.newHazelcastInstance();
-        final HazelcastInstance lite = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        final HazelcastInstance lite = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         instanceCachingProvider = HazelcastServerCachingProvider.createCachingProvider(instance);
         liteCachingProvider = HazelcastServerCachingProvider.createCachingProvider(lite);

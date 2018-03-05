@@ -49,7 +49,7 @@ public class ReplicatedMapListenerTest extends HazelcastTestSupport {
     @Test
     public void testRegisterListenerViaConfiguration() {
         String mapName = randomMapName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         ReplicatedMapConfig replicatedMapConfig = config.getReplicatedMapConfig(mapName);
         EntryListenerConfig listenerConfig = new EntryListenerConfig();
         final EventCountingListener listener = new EventCountingListener();

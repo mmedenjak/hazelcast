@@ -57,7 +57,7 @@ public class MapReduceStressTest
         TestHazelcastInstanceFactory hazelcastInstanceFactory = createHazelcastInstanceFactory(HAZELCAST_INSTANCE_COUNT);
 
         HazelcastInstance[] instances = new HazelcastInstance[HAZELCAST_INSTANCE_COUNT];
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(generateRandomString(10));
         for (int i = 0; i < HAZELCAST_INSTANCE_COUNT; i++) {
             instances[i] = hazelcastInstanceFactory.newHazelcastInstance(config);

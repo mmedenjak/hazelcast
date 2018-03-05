@@ -48,7 +48,7 @@ public class ExpirationListenerTest extends HazelcastTestSupport {
     @Before
     public void init() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(instanceCount);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         instances = factory.newInstances(config);
         HazelcastInstance randomNode = instances[RandomPicker.getInt(instanceCount)];
         map = randomNode.getMap(randomMapName());

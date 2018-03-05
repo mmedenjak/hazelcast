@@ -58,7 +58,7 @@ public class NestedPredicateWithExtractorTest extends HazelcastTestSupport {
     public void setup() {
         bodyExtractorExecutions = 0;
         limbExtractorExecutions = 0;
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = new MapConfig();
         mapConfig.setName("map");
         mapConfig.addMapAttributeConfig(extractor("name",

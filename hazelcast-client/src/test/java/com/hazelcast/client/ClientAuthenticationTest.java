@@ -70,7 +70,7 @@ public class ClientAuthenticationTest extends HazelcastTestSupport {
         PortableFactory factory = new CustomCredentialsPortableFactory();
 
         // with this config, the server will authenticate any credential of type CustomCredentials
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig()
                 .setName(USERNAME)
                 .setPassword(PASSWORD);
@@ -90,7 +90,7 @@ public class ClientAuthenticationTest extends HazelcastTestSupport {
         PortableFactory factory = new CustomCredentialsPortableFactory();
 
         // with this config, the server will authenticate any credential of type CustomCredentials
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig()
                 .setName(USERNAME)
                 .setPassword(PASSWORD);

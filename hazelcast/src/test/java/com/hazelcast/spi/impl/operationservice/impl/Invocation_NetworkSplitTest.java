@@ -173,7 +173,7 @@ public class Invocation_NetworkSplitTest extends HazelcastTestSupport {
     }
 
     private Config createConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(generateRandomString(10));
         config.setProperty(GroupProperty.MASTER_CONFIRMATION_INTERVAL_SECONDS.getName(), "1");
         config.setProperty(GroupProperty.MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "10");

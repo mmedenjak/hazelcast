@@ -383,7 +383,7 @@ public class ClientRegressionWithMockNetworkTest extends HazelcastTestSupport {
 
     @Test
     public void testCredentials() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName("foo").setPassword("bar");
         hazelcastFactory.newHazelcastInstance(config);
 

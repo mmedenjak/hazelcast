@@ -77,7 +77,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         cacheSimpleConfig.setName("cardinalityEstimator");
         cacheSimpleConfig.setMergePolicy(hyperLogLogMergePolicy.getPolicy());
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addCacheConfig(cacheSimpleConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -93,7 +93,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         cacheSimpleConfig.setStatisticsEnabled(false);
         cacheSimpleConfig.setMergePolicy(statisticsMergePolicy.getPolicy());
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addCacheConfig(cacheSimpleConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -107,7 +107,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         MapConfig mapConfig = new MapConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -122,7 +122,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(false)
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -136,7 +136,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         ReplicatedMapConfig replicatedMapConfig = new ReplicatedMapConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addReplicatedMapConfig(replicatedMapConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -151,7 +151,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(false)
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addReplicatedMapConfig(replicatedMapConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -166,7 +166,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(true)
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMultiMapConfig(multiMapConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -181,7 +181,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(false)
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMultiMapConfig(multiMapConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -195,7 +195,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         QueueConfig queueConfig = new QueueConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQueueConfig(queueConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -211,7 +211,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(true)
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQueueConfig(queueConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -225,7 +225,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         ListConfig listConfig = new ListConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addListConfig(listConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -241,7 +241,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(true)
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addListConfig(listConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -255,7 +255,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         SetConfig setConfig = new SetConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addSetConfig(setConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -271,7 +271,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
                 .setStatisticsEnabled(true)
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addSetConfig(setConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -285,7 +285,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         RingbufferConfig ringbufferConfig = new RingbufferConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addRingBufferConfig(ringbufferConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -299,7 +299,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         RingbufferConfig ringbufferConfig = new RingbufferConfig("statistics")
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addRingBufferConfig(ringbufferConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -313,7 +313,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         AtomicLongConfig atomicLongConfig = new AtomicLongConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addAtomicLongConfig(atomicLongConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -327,7 +327,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         AtomicLongConfig atomicLongConfig = new AtomicLongConfig("statistics")
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addAtomicLongConfig(atomicLongConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -341,7 +341,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         AtomicReferenceConfig atomicReferenceConfig = new AtomicReferenceConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addAtomicReferenceConfig(atomicReferenceConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -355,7 +355,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         AtomicReferenceConfig atomicReferenceConfig = new AtomicReferenceConfig("statistics")
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addAtomicReferenceConfig(atomicReferenceConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -369,7 +369,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         ScheduledExecutorConfig scheduledExecutorConfig = new ScheduledExecutorConfig("cardinalityEstimator")
                 .setMergePolicyConfig(hyperLogLogMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addScheduledExecutorConfig(scheduledExecutorConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);
@@ -383,7 +383,7 @@ public class ConfigValidationMergePolicyIntegrationTest extends HazelcastTestSup
         ScheduledExecutorConfig scheduledExecutorConfig = new ScheduledExecutorConfig("statistics")
                 .setMergePolicyConfig(statisticsMergePolicy);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addScheduledExecutorConfig(scheduledExecutorConfig);
 
         HazelcastInstance hz = factory.newHazelcastInstance(config);

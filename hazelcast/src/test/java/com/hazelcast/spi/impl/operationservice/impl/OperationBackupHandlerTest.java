@@ -59,7 +59,7 @@ public class OperationBackupHandlerTest extends HazelcastTestSupport {
     }
 
     public void setup(boolean backPressureEnabled) {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.BACKPRESSURE_ENABLED.getName(), String.valueOf(backPressureEnabled))
                 .setProperty(GroupProperty.BACKPRESSURE_SYNCWINDOW.getName(), "1");
 

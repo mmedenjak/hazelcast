@@ -47,7 +47,7 @@ public class ClusterVersionInitTest extends HazelcastTestSupport {
 
     @Test
     public void test_clusterVersion_isEventuallySet_whenSingleNodeMulticastJoinerCluster() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
         setupInstance(config);
@@ -62,7 +62,7 @@ public class ClusterVersionInitTest extends HazelcastTestSupport {
 
     @Test
     public void test_clusterVersion_isEventuallySet_whenNoJoinerConfiguredSingleNode() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
@@ -78,7 +78,7 @@ public class ClusterVersionInitTest extends HazelcastTestSupport {
 
     @Test
     public void test_clusterVersion_isEventuallySet_whenTcpJoinerConfiguredSingleNode() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);
@@ -94,7 +94,7 @@ public class ClusterVersionInitTest extends HazelcastTestSupport {
 
     @Test
     public void test_clusterVersion_isEventuallySetOnJoiningMember_whenMulticastJoinerConfigured() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
         setupInstance(config);
@@ -114,7 +114,7 @@ public class ClusterVersionInitTest extends HazelcastTestSupport {
 
     @Test
     public void test_clusterVersion_isEventuallySetOnJoiningMember_whenTcpJoinerConfigured() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(true);

@@ -164,7 +164,7 @@ public class QueueTestsFrom2X extends HazelcastTestSupport {
     @Ignore
     public void testInterruption() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);
-        HazelcastInstance instance = factory.newHazelcastInstance(new Config());
+        HazelcastInstance instance = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         final IQueue<String> queue = instance.getQueue("testInterruption");
         final CountDownLatch latch = new CountDownLatch(1);
@@ -270,7 +270,7 @@ public class QueueTestsFrom2X extends HazelcastTestSupport {
 
     @Test
     public void issue427QOfferIncorrectWithinTransaction() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig("default").setMaxSize(100);
         HazelcastInstance instance = createHazelcastInstance(config);
         TransactionContext transactionContext = instance.newTransactionContext();

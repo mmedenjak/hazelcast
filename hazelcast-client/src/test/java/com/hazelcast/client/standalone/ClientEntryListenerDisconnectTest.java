@@ -41,7 +41,7 @@ public class ClientEntryListenerDisconnectTest {
 
     public static void main(String[] args) throws InterruptedException {
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setGroupConfig(new GroupConfig("test", "test"));
         config.getNetworkConfig().setPort(6701);
 

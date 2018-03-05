@@ -670,7 +670,7 @@ public class BasicMapTest extends HazelcastTestSupport {
     @Test
     @SuppressWarnings("OverwrittenKey")
     public void testEntryView() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig("default").setStatisticsEnabled(true);
         HazelcastInstance instance = getInstance();
 

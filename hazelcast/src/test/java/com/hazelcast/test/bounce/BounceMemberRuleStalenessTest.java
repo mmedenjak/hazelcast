@@ -40,7 +40,7 @@ public class BounceMemberRuleStalenessTest extends HazelcastTestSupport {
     private static final int BOUNCING_INTERVAL_SECONDS = 120;
 
     @Rule
-    public BounceMemberRule bounceMemberRule = BounceMemberRule.with(new Config())
+    public BounceMemberRule bounceMemberRule = BounceMemberRule.with(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig())
             .clusterSize(2)
             .maximumStalenessSeconds(MAXIMUM_STALENESS_SECONDS)
             .bouncingIntervalSeconds(BOUNCING_INTERVAL_SECONDS)

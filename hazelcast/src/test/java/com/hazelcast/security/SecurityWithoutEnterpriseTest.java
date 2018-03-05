@@ -36,7 +36,7 @@ public class SecurityWithoutEnterpriseTest extends HazelcastTestSupport {
         SecurityConfig securityConfig = new SecurityConfig()
                 .setEnabled(true);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setSecurityConfig(securityConfig);
 
         createHazelcastInstance(config);
@@ -46,7 +46,7 @@ public class SecurityWithoutEnterpriseTest extends HazelcastTestSupport {
     public void testSymmetricEncryption() {
         SymmetricEncryptionConfig symmetricEncryptionConfig = new SymmetricEncryptionConfig()
                 .setEnabled(true);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().setSymmetricEncryptionConfig(symmetricEncryptionConfig);
         createHazelcastInstance(config);
     }

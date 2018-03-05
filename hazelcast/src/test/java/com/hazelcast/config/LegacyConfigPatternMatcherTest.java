@@ -34,7 +34,7 @@ public class LegacyConfigPatternMatcherTest {
     public void testMapConfigWildcardStartsWith() {
         MapConfig mapConfig = new MapConfig().setName("bc*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new LegacyWildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -51,7 +51,7 @@ public class LegacyConfigPatternMatcherTest {
     public void testMapConfigWildcardEndsWith() {
         MapConfig mapConfig = new MapConfig().setName("*ab");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new LegacyWildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 

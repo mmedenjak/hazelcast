@@ -56,7 +56,7 @@ public abstract class ReliableTopicAbstractTest extends HazelcastTestSupport {
         RingbufferConfig ringbufferConfig = new RingbufferConfig(topicConfig.getName());
         ringbufferConfig.setCapacity(CAPACITY);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(topicConfig);
         config.addRingBufferConfig(ringbufferConfig);
 

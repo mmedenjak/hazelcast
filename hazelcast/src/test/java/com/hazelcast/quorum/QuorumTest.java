@@ -78,7 +78,7 @@ public class QuorumTest extends HazelcastTestSupport {
                 .setEnabled(true)
                 .setSize(2);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig1)
                 .addQuorumConfig(quorumConfig2);
 
@@ -103,7 +103,7 @@ public class QuorumTest extends HazelcastTestSupport {
                 .setEnabled(true)
                 .setQuorumFunctionImplementation(quorumFunction);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig)
                 .setProperty(GroupProperty.HEARTBEAT_INTERVAL_SECONDS.getName(), "1");
 
@@ -128,7 +128,7 @@ public class QuorumTest extends HazelcastTestSupport {
                 .setEnabled(true)
                 .setQuorumFunctionImplementation(quorumFunction);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig)
                 .setProperty(GroupProperty.HEARTBEAT_INTERVAL_SECONDS.getName(), "1");
 
@@ -153,7 +153,7 @@ public class QuorumTest extends HazelcastTestSupport {
                 .setEnabled(true)
                 .setQuorumFunctionImplementation(function);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig);
 
         HazelcastInstance hazelcastInstance = createHazelcastInstance(config);
@@ -192,7 +192,7 @@ public class QuorumTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig)
                 .addMapConfig(mapConfig);
 
@@ -219,7 +219,7 @@ public class QuorumTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig)
                 .addMapConfig(mapConfig);
 
@@ -252,7 +252,7 @@ public class QuorumTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig)
                 .addQuorumConfig(quorumConfig);
 
@@ -287,7 +287,7 @@ public class QuorumTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig)
                 .addQuorumConfig(quorumConfig);
 
@@ -330,7 +330,7 @@ public class QuorumTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(fourNodeMapConfig)
                 .addMapConfig(threeNodeMapConfig)
                 .addQuorumConfig(threeNodeQuorumConfig)
@@ -369,7 +369,7 @@ public class QuorumTest extends HazelcastTestSupport {
         MapConfig mapConfig = new MapConfig("quorumMap")
                 .setQuorumName(quorumName);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig)
                 .addQuorumConfig(quorumConfig);
 
@@ -394,7 +394,7 @@ public class QuorumTest extends HazelcastTestSupport {
         QuorumConfig quorumConfig = new QuorumConfig(randomString(), true)
                 .setQuorumFunctionClassName(HazelcastInstanceAwareQuorumFunction.class.getName());
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig);
 
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -406,7 +406,7 @@ public class QuorumTest extends HazelcastTestSupport {
         QuorumConfig quorumConfig = new QuorumConfig(randomString(), true)
                 .setQuorumFunctionImplementation(new HazelcastInstanceAwareQuorumFunction());
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQuorumConfig(quorumConfig);
 
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -415,7 +415,7 @@ public class QuorumTest extends HazelcastTestSupport {
 
     @Test(expected = ConfigurationException.class)
     public void givenProbabilisticQuorum_whenAcceptableHeartbeatPause_greaterThanMaxNoHeartbeat_exceptionIsThrown() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MAX_NO_HEARTBEAT_SECONDS.getName(), "10");
         QuorumConfig probabilisticQuorumConfig = QuorumConfig.newProbabilisticQuorumConfigBuilder("prob-quorum", 3)
                 .withAcceptableHeartbeatPauseMillis(13000)
@@ -428,7 +428,7 @@ public class QuorumTest extends HazelcastTestSupport {
 
     @Test(expected = ConfigurationException.class)
     public void givenProbabilisticQuorum_whenAcceptableHeartbeatPause_lessThanHeartbeatInterval_exceptionIsThrown() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.HEARTBEAT_INTERVAL_SECONDS.getName(), "5");
         QuorumConfig probabilisticQuorumConfig = QuorumConfig.newProbabilisticQuorumConfigBuilder("prob-quorum", 3)
                 .withAcceptableHeartbeatPauseMillis(3000)
@@ -441,7 +441,7 @@ public class QuorumTest extends HazelcastTestSupport {
 
     @Test(expected = ConfigurationException.class)
     public void givenRecentlyActiveQuorum_whenHeartbeatTolerance_greaterThanMaxNoHeartbeat_exceptionIsThrown() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MAX_NO_HEARTBEAT_SECONDS.getName(), "10");
         QuorumConfig recentlyActiveQuorumConfig = QuorumConfig
                 .newRecentlyActiveQuorumConfigBuilder("test-quorum", 3, 13000)
@@ -454,7 +454,7 @@ public class QuorumTest extends HazelcastTestSupport {
 
     @Test(expected = ConfigurationException.class)
     public void givenRecentlyActiveQuorum_whenHeartbeatTolerance_lessThanHeartbeatInterval_exceptionIsThrown() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.HEARTBEAT_INTERVAL_SECONDS.getName(), "5");
         QuorumConfig recentlyActiveQuorumConfig = QuorumConfig
                 .newRecentlyActiveQuorumConfigBuilder("test-quorum", 3, 3000)

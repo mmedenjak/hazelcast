@@ -40,7 +40,7 @@ public class ClientPNCounterConsistencyLostTest extends BasePNCounterConsistency
 
     @Before
     public void setup() {
-        final Config config = new Config()
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "5")
                 .setCRDTReplicationConfig(new CRDTReplicationConfig()
                         .setReplicationPeriodMillis(Integer.MAX_VALUE)

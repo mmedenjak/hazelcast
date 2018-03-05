@@ -232,7 +232,7 @@ public class QueryResultSizeLimiterTest {
     }
 
     private void initMocksWithConfiguration(int maxResultSizeLimit, int maxLocalPartitionLimitForPreCheck, int partitionCount) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(QUERY_RESULT_SIZE_LIMIT.getName(), valueOf(maxResultSizeLimit));
         config.setProperty(QUERY_MAX_LOCAL_PARTITION_LIMIT_FOR_PRE_CHECK.getName(), valueOf(maxLocalPartitionLimitForPreCheck));
         config.setProperty(PARTITION_COUNT.getName(), valueOf(partitionCount));

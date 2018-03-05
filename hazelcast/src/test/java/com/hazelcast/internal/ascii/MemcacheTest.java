@@ -57,7 +57,7 @@ import static org.junit.Assert.assertTrue;
 // test is starting standalone HazelcastInstances.
 public class MemcacheTest extends HazelcastTestSupport {
 
-    private Config config = new Config();
+    private Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     private HazelcastInstance instance;
     private MemcachedClient client;
 

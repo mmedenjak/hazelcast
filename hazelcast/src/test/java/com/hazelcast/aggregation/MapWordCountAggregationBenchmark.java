@@ -79,7 +79,7 @@ public class MapWordCountAggregationBenchmark extends HazelcastTestSupport {
     }
 
     private static HazelcastInstance buildCluster(int memberCount) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         NetworkConfig networkConfig = config.getNetworkConfig();
         networkConfig.getJoin().getMulticastConfig().setEnabled(false);
         networkConfig.getJoin().getTcpIpConfig().setEnabled(true);

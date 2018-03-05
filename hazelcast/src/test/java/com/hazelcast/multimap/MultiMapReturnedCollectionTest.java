@@ -126,7 +126,7 @@ public class MultiMapReturnedCollectionTest extends HazelcastTestSupport {
 
     private MultiMap<Integer, Integer> createMultiMapWithCollectionType(MultiMapConfig.ValueCollectionType collectionType, int nodeCount) {
         String multiMapName = randomMapName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMultiMapConfig(multiMapName).setValueCollectionType(collectionType);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(nodeCount);
         final HazelcastInstance[] instances = factory.newInstances(config);

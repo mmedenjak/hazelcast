@@ -69,7 +69,7 @@ public class ClientReplicatedMapTest extends HazelcastTestSupport {
     @Parameter
     public InMemoryFormat inMemoryFormat;
 
-    private Config config = new Config();
+    private Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     private TestHazelcastFactory hazelcastFactory = new TestHazelcastFactory();
 
     @Parameters(name = "format:{0}")

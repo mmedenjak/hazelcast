@@ -71,7 +71,7 @@ public class IMapDataStructureAdapterTest extends HazelcastTestSupport {
                 .setClassName(null)
                 .setImplementation(mapStore);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig("IMapDataStructureAdapterLoaderTest")
                 .setMapStoreConfig(mapStoreConfig);
 

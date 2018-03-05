@@ -52,7 +52,7 @@ public class CacheQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testQuorumFailureEventFiredWhenNodeCountBelowThreshold() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {
@@ -85,7 +85,7 @@ public class CacheQuorumListenerTest extends HazelcastTestSupport {
     public void testQuorumEventsFiredWhenNodeCountBelowThenAboveThreshold() {
         final CountDownLatch belowLatch = new CountDownLatch(1);
         final CountDownLatch aboveLatch = new CountDownLatch(1);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {
@@ -151,7 +151,7 @@ public class CacheQuorumListenerTest extends HazelcastTestSupport {
         threeNodeCacheConfig.setName("threeNode");
         threeNodeCacheConfig.setQuorumName(threeNodeQuorumName);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addCacheConfig(fourNodeCacheConfig);
         config.addQuorumConfig(fourNodeQuorumConfig);
         config.addCacheConfig(threeNodeCacheConfig);
@@ -181,7 +181,7 @@ public class CacheQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testCustomResolverFiresQuorumFailureEvent() {
         final CountDownLatch countDownLatch = new CountDownLatch(1);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             @Override
@@ -222,7 +222,7 @@ public class CacheQuorumListenerTest extends HazelcastTestSupport {
     @Test
     public void testQuorumEventProvidesCorrectMemberListSize() {
         final CountDownLatch belowLatch = new CountDownLatch(1);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumListenerConfig listenerConfig = new QuorumListenerConfig();
         listenerConfig.setImplementation(new QuorumListener() {
             public void onChange(QuorumEvent quorumEvent) {

@@ -61,10 +61,10 @@ public class ClusterJoinConfigCheckTest {
     }
 
     private void whenDifferentGroups_thenDifferentClustersAreFormed(boolean tcp) {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getGroupConfig().setName("group1");
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getGroupConfig().setName("group2");
 
         if (tcp) {

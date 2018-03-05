@@ -67,7 +67,7 @@ public class NodeExtensionTest extends HazelcastTestSupport {
     }
 
     protected Config getConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         NetworkConfig networkConfig = config.getNetworkConfig();
         JoinConfig join = networkConfig.getJoin();
         join.getMulticastConfig().setEnabled(false);

@@ -78,7 +78,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
 
     @Test
     public void testRingbufferConfiguration() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         RingbufferConfig rbConfig = new RingbufferConfig("foo").setCapacity(21);
         config.addRingBufferConfig(rbConfig);
 
@@ -106,7 +106,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
 
     @Test
     public void testWildcardConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(new RingbufferConfig("foo*").setCapacity(10));
         config.addReliableTopicConfig(new ReliableTopicConfig("foo*").setTopicOverloadPolicy(DISCARD_NEWEST));
 
@@ -136,7 +136,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
     @Test
     public void testConfiguredListenerInstance() {
         final ReliableMessageListenerMock messageListener = new ReliableMessageListenerMock();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(
                 new ReliableTopicConfig("foo*")
                         .addMessageListenerConfig(new ListenerConfig(messageListener)));
@@ -160,7 +160,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
     @Test
     public void testConfiguredListenerInstanceHazelcastInstanceAware() {
         final InstanceAwareReliableMessageListenerMock messageListener = new InstanceAwareReliableMessageListenerMock();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(
                 new ReliableTopicConfig("foo*").addMessageListenerConfig(new ListenerConfig(messageListener)));
 
@@ -192,7 +192,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
 
     @Test
     public void testConfiguredListenerClass() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(
                 new ReliableTopicConfig("foo*")
                         .addMessageListenerConfig(new ListenerConfig(ReliableMessageListenerMock.class.getName())));
@@ -212,7 +212,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testConfiguredListenerClassNotMessageListener() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(
                 new ReliableTopicConfig("foo*")
                         .addMessageListenerConfig(new ListenerConfig(String.class.getName())));
@@ -225,7 +225,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
 
     @Test(expected = HazelcastException.class)
     public void testConfiguredListenerClassNotExist() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(
                 new ReliableTopicConfig("foo*")
                         .addMessageListenerConfig(new ListenerConfig("kfosajdajdksajdj")));
@@ -238,7 +238,7 @@ public class ReliableTopicCreateTest extends HazelcastTestSupport {
 
     @Test
     public void testConfiguredListenerClassAndHazelcastInstanceAware() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addReliableTopicConfig(
                 new ReliableTopicConfig("foo*")
                         .addMessageListenerConfig(new ListenerConfig(InstanceAwareReliableMessageListenerMock.class.getName())));

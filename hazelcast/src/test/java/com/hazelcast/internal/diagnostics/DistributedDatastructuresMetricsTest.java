@@ -63,7 +63,7 @@ public class DistributedDatastructuresMetricsTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(Diagnostics.METRICS_LEVEL.getName(), ProbeLevel.INFO.name())
                 .setProperty(Diagnostics.METRICS_DISTRIBUTED_DATASTRUCTURES.getName(), "true");
         config.addMapConfig(new MapConfig(NEAR_CACHE_MAP_NAME).setNearCacheConfig(new NearCacheConfig("nearCache")));

@@ -57,7 +57,7 @@ public class ClientDisconnectTest extends HazelcastTestSupport {
 
     @Test
     public void testClientOperationCancelled_whenDisconnected() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.CLIENT_ENDPOINT_REMOVE_DELAY_SECONDS.getName(), String.valueOf(Integer.MAX_VALUE));
         HazelcastInstance hazelcastInstance = hazelcastFactory.newHazelcastInstance();
         final String queueName = "q";
@@ -110,7 +110,7 @@ public class ClientDisconnectTest extends HazelcastTestSupport {
 
     @Test
     public void testClientOperationCancelled_whenDisconnected_lock() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.CLIENT_ENDPOINT_REMOVE_DELAY_SECONDS.getName(), String.valueOf(Integer.MAX_VALUE));
         HazelcastInstance hazelcastInstance = hazelcastFactory.newHazelcastInstance();
         final String name = "m";

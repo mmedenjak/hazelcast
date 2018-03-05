@@ -60,7 +60,7 @@ public class ClientTxnDisconnectionTest {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig(BOUNDED_QUEUE_PREFIX).setMaxSize(1);
         HazelcastInstance instance = hazelcastFactory.newHazelcastInstance(config);
         NodeEngineImpl nodeEngine = HazelcastTestSupport.getNode(instance).nodeEngine;

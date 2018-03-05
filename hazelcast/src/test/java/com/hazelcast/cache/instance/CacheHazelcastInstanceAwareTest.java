@@ -83,7 +83,7 @@ public class CacheHazelcastInstanceAwareTest extends HazelcastTestSupport {
     }
 
     protected Config createConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     protected CacheConfig<Integer, Integer> createCacheConfig(String cacheName) {

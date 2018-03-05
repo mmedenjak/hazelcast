@@ -48,7 +48,7 @@ public class RingbufferMigrationTest extends HazelcastTestSupport {
     @Test
     public void test() throws Exception {
         final String ringbufferName = "ringbuffer";
-        final Config config = new Config()
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addRingBufferConfig(new RingbufferConfig(ringbufferName).setTimeToLiveSeconds(0));
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), BOUNCING_TEST_PARTITION_COUNT);
         HazelcastInstance hz1 = instanceFactory.newHazelcastInstance(config);

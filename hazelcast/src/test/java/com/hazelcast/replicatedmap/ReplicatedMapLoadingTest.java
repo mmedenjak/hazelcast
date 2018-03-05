@@ -38,7 +38,7 @@ public class ReplicatedMapLoadingTest extends ReplicatedMapAbstractTest {
 
     @Test
     public void testAsyncFillUp() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String mapName = randomMapName();
         ReplicatedMapConfig replicatedMapConfig = config.getReplicatedMapConfig(mapName);
         replicatedMapConfig.setAsyncFillup(true);
@@ -49,7 +49,7 @@ public class ReplicatedMapLoadingTest extends ReplicatedMapAbstractTest {
 
     @Test
     public void testSyncFillUp() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String mapName = randomMapName();
         ReplicatedMapConfig replicatedMapConfig = config.getReplicatedMapConfig(mapName);
         replicatedMapConfig.setAsyncFillup(false);

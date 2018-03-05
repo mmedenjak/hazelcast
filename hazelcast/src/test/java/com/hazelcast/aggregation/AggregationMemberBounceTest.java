@@ -46,7 +46,7 @@ public class AggregationMemberBounceTest extends HazelcastTestSupport {
             .driverCount(DRIVER_COUNT).build();
 
     protected Config getConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     @Before

@@ -35,7 +35,7 @@ public class FlakeIdGenerator_MemberBackpressureTest extends FlakeIdGenerator_Ab
     @Before
     public void before() {
         factory = new TestHazelcastInstanceFactory();
-        instance = factory.newHazelcastInstance(new Config().addFlakeIdGeneratorConfig(new FlakeIdGeneratorConfig("gen")
+        instance = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addFlakeIdGeneratorConfig(new FlakeIdGeneratorConfig("gen")
                 .setPrefetchCount(BATCH_SIZE)));
     }
 

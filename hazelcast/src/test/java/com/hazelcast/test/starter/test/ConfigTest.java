@@ -39,7 +39,7 @@ public class ConfigTest extends HazelcastTestSupport {
 
     @Test
     public void configCloneTest() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setInstanceName("myInstanceName")
                 .addMapConfig(new MapConfig("myMap"))
                 .addListConfig(new ListConfig("myList"))

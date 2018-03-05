@@ -142,7 +142,7 @@ public class JoinStressTest extends HazelcastTestSupport {
     }
 
     private Config createConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "3");
         config.setProperty(MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "3");
         return config;
@@ -245,7 +245,7 @@ public class JoinStressTest extends HazelcastTestSupport {
     public void testJoinWhenMemberClosedInBetween() throws InterruptedException {
         //Test is expecting to all can join safely.
         // On the failed case the last opened instance throws java.lang.IllegalStateException: Node failed to start!
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         HazelcastInstance i1 = Hazelcast.newHazelcastInstance(config);
         HazelcastInstance i2 = Hazelcast.newHazelcastInstance(config);
         HazelcastInstance i3 = Hazelcast.newHazelcastInstance(config);

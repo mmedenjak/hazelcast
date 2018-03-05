@@ -67,7 +67,7 @@ public class PartitionLostListenerRegistrationTest extends HazelcastTestSupport 
 
     @Test
     public void test_partitionLostListener_whenListenerRegisteredViaConfiguration() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addListenerConfig(new ListenerConfig(mock(PartitionLostListener.class)));
 
         HazelcastInstance instance = createHazelcastInstance(config);

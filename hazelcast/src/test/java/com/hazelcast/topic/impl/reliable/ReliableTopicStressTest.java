@@ -50,7 +50,7 @@ public class ReliableTopicStressTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         RingbufferConfig ringbufferConfig = new RingbufferConfig("foobar");
         ringbufferConfig.setCapacity(1000 * 1000);

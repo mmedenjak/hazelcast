@@ -60,13 +60,13 @@ public class ClientRegressionWithRealNetworkTest extends ClientTestSupport {
 
     @Test
     public void testClientPortConnection() {
-        final Config config1 = new Config();
+        final Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getGroupConfig().setName("foo");
         config1.getNetworkConfig().setPort(5701);
         final HazelcastInstance instance1 = Hazelcast.newHazelcastInstance(config1);
         instance1.getMap("map").put("key", "value");
 
-        final Config config2 = new Config();
+        final Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getGroupConfig().setName("bar");
         config2.getNetworkConfig().setPort(5702);
         Hazelcast.newHazelcastInstance(config2);
@@ -106,7 +106,7 @@ public class ClientRegressionWithRealNetworkTest extends ClientTestSupport {
 
     @Test
     public void testConnectWithDNSHostnames() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().setPublicAddress("localhost");
         HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 
@@ -152,7 +152,7 @@ public class ClientRegressionWithRealNetworkTest extends ClientTestSupport {
 
     @Test
     public void testListenersWhenDNSHostnamesAreUsed() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int heartBeatSeconds = 5;
         config.getNetworkConfig().setPublicAddress("localhost");
         config.setProperty(GroupProperty.CLIENT_HEARTBEAT_TIMEOUT_SECONDS.getName(), Integer.toString(heartBeatSeconds));

@@ -99,7 +99,7 @@ public class MultiMapLockTest extends HazelcastTestSupport {
 
     @Test
     public void testLock() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "defMM";
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
         final int insCount = 4;

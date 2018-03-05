@@ -104,7 +104,7 @@ import static org.junit.Assert.fail;
  * <p>
  * Has built-in support for {@link TestHazelcastInstanceFactory}, {@link JitterRule} and {@link DumpBuildInfoOnFailureRule}.
  * <p>
- * Tests which are be extended in Hazelcast Enterprise, should use {@link #getConfig()} instead of {@code new Config()},
+ * Tests which are be extended in Hazelcast Enterprise, should use {@link #getConfig()} instead of {@code com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()},
  * so the Enterprise test can override this method to return a config with a {@link com.hazelcast.config.NativeMemoryConfig}.
  */
 @SuppressWarnings({"unused", "SameParameterValue", "WeakerAccess"})
@@ -138,13 +138,18 @@ public abstract class HazelcastTestSupport {
     // ########## configuration ##########
     // ###################################
 
-    protected Config getConfig() {
+    public static Config smallInstanceConfig() {
         // make the test instances consume less resources per default
         return new Config()
                 .setProperty(PARTITION_COUNT.getName(), "11")
                 .setProperty(PARTITION_OPERATION_THREAD_COUNT.getName(), "2")
                 .setProperty(GENERIC_OPERATION_THREAD_COUNT.getName(), "2")
                 .setProperty(EVENT_THREAD_COUNT.getName(), "1");
+    }
+
+    protected Config getConfig() {
+        return smallInstanceConfig();
+
     }
 
     protected Config toDefaultProperties(Config config) {

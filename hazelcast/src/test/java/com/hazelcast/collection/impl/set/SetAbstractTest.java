@@ -51,7 +51,7 @@ public abstract class SetAbstractTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        config = new Config();
+        config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addSetConfig(new SetConfig("testAdd_withMaxCapacity*").setMaxSize(1));
 
         instances = newInstances(config);

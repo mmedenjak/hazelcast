@@ -61,7 +61,7 @@ public abstract class StressTestSupport extends HazelcastTestSupport {
     }
 
     public Config createClusterConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     @After

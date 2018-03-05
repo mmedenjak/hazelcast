@@ -44,7 +44,7 @@ public class MemberAttributeTest extends HazelcastTestSupport {
 
     @Test(timeout = 120000)
     public void testConfigAttributes() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
 
         MemberAttributeConfig memberAttributeConfig = config.getMemberAttributeConfig();
@@ -245,7 +245,7 @@ public class MemberAttributeTest extends HazelcastTestSupport {
         System.setProperty("hazelcast.member.attribute.Test-3", "12345");
         System.setProperty("hazelcast.member.attribute.Test-4", "123456");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMemberAttributeConfig().setIntAttribute("Test-1", 123);
         config.getMemberAttributeConfig().setIntAttribute("Test-2", 123);
 

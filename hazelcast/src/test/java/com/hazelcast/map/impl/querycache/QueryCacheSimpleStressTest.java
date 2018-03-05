@@ -49,7 +49,7 @@ public class QueryCacheSimpleStressTest extends HazelcastTestSupport {
 
     private final String mapName = randomString();
     private final String cacheName = randomString();
-    private final Config config = new Config();
+    private final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     private final int numberOfElementsToPut = 10000;
 
     @Before

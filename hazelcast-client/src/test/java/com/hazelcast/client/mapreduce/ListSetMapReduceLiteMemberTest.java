@@ -44,8 +44,8 @@ public class ListSetMapReduceLiteMemberTest {
     @Before
     public void before() {
         factory = new TestHazelcastFactory();
-        final HazelcastInstance lite = factory.newHazelcastInstance(new Config().setLiteMember(false));
-        final HazelcastInstance lite2 = factory.newHazelcastInstance(new Config().setLiteMember(false));
+        final HazelcastInstance lite = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(false));
+        final HazelcastInstance lite2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(false));
         final HazelcastInstance instance1 = factory.newHazelcastInstance();
         final HazelcastInstance instance2 = factory.newHazelcastInstance();
 

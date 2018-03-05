@@ -194,7 +194,7 @@ public class TransactionQueueTest extends HazelcastTestSupport {
 
     @Test
     public void testTransactionalOfferPoll1() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final int insCount = 4;
         final String name = "defQueue";
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(insCount);
@@ -218,7 +218,7 @@ public class TransactionQueueTest extends HazelcastTestSupport {
 
     @Test
     public void testTransactionalOfferPoll2() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final int insCount = 4;
         final String name0 = "defQueue0";
         final String name1 = "defQueue1";
@@ -258,7 +258,7 @@ public class TransactionQueueTest extends HazelcastTestSupport {
 
     @Test
     public void testQueueWithMap() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final int insCount = 4;
         final String queueName = "defQueue";
         final String mapName = "defMap";
@@ -470,7 +470,7 @@ public class TransactionQueueTest extends HazelcastTestSupport {
 
     @Test
     public void testPeekMethod() throws Exception {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final int insCount = 4;
         final String name = "defQueue";
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(insCount);

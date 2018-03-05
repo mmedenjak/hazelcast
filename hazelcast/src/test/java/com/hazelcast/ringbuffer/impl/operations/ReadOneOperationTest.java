@@ -54,7 +54,7 @@ public class ReadOneOperationTest extends HazelcastTestSupport {
     public void setup() {
         RingbufferConfig rbConfig = new RingbufferConfig("foo").setCapacity(10).setTimeToLiveSeconds(10);
 
-        Config config = new Config().addRingBufferConfig(rbConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addRingBufferConfig(rbConfig);
 
         hz = createHazelcastInstance(config);
         nodeEngine = getNodeEngineImpl(hz);

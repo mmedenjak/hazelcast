@@ -298,7 +298,7 @@ public class ClientServiceTest extends ClientTestSupport {
 
     @Test(timeout = 120000)
     public void testClientListenerDisconnected() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.IO_THREAD_COUNT.getName(), "1");
 
         final HazelcastInstance hz = hazelcastFactory.newHazelcastInstance(config);
@@ -439,7 +439,7 @@ public class ClientServiceTest extends ClientTestSupport {
 
     @Test
     public void testClientListener_fromConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final CountDownLatch connectedLatch = new CountDownLatch(1);
         final CountDownLatch disconnectedLatch = new CountDownLatch(1);
         ListenerConfig listenerConfig = new ListenerConfig(new ClientListener() {
@@ -466,7 +466,7 @@ public class ClientServiceTest extends ClientTestSupport {
 
     @Test
     public void testClientListener_withDummyClient() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final CountDownLatch latch = new CountDownLatch(2);
         final AtomicInteger eventCount = new AtomicInteger();
         ListenerConfig listenerConfig = new ListenerConfig(new ClientListener() {
@@ -502,7 +502,7 @@ public class ClientServiceTest extends ClientTestSupport {
 
     @Test
     public void testClientListener_withShuttingDownOwnerMember() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final CountDownLatch latch = new CountDownLatch(1);
         final AtomicInteger atomicInteger = new AtomicInteger();
         ListenerConfig listenerConfig = new ListenerConfig(new ClientListener() {

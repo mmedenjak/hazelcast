@@ -40,7 +40,7 @@ public abstract class CardinalityEstimatorAbstractTest extends HazelcastTestSupp
 
     @Parameters(name = "config:{0}")
     public static Collection<Object[]> params() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final SerializerConfig serializerConfig = new SerializerConfig();
         serializerConfig.setImplementation(new CustomObjectSerializer());
         serializerConfig.setTypeClass(CustomObject.class);

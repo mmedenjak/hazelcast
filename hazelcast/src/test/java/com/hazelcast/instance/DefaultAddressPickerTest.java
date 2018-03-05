@@ -53,7 +53,7 @@ public class DefaultAddressPickerTest {
     private static final String HAZELCAST_LOCAL_ADDRESS_PROP = "hazelcast.local.localAddress";
 
     private ILogger logger = Logger.getLogger(AddressPicker.class);
-    private Config config = new Config();
+    private Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     private HazelcastProperties properties;
     private AddressPicker addressPicker;
 

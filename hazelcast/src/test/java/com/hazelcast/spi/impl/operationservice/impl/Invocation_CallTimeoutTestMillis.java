@@ -48,7 +48,7 @@ public class Invocation_CallTimeoutTestMillis extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + CALL_TIMEOUT);
 
         hz = createHazelcastInstance(config);

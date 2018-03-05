@@ -52,7 +52,7 @@ public class ClientCachingProviderTest extends CachingProviderTest {
     @Before
     public void setup() {
         // start a member
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);
         instances.add(instance);
         // start two client instances

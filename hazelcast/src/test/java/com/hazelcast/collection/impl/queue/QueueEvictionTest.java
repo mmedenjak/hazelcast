@@ -45,7 +45,7 @@ public class QueueEvictionTest extends HazelcastTestSupport {
     public void testQueueEviction_whenTtlIsSet_thenTakeThrowsException() throws Exception {
         String queueName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig(queueName).setEmptyQueueTtl(2);
         HazelcastInstance hz = createHazelcastInstance(config);
         IQueue<Object> queue = hz.getQueue(queueName);
@@ -66,7 +66,7 @@ public class QueueEvictionTest extends HazelcastTestSupport {
     public void testQueueEviction_whenTtlIsZero_thenListenersAreNeverthelessExecuted() throws Exception {
         String queueName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig(queueName).setEmptyQueueTtl(0);
         HazelcastInstance hz = createHazelcastInstance(config);
 

@@ -79,7 +79,7 @@ public class TopicStressTest extends HazelcastTestSupport {
         topicConfig.setName("topic*");
         topicConfig.setMultiThreadingEnabled(multiThreadingEnabled);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addTopicConfig(topicConfig);
 
         instances = createHazelcastInstanceFactory(NODE_COUNT).newInstances(config);

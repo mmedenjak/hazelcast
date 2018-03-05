@@ -94,7 +94,7 @@ public class LockLeaseMemberBounceTest {
     }
 
     protected Config getConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
 

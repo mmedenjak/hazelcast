@@ -120,7 +120,7 @@ public abstract class AbstractListenersOnReconnectTest extends ClientTestSupport
 
     @Test
     public void testListenersWaitMemberDestroySmartRouting() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int endpointDelaySeconds = 2;
         config.setProperty(GroupProperty.CLIENT_ENDPOINT_REMOVE_DELAY_SECONDS.getName(), String.valueOf(endpointDelaySeconds));
         factory.newInstances(config, 3);
@@ -175,7 +175,7 @@ public abstract class AbstractListenersOnReconnectTest extends ClientTestSupport
 
     @Test
     public void testListenersWhenClientDisconnectedOperationRuns_whenOwnerMemberRemoved() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int endpointDelaySeconds = 2;
         config.setProperty(GroupProperty.CLIENT_ENDPOINT_REMOVE_DELAY_SECONDS.getName(), String.valueOf(endpointDelaySeconds));
         HazelcastInstance ownerServer = factory.newHazelcastInstance(config);
@@ -215,7 +215,7 @@ public abstract class AbstractListenersOnReconnectTest extends ClientTestSupport
 
     @Test
     public void testListenersWhenClientDisconnectedOperationRuns_whenOwnerConnectionRemoved() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int endpointDelaySeconds = 2;
         config.setProperty(GroupProperty.CLIENT_ENDPOINT_REMOVE_DELAY_SECONDS.getName(), String.valueOf(endpointDelaySeconds));
         config.setProperty(GroupProperty.CLIENT_HEARTBEAT_TIMEOUT_SECONDS.getName(), "4");

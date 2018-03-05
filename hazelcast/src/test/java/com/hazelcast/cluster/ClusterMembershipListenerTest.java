@@ -166,7 +166,7 @@ public class ClusterMembershipListenerTest extends HazelcastTestSupport {
         final CountDownLatch eventLatch = new CountDownLatch(nodeCount - 1);
         final CountDownLatch nodeLatch = new CountDownLatch(nodeCount - 1);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addListenerConfig(new ListenerConfig().setImplementation(newAddMemberListener(eventLatch)));
 
 
@@ -176,7 +176,7 @@ public class ClusterMembershipListenerTest extends HazelcastTestSupport {
         for (int i = 1; i < nodeCount; i++) {
             spawn(new Runnable() {
                 public void run() {
-                    factory.newHazelcastInstance(new Config());
+                    factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
                     nodeLatch.countDown();
                 }
             });

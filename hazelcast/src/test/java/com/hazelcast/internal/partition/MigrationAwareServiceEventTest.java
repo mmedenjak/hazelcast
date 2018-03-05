@@ -62,7 +62,7 @@ public class MigrationAwareServiceEventTest extends HazelcastTestSupport {
 
     @Test
     public void migrationCommitEvents_shouldBeEqual_onSource_and_onDestination() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final MigrationEventCounterService counter = new MigrationEventCounterService();
         ServiceConfig serviceConfig = new ServiceConfig()
                 .setEnabled(true).setName("event-counter")
@@ -111,7 +111,7 @@ public class MigrationAwareServiceEventTest extends HazelcastTestSupport {
     }
 
     private Config newConfig(FailingOperationResponseHandler responseHandler) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getServicesConfig().addServiceConfig(
                 new ServiceConfig().setEnabled(true).setImplementation(new MigrationCommitRollbackTestingService(responseHandler))
                         .setName(MigrationCommitRollbackTestingService.NAME));

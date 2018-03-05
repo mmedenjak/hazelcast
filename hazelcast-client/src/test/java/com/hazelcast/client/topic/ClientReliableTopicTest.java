@@ -60,7 +60,7 @@ public class ClientReliableTopicTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         hazelcastFactory.newHazelcastInstance(config);
         client = hazelcastFactory.newHazelcastClient();
     }

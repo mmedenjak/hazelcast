@@ -381,7 +381,7 @@ public class DefaultPortableReaderQuickTest extends HazelcastTestSupport {
     //
 
     public PortableReader reader(Portable portable) throws IOException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig().addPortableFactory(TestPortableFactory.ID,
                 new TestPortableFactory());
 

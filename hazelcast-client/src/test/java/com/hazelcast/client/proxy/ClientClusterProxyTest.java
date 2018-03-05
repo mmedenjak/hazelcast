@@ -51,7 +51,7 @@ public class ClientClusterProxyTest extends HazelcastTestSupport {
 
     private HazelcastInstance client() {
         factory = new TestHazelcastFactory();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String groupAName = "HZ:GROUP";
         config.getGroupConfig().setName(groupAName);
         factory.newHazelcastInstance(config);

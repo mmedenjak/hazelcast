@@ -38,7 +38,7 @@ import static org.junit.Assert.assertTrue;
 @Category(QuickTest.class)
 public class HazelcastPropertiesTest {
 
-    private final Config config = new Config();
+    private final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     private final HazelcastProperties defaultProperties = new HazelcastProperties(config);
 
     @Test

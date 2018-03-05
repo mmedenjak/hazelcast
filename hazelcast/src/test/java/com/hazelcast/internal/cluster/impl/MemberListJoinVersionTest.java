@@ -93,7 +93,7 @@ public class MemberListJoinVersionTest extends HazelcastTestSupport {
 
     @Test
     public void when_splitSubClustersMerge_then_targetClusterShouldIncrementMemberListVersion() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
                 .setProperty(HEARTBEAT_INTERVAL_SECONDS.getName(), "1")
                 .setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5")

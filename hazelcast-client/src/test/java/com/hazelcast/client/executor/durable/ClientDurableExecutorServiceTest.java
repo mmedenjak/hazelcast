@@ -74,7 +74,7 @@ public class ClientDurableExecutorServiceTest {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         DurableExecutorConfig durableExecutorConfig = config.getDurableExecutorConfig(SINGLE_TASK + "*");
         durableExecutorConfig.setCapacity(1);
 

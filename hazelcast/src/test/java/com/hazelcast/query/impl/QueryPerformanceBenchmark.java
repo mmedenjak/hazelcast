@@ -103,7 +103,7 @@ public class QueryPerformanceBenchmark extends HazelcastTestSupport {
                 .addMapAttributeConfig(portableLimbNameWithExtractor);
 
         // config
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(objectMapConfig)
                 .addMapConfig(objectMapWithExtractorConfig)
                 .addMapConfig(portableMapConfig);

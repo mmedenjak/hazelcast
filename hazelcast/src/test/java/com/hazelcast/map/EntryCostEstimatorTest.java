@@ -169,7 +169,7 @@ public class EntryCostEstimatorTest
     public void testInMemoryFormats() {
         String BINARY_MAP = "testBinaryFormat";
         String OBJECT_MAP = "testObjectFormat";
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(BINARY_MAP).setInMemoryFormat(InMemoryFormat.BINARY).setBackupCount(0);
         config.getMapConfig(OBJECT_MAP).setInMemoryFormat(InMemoryFormat.OBJECT).setBackupCount(0);
 

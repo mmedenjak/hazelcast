@@ -51,7 +51,7 @@ public class ClientMultiMapReturnedCollectionTest {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMultiMapConfig(SET_MAP).setValueCollectionType(MultiMapConfig.ValueCollectionType.SET);
         config.getMultiMapConfig(LIST_MAP).setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
 

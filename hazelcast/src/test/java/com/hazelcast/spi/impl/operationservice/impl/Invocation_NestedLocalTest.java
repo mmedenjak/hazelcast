@@ -99,7 +99,7 @@ public class Invocation_NestedLocalTest extends Invocation_NestedAbstractTest {
 
     @Test
     public void invokeOnPartition_outerLocal_innerSameInstance_callsDifferentPartition_mappedToSameThread() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "2");
         config.setProperty(GroupProperty.PARTITION_OPERATION_THREAD_COUNT.getName(), "1");
         HazelcastInstance local = createHazelcastInstance(config);

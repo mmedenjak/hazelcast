@@ -34,7 +34,7 @@ public class SSLWithoutEnterpriseTest extends HazelcastTestSupport {
 
     @Test(expected = IllegalStateException.class)
     public void test() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         SSLConfig sslConfig = new SSLConfig();
         sslConfig.setEnabled(true)
                 .setProperties(createSslProperties());

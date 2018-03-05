@@ -69,7 +69,7 @@ public class RingbufferStoreTest extends HazelcastTestSupport {
                                     int capacity,
                                     InMemoryFormat inMemoryFormat,
                                     RingbufferStoreConfig ringbufferStoreConfig) {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final RingbufferConfig rbConfig = config
                 .getRingbufferConfig(ringbufferName)
                 .setInMemoryFormat(inMemoryFormat)

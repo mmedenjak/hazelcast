@@ -51,7 +51,7 @@ public class NodeIOServiceTest extends HazelcastTestSupport {
         NodeEngineImpl mockNodeEngine = mock(NodeEngineImpl.class);
         ioService = new NodeIOService(mockNode, mockNodeEngine);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         networkConfig = config.getNetworkConfig();
         when(mockNode.getConfig()).thenReturn(config);
     }

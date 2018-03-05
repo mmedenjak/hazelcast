@@ -53,7 +53,7 @@ public class PartitionMigrationListenerTest extends HazelcastTestSupport {
     @Test
     public void testMigrationListenerCalledOnlyOnceWhenMigrationHappens() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         // even partition count to make migration count deterministic
         final int partitionCount = 10;
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), String.valueOf(partitionCount));

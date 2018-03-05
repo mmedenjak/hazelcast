@@ -132,7 +132,7 @@ public class EntryListenerConfigTest extends HazelcastTestSupport {
     private void createInstanceAndInitializeListeners() {
         MapConfig mapConfig = new MapConfig(mapName);
         mapConfig.getEntryListenerConfigs().add(listenerConfig);
-        Config config = new Config().addMapConfig(mapConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addMapConfig(mapConfig);
 
         instance = createHazelcastInstance(config);
         instance.getMap(mapName);

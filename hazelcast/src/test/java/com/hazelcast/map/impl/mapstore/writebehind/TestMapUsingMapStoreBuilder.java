@@ -155,7 +155,7 @@ public class TestMapUsingMapStoreBuilder<K, V> {
                 .setWriteBatchSize(writeBatchSize)
                 .setWriteCoalescing(writeCoalescing);
 
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(mapName)
                 .setBackupCount(backupCount)
                 .setMapStoreConfig(mapStoreConfig)

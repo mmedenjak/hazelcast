@@ -120,7 +120,7 @@ public class AbstractQuorumFunctionTest
     }
 
     protected Config getIcmpFDEnabledConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         IcmpFailureDetectorConfig icmpFDConfig = new IcmpFailureDetectorConfig();
         icmpFDConfig.setEnabled(true)
                 .setFailFastOnStartup(false)

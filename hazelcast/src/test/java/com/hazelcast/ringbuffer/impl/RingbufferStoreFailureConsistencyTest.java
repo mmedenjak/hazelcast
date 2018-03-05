@@ -65,7 +65,7 @@ public class RingbufferStoreFailureConsistencyTest extends HazelcastTestSupport 
     private HazelcastInstance primaryInstance;
 
     private static Config getConfig(String ringbufferName, int capacity, RingbufferStoreConfig ringbufferStoreConfig) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         RingbufferConfig rbConfig = config
                 .getRingbufferConfig(ringbufferName)
                 .setInMemoryFormat(OBJECT)

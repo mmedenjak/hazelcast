@@ -51,7 +51,7 @@ public class ClientPartitionServiceLiteMemberTest {
 
     @Test(expected = NoDataMemberInClusterException.class)
     public void testGetPartitionsBlockingFailWithOnlyLiteMember() {
-        factory.newHazelcastInstance(new Config().setLiteMember(true));
+        factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         final HazelcastInstance client = factory.newHazelcastClient();
         final ClientPartitionService clientPartitionService = getClientPartitionService(client);
@@ -61,7 +61,7 @@ public class ClientPartitionServiceLiteMemberTest {
     @Test
     public void testPartitionsBlockingSucceedsWithLiteMemberAndDataMember() {
         factory.newHazelcastInstance();
-        factory.newHazelcastInstance(new Config().setLiteMember(true));
+        factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         final HazelcastInstance client = factory.newHazelcastClient();
         final ClientPartitionService clientPartitionService = getClientPartitionService(client);

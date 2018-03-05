@@ -44,7 +44,7 @@ public class ConditionAdvancedTest extends HazelcastTestSupport {
 
     @Test(timeout = 60000)
     public void testInterruptionDuringWaiting() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         // the system should wait at most 5000 ms in order to determine the operation status
         config.setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), "5000");
 

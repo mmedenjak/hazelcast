@@ -196,6 +196,6 @@ public abstract class AbstractCRDTBounceTest extends HazelcastTestSupport {
     }
 
     protected Config getConfig() {
-        return new Config().setProperty(GroupProperty.PARTITION_COUNT.getName(), "5");
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 }

@@ -91,7 +91,7 @@ public class ClientNodeExtensionTest
     @Test(expected = IllegalStateException.class)
     public void test_canNotConnect_whenNodeExtensionIsNotComplete()
             throws UnknownHostException {
-        HazelcastInstanceFactory.newHazelcastInstance(new Config(), randomName(),
+        HazelcastInstanceFactory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), randomName(),
                 new ManagedExtensionNodeContext(factory.getRegistry(), new Address("127.0.0.1", 5555), false));
 
         ClientConfig clientConfig = new ClientConfig();
@@ -106,7 +106,7 @@ public class ClientNodeExtensionTest
         try {
             nodeContext = new ManagedExtensionNodeContext(factory.getRegistry(), new Address("127.0.0.1", 5555), true);
 
-            HazelcastInstanceFactory.newHazelcastInstance(new Config(), randomName(), nodeContext);
+            HazelcastInstanceFactory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), randomName(), nodeContext);
 
             ClientConfig clientConfig = new ClientConfig();
             clientConfig.setProperty(ClientProperty.INVOCATION_TIMEOUT_SECONDS.getName(), "3");

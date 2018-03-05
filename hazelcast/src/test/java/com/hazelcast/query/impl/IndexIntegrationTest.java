@@ -74,7 +74,7 @@ public class IndexIntegrationTest extends HazelcastTestSupport {
         String currency = "dollar";
         long amount = 5L;
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "1");
         MapConfig mapConfig = config.getMapConfig(name);
         mapConfig.setEvictionPolicy(EvictionPolicy.LFU);
@@ -123,7 +123,7 @@ public class IndexIntegrationTest extends HazelcastTestSupport {
         MapConfig mapConfig = new MapConfig().setName("map");
         mapConfig.addMapIndexConfig(mapIndexConfig);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addMapConfig(mapConfig);
 
         Trade trade = new Trade();

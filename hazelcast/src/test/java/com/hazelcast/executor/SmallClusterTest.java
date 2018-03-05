@@ -59,7 +59,7 @@ public class SmallClusterTest extends ExecutorServiceTestSupport {
 
     @Before
     public void setUp() {
-        instances = createHazelcastInstanceFactory(NODE_COUNT).newInstances(new Config());
+        instances = createHazelcastInstanceFactory(NODE_COUNT).newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
         warmUpPartitions(instances);
     }
 

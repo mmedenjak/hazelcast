@@ -178,7 +178,7 @@ public class TransactionListTest extends HazelcastTestSupport {
 
     @Test
     public void testMigrationSerializationNotFails_whenTransactionsAreUsed() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty("hazelcast.partition.count", "2");
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance instance1 = factory.newHazelcastInstance(config);

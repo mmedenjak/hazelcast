@@ -46,7 +46,7 @@ public class HealthMonitorTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(HEALTH_MONITORING_LEVEL.getName(), HealthMonitorLevel.NOISY.toString())
                 .setProperty(HEALTH_MONITORING_DELAY_SECONDS.getName(), "1")
                 .setProperty(HEALTH_MONITORING_THRESHOLD_MEMORY_PERCENTAGE.getName(), "70")

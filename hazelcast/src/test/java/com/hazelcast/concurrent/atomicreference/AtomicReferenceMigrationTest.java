@@ -42,7 +42,7 @@ public class AtomicReferenceMigrationTest extends HazelcastTestSupport {
 
     @Test
     public void testWhenInstancesShutdown() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance instance1 = factory.newHazelcastInstance(config);
         IAtomicReference<SimpleObject> reference1 = instance1.getAtomicReference("test");

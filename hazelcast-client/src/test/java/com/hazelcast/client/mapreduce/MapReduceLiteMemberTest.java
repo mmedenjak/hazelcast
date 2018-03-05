@@ -60,8 +60,8 @@ public class MapReduceLiteMemberTest {
     @Before
     public void before() {
         factory = new TestHazelcastFactory();
-        lite = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        lite2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        lite = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        lite2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
         instance = factory.newHazelcastInstance();
         instance2 = factory.newHazelcastInstance();
 

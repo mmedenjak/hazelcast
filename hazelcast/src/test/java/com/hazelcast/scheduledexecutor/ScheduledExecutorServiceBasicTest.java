@@ -79,7 +79,7 @@ public class ScheduledExecutorServiceBasicTest extends ScheduledExecutorServiceT
                 .setDurability(5)
                 .setPoolSize(24);
 
-        Config config = new Config().addScheduledExecutorConfig(sec);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addScheduledExecutorConfig(sec);
 
         HazelcastInstance[] instances = createClusterWithCount(1, config);
         IScheduledFuture future = instances[0].getScheduledExecutorService(schedulerName)
@@ -108,7 +108,7 @@ public class ScheduledExecutorServiceBasicTest extends ScheduledExecutorServiceT
                 .setPoolSize(1)
                 .setCapacity(0);
 
-        Config config = new Config().addScheduledExecutorConfig(sec);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addScheduledExecutorConfig(sec);
 
         HazelcastInstance[] instances = createClusterWithCount(1, config);
         IScheduledExecutorService service = instances[0].getScheduledExecutorService(schedulerName);
@@ -150,7 +150,7 @@ public class ScheduledExecutorServiceBasicTest extends ScheduledExecutorServiceT
                 .setPoolSize(1)
                 .setCapacity(10);
 
-        Config config = new Config().addScheduledExecutorConfig(sec);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addScheduledExecutorConfig(sec);
 
         HazelcastInstance[] instances = createClusterWithCount(1, config);
         IScheduledExecutorService service = instances[0].getScheduledExecutorService(schedulerName);
@@ -179,7 +179,7 @@ public class ScheduledExecutorServiceBasicTest extends ScheduledExecutorServiceT
                 .setPoolSize(1)
                 .setCapacity(10);
 
-        Config config = new Config().addScheduledExecutorConfig(sec);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addScheduledExecutorConfig(sec);
 
         HazelcastInstance[] instances = createClusterWithCount(1, config);
         IScheduledExecutorService service = instances[0].getScheduledExecutorService(schedulerName);

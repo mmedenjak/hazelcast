@@ -55,7 +55,7 @@ public class MockJoinerTest extends HazelcastTestSupport {
     @Test
     public void serialJoin_withNewInstances() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
-        HazelcastInstance[] instances = factory.newInstances(new Config(), nodeCount);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), nodeCount);
 
         assertClusterSizeEventually(instances);
     }
@@ -89,13 +89,13 @@ public class MockJoinerTest extends HazelcastTestSupport {
     public void restart_master() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance[] instances = factory.newInstances(new Config(), nodeCount);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), nodeCount);
         assertClusterSizeEventually(instances);
 
         Address address = getAddress(instances[0]);
         instances[0].getLifecycleService().terminate();
 
-        instances[0] = factory.newHazelcastInstance(address, new Config());
+        instances[0] = factory.newHazelcastInstance(address, com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
         assertClusterSizeEventually(instances);
     }
 
@@ -103,13 +103,13 @@ public class MockJoinerTest extends HazelcastTestSupport {
     public void restart_slave() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance[] instances = factory.newInstances(new Config(), nodeCount);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), nodeCount);
         assertClusterSizeEventually(instances);
 
         Address address = getAddress(instances[1]);
         instances[1].getLifecycleService().terminate();
 
-        instances[1] = factory.newHazelcastInstance(address, new Config());
+        instances[1] = factory.newHazelcastInstance(address, com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
         assertClusterSizeEventually(instances);
     }
 
@@ -117,7 +117,7 @@ public class MockJoinerTest extends HazelcastTestSupport {
     public void restart_multipleInParallel() {
         final TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        final HazelcastInstance[] instances = factory.newInstances(new Config(), nodeCount);
+        final HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), nodeCount);
         assertClusterSizeEventually(instances);
 
         int restartCount = nodeCount / 2;
@@ -129,7 +129,7 @@ public class MockJoinerTest extends HazelcastTestSupport {
                 public void run() {
                     Address address = getAddress(instances[ix]);
                     instances[ix].getLifecycleService().terminate();
-                    instances[ix] = factory.newHazelcastInstance(address, new Config());
+                    instances[ix] = factory.newHazelcastInstance(address, com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
                     latch.countDown();
                 }
             }.start();

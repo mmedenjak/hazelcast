@@ -43,7 +43,7 @@ import static org.mockito.Mockito.withSettings;
 public class MapLoaderLifecycleTest extends HazelcastTestSupport {
 
     private MapLoaderLifecycleSupport loader = mockMapLoaderWithLifecycle();
-    private Config config = new Config();
+    private Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
     @Before
     public void configure() {

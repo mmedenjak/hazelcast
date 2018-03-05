@@ -51,7 +51,7 @@ public class SpecificSetupTest extends ExecutorServiceTestSupport {
     @Test
     public void managedContext_mustInitializeRunnable() throws Exception {
         final AtomicBoolean initialized = new AtomicBoolean();
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addExecutorConfig(new ExecutorConfig("test", 1))
                 .setManagedContext(new ManagedContext() {
                     @Override
@@ -69,7 +69,7 @@ public class SpecificSetupTest extends ExecutorServiceTestSupport {
 
     @Test
     public void statsIssue2039() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String name = "testStatsIssue2039";
         config.addExecutorConfig(new ExecutorConfig(name).setQueueCapacity(1).setPoolSize(1));
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -99,7 +99,7 @@ public class SpecificSetupTest extends ExecutorServiceTestSupport {
     @Test
     public void operationTimeoutConfigProp() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int timeoutSeconds = 3;
         config.setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), String.valueOf(SECONDS.toMillis(timeoutSeconds)));
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);

@@ -50,7 +50,7 @@ public class DistributedExecutorServiceTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addExecutorConfig(new ExecutorConfig().setName(EXECUTOR_NAME).setStatisticsEnabled(false));
 
         hz = createHazelcastInstance(config);

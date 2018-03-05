@@ -163,7 +163,7 @@ public class DynamicConfigSmokeTest extends HazelcastTestSupport {
         String mapName = randomMapName();
         int initialClusterSize = 1;
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = new MapConfig(mapName);
         config.addMapConfig(mapConfig);
 
@@ -209,7 +209,7 @@ public class DynamicConfigSmokeTest extends HazelcastTestSupport {
         config.addMapConfig(mapConfig);
 
         // start a lite member after the dynamic config was submitted
-        Config liteConfig = new Config();
+        Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         liteConfig.setLiteMember(true);
         HazelcastInstance i3 = factory.newHazelcastInstance(liteConfig);
 

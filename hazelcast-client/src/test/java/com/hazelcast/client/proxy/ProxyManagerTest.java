@@ -110,7 +110,7 @@ public class ProxyManagerTest extends HazelcastTestSupport {
     private List<HazelcastInstance> createNodes(final int numberOfLiteNodes, final int numberOfDataNodes) {
         final List<HazelcastInstance> instances = new ArrayList<HazelcastInstance>();
 
-        final Config liteConfig = new Config().setLiteMember(true);
+        final Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
         for (int i = 0; i < numberOfLiteNodes; i++) {
             instances.add(factory.newHazelcastInstance(liteConfig));
         }

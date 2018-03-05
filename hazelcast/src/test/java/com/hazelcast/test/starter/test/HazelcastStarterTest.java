@@ -48,7 +48,7 @@ public class HazelcastStarterTest {
 
     @Test
     public void testMemberWithConfig() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setInstanceName("test-name");
 
         HazelcastInstance alwaysRunningMember = HazelcastStarter.newHazelcastInstance("3.8", config, false);

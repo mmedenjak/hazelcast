@@ -331,7 +331,7 @@ public class HazelcastOSGiServiceTest extends HazelcastTestSupport {
 
     @Test
     public void groupNameIsSetToDefaultGroupNameOfBundleWhenConfigIsGivenWithoutSpecifiedGroupConfigAndGroupingIsNotDisabled() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         HazelcastInternalOSGiService service = getService();
 
@@ -346,7 +346,7 @@ public class HazelcastOSGiServiceTest extends HazelcastTestSupport {
 
     @Test
     public void groupNameIsSetToDefaultGroupNameOfBundleWhenConfigIsGivenWithNullGroupConfigAndGroupingIsNotDisabled() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setGroupConfig(null);
 
         HazelcastInternalOSGiService service = getService();
@@ -366,7 +366,7 @@ public class HazelcastOSGiServiceTest extends HazelcastTestSupport {
 
         HazelcastInternalOSGiService service = getService();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(GROUP_NAME);
 
         HazelcastOSGiInstance osgiInstance = service.newHazelcastInstance(config);
@@ -425,7 +425,7 @@ public class HazelcastOSGiServiceTest extends HazelcastTestSupport {
             HazelcastInternalOSGiService service = getService(testBundleContext);
             assertNotNull(service);
 
-            Config config = new Config();
+            Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
             config.getGroupConfig().setName(GROUP_NAME);
 
             HazelcastOSGiInstance osgiInstance = service.newHazelcastInstance(config);

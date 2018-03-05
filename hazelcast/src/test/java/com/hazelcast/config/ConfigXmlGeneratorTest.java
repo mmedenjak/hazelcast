@@ -59,7 +59,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testIfSensitiveDataIsMasked_whenMaskingEnabled() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         SSLConfig sslConfig = new SSLConfig();
         sslConfig.setProperty("keyStorePassword", "Hazelcast")
                 .setProperty("trustStorePassword", "Hazelcast");
@@ -92,7 +92,7 @@ public class ConfigXmlGeneratorTest {
         String salt = "theSalt";
         String licenseKey = "HazelcastLicenseKey";
 
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         cfg.getGroupConfig().setPassword(password);
 
         SSLConfig sslConfig = new SSLConfig();
@@ -123,7 +123,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testMemberAddressProvider() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MemberAddressProviderConfig expected = cfg.getNetworkConfig().getMemberAddressProviderConfig();
         expected.setEnabled(true)
                 .setEnabled(true)
@@ -144,7 +144,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testFailureDetectorConfigGenerator() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         IcmpFailureDetectorConfig expected = new IcmpFailureDetectorConfig();
         expected.setEnabled(true)
                 .setIntervalMilliseconds(1001)
@@ -171,7 +171,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testNetworkMulticastJoinConfig() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         MulticastConfig expectedConfig = new MulticastConfig()
                 .setEnabled(true)
@@ -191,7 +191,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testNetworkTcpJoinConfig() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TcpIpConfig expectedConfig = new TcpIpConfig()
                 .setEnabled(true)
@@ -209,7 +209,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testNetworkConfigOutboundPorts() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         NetworkConfig expectedNetworkConfig = cfg.getNetworkConfig();
         expectedNetworkConfig
@@ -224,7 +224,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testNetworkConfigInterfaces() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         NetworkConfig expectedNetworkConfig = cfg.getNetworkConfig();
         expectedNetworkConfig.getInterfaces()
@@ -238,7 +238,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testNetworkConfigSocketInterceptor() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         SocketInterceptorConfig expectedConfig = new SocketInterceptorConfig()
                 .setEnabled(true)
@@ -254,7 +254,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testListenerConfig() {
-        Config expectedConfig = new Config();
+        Config expectedConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         expectedConfig.setListenerConfigs(asList(new ListenerConfig("Listener")));
 
@@ -265,7 +265,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testHotRestartPersistenceConfig() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         HotRestartPersistenceConfig expectedConfig = cfg.getHotRestartPersistenceConfig();
         expectedConfig.setEnabled(true)
@@ -283,7 +283,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testServicesConfig() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         Properties properties = new Properties();
         properties.setProperty("key", "value");
@@ -304,7 +304,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testSerializationConfig() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         GlobalSerializerConfig globalSerializerConfig = new GlobalSerializerConfig()
                 .setClassName("GlobalSerializer")
@@ -346,7 +346,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testPartitionGroupConfig() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         PartitionGroupConfig expectedConfig = new PartitionGroupConfig()
                 .setEnabled(true)
@@ -375,7 +375,7 @@ public class ConfigXmlGeneratorTest {
                                 .setProperty("trustStorePassword", "myp@ss2")
                 );
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setManagementCenterConfig(managementCenterConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -408,7 +408,7 @@ public class ConfigXmlGeneratorTest {
 
         replicatedMapConfig.setAsyncFillup(true);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addReplicatedMapConfig(replicatedMapConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -435,7 +435,7 @@ public class ConfigXmlGeneratorTest {
                 .setIdOffset(20L)
                 .setStatisticsEnabled(false);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addFlakeIdGeneratorConfig(figConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -470,7 +470,7 @@ public class ConfigXmlGeneratorTest {
         expectedConfig.setDisablePerEntryInvalidationEvents(true);
         expectedConfig.setWanReplicationRef(wanReplicationRef());
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addCacheConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -496,7 +496,7 @@ public class ConfigXmlGeneratorTest {
         expectedConfig.setMergePolicy("mergePolicy");
         expectedConfig.setDisablePerEntryInvalidationEvents(true);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addCacheConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -520,7 +520,7 @@ public class ConfigXmlGeneratorTest {
                 .setName("testCache")
                 .setQuorumName("testQuorum");
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addCacheConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -567,7 +567,7 @@ public class ConfigXmlGeneratorTest {
                 .setQuorumName("quorum")
                 .setMergePolicyConfig(mergePolicyConfig);
 
-        Config config = new Config().addRingBufferConfig(expectedConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addRingBufferConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
 
@@ -584,7 +584,7 @@ public class ConfigXmlGeneratorTest {
                 .setBackupCount(1)
                 .setAsyncBackupCount(2);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addSemaphoreConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -602,7 +602,7 @@ public class ConfigXmlGeneratorTest {
                 .setQueueCapacity(100)
                 .setQuorumName("quorum");
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addExecutorConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -620,7 +620,7 @@ public class ConfigXmlGeneratorTest {
                 .setDurability(2)
                 .setQuorumName("quorum");
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addDurableExecutorConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -636,7 +636,7 @@ public class ConfigXmlGeneratorTest {
                 .setReplicaCount(100)
                 .setQuorumName("quorum");
 
-        Config config = new Config().addPNCounterConfig(expectedConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addPNCounterConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
 
@@ -656,7 +656,7 @@ public class ConfigXmlGeneratorTest {
                 .setQuorumName("quorum")
                 .setEntryListenerConfigs(asList(new EntryListenerConfig("java.Listener", true, true)));
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMultiMapConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -675,7 +675,7 @@ public class ConfigXmlGeneratorTest {
                 .setMergePolicyConfig(mergePolicyConfig)
                 .setQuorumName("quorum");
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addAtomicLongConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -698,7 +698,7 @@ public class ConfigXmlGeneratorTest {
                 .setMergePolicyConfig(mergePolicyConfig)
                 .setQuorumName("quorum");
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addAtomicReferenceConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -717,7 +717,7 @@ public class ConfigXmlGeneratorTest {
                 .setQuorumName("quorum");
 
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addCountDownLatchConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -741,7 +741,7 @@ public class ConfigXmlGeneratorTest {
                 .setMergePolicyConfig(mergePolicyConfig)
                 .setItemListenerConfigs(asList(new ItemListenerConfig("java.Listener", true)));
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addListConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -765,7 +765,7 @@ public class ConfigXmlGeneratorTest {
                 .setMergePolicyConfig(mergePolicyConfig)
                 .setItemListenerConfigs(asList(new ItemListenerConfig("java.Listener", true)));
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addSetConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -810,7 +810,7 @@ public class ConfigXmlGeneratorTest {
                 .setQueueStoreConfig(queueStoreConfig)
                 .setItemListenerConfigs(asList(new ItemListenerConfig("java.Listener", true)));
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addQueueConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -834,7 +834,7 @@ public class ConfigXmlGeneratorTest {
         expectedConfig.setPageSize(100);
         expectedConfig.setSize(new MemorySize(20, MemoryUnit.MEGABYTES));
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setNativeMemoryConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -869,7 +869,7 @@ public class ConfigXmlGeneratorTest {
         final CRDTReplicationConfig replicationConfig = new CRDTReplicationConfig()
                 .setMaxConcurrentReplicationTargets(10)
                 .setReplicationPeriodMillis(2000);
-        final Config config = new Config().setCRDTReplicationConfig(replicationConfig);
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setCRDTReplicationConfig(replicationConfig);
         final Config xmlConfig = getNewConfigViaXMLGenerator(config);
         final CRDTReplicationConfig xmlReplicationConfig = xmlConfig.getCRDTReplicationConfig();
 
@@ -975,7 +975,7 @@ public class ConfigXmlGeneratorTest {
 
         expectedConfig.setQueryCacheConfigs(asList(queryCacheConfig1, queryCacheConfig2));
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(expectedConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -1004,7 +1004,7 @@ public class ConfigXmlGeneratorTest {
                 .setName("nearCacheTest")
                 .setNearCacheConfig(expectedConfig);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -1025,7 +1025,7 @@ public class ConfigXmlGeneratorTest {
                 .setName("nearCacheTest")
                 .setNearCacheConfig(expectedConfig);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(mapConfig);
 
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
@@ -1049,7 +1049,7 @@ public class ConfigXmlGeneratorTest {
                 .setBinary(false)
                 .setMergePolicyConfig(mergePolicyConfig);
 
-        Config config = new Config().addMultiMapConfig(multiMapConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addMultiMapConfig(multiMapConfig);
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
 
         assertEquals(multiMapConfig, xmlConfig.getMultiMapConfig("myMultiMap"));
@@ -1071,7 +1071,7 @@ public class ConfigXmlGeneratorTest {
                 .setDiscoveryConfig(getDummyDiscoveryConfig());
         wanConfig.setWanPublisherConfigs(Collections.singletonList(publisherConfig));
 
-        Config config = new Config().addWanReplicationConfig(wanConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addWanReplicationConfig(wanConfig);
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
 
         ConfigCompatibilityChecker.checkWanConfigs(config.getWanReplicationConfigs(), xmlConfig.getWanReplicationConfigs());
@@ -1085,7 +1085,7 @@ public class ConfigXmlGeneratorTest {
                 .setEnabled(true)
                 .setCapacity(123)
                 .setTimeToLiveSeconds(321);
-        Config config = new Config().addEventJournalConfig(expectedConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addEventJournalConfig(expectedConfig);
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
 
         EventJournalConfig actualConfig = xmlConfig.getMapEventJournalConfig(mapName);
@@ -1101,7 +1101,7 @@ public class ConfigXmlGeneratorTest {
                 .setEnabled(true)
                 .setCapacity(123)
                 .setTimeToLiveSeconds(321);
-        Config config = new Config().addEventJournalConfig(expectedConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addEventJournalConfig(expectedConfig);
         Config xmlConfig = getNewConfigViaXMLGenerator(config);
 
         EventJournalConfig actualConfig = xmlConfig.getCacheEventJournalConfig(cacheName);
@@ -1111,7 +1111,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testCardinalityEstimator() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         CardinalityEstimatorConfig estimatorConfig = new CardinalityEstimatorConfig()
                 .setBackupCount(2)
                 .setAsyncBackupCount(3)
@@ -1136,7 +1136,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testTopicGlobalOrdered() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TopicConfig expectedConfig = new TopicConfig()
                 .setName("TestTopic")
@@ -1153,7 +1153,7 @@ public class ConfigXmlGeneratorTest {
     @Test
     public void testTopicMultiThreaded() {
         String testTopic = "TestTopic";
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TopicConfig expectedConfig = new TopicConfig()
                 .setName(testTopic)
@@ -1170,7 +1170,7 @@ public class ConfigXmlGeneratorTest {
     @Test
     public void testReliableTopic() {
         String testTopic = "TestTopic";
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         ReliableTopicConfig expectedConfig = new ReliableTopicConfig()
                 .setName(testTopic)
@@ -1189,7 +1189,7 @@ public class ConfigXmlGeneratorTest {
     @Test
     public void testLock() {
         String testLock = "TestLock";
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         LockConfig expectedConfig = new LockConfig().setName(testLock).setQuorumName("quorum");
 
@@ -1202,7 +1202,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testScheduledExecutor() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         ScheduledExecutorConfig scheduledExecutorConfig =
                 new ScheduledExecutorConfig()
                         .setCapacity(1)
@@ -1229,7 +1229,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testQuorumConfig_configByClassName() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumConfig quorumConfig = new QuorumConfig("test-quorum", true, 3);
         quorumConfig.setType(QuorumType.READ_WRITE)
                 .setQuorumFunctionClassName("com.hazelcast.QuorumFunction");
@@ -1242,7 +1242,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testQuorumConfig_configuredByRecentlyActiveQuorumConfigBuilder() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumConfig quorumConfig = QuorumConfig.newRecentlyActiveQuorumConfigBuilder("recently-active", 3, 3141592)
                 .build();
         quorumConfig.setType(QuorumType.READ_WRITE)
@@ -1256,7 +1256,7 @@ public class ConfigXmlGeneratorTest {
 
     @Test
     public void testQuorumConfig_configuredByProbabilisticQuorumConfigBuilder() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QuorumConfig quorumConfig = QuorumConfig.newProbabilisticQuorumConfigBuilder("probabilistic-quorum", 3)
                 .withHeartbeatIntervalMillis(1)
                 .withAcceptableHeartbeatPauseMillis(2)

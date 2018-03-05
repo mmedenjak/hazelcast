@@ -54,9 +54,9 @@ public class NodeShutdownEventsTest {
         // Only expecting SHUTTING_DOWN & SHUTDOWN events so latch count should be 2.
         final CountDownLatch shutdownEventCount = new CountDownLatch(2);
 
-        final Config config1 = new Config();
+        final Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
-        final Config config2 = new Config();
+        final Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         // force join failure.
         config2.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "-100");
         // add lifecycle listener.

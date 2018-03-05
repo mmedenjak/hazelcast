@@ -93,7 +93,7 @@ public class QueryCacheTest extends AbstractQueryCacheTestSupport {
         IMap<Integer, Integer> map = getMap(instances[0], mapName);
 
         String cacheName = randomString();
-        config = new Config().setProperty(GroupProperty.PARTITION_COUNT.getName(), "1");
+        config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(GroupProperty.PARTITION_COUNT.getName(), "1");
 
         for (int i = 0; i < 30; i++) {
             map.put(i, i);

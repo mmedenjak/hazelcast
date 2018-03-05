@@ -142,7 +142,7 @@ public class MapAggregatePerformanceTest extends HazelcastTestSupport {
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(nodeCount);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         //config.setProperty("hazelcast.partition.count", "3");
         MapConfig mapConfig = new MapConfig();
         mapConfig.setName("aggr");

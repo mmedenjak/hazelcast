@@ -51,7 +51,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
 
     @Test
     public void test() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         JoinConfig join = networkConfig.getJoin();
@@ -64,7 +64,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
 
     @Test
     public void test_whenInterfacesEnabled() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         NetworkConfig networkConfig = config.getNetworkConfig();
         JoinConfig join = networkConfig.getJoin();
@@ -81,7 +81,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
 
     @Test
     public void test_whenDifferentBuildNumber() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig join = config.getNetworkConfig().getJoin();
         MulticastConfig multicastConfig = join.getMulticastConfig();
         multicastConfig.setEnabled(true);
@@ -92,7 +92,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
 
     @Test
     public void test_whenDifferentGroupNames() throws Exception {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         config1.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "3");
         config1.getGroupConfig().setName("group1");
@@ -100,7 +100,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
                 .setEnabled(true).setMulticastTimeoutSeconds(3);
         config1.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         config2.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "3");
         config2.getGroupConfig().setName("group2");
@@ -113,7 +113,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
 
     @Test
     public void test_whenIncompatiblePartitionGroups() throws Exception {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         config1.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "3");
         config1.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
@@ -122,7 +122,7 @@ public class MulticastJoinTest extends AbstractJoinTest {
         config1.getPartitionGroupConfig().setEnabled(true)
                 .setGroupType(PartitionGroupConfig.MemberGroupType.HOST_AWARE);
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         config2.setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "3");
         config2.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(true);
@@ -138,21 +138,21 @@ public class MulticastJoinTest extends AbstractJoinTest {
      */
     @Test
     public void test_issue247() throws Exception {
-        Config c1 = new Config();
+        Config c1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         c1.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         c1.getNetworkConfig().setPort(5701).setPortAutoIncrement(false);
         c1.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         c1.getNetworkConfig().getJoin().getTcpIpConfig()
                 .setEnabled(true).clear().addMember("127.0.0.1:5701");
 
-        Config c2 = new Config();
+        Config c2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         c2.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         c2.getNetworkConfig().setPort(5702).setPortAutoIncrement(false);
         c2.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         c2.getNetworkConfig().getJoin().getTcpIpConfig()
                 .setEnabled(true).clear().addMember("127.0.0.1:5702");
 
-        Config c3 = new Config();
+        Config c3 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         c3.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         c3.getNetworkConfig().setPort(5703).setPortAutoIncrement(false);
         c3.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);

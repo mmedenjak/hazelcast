@@ -91,7 +91,7 @@ public class QueryCacheBasicTest extends HazelcastTestSupport {
     // setup a map with 2 query caches, same predicate, one includes values, the other excludes values
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(TEST_MAP_NAME).addQueryCacheConfig(
                 new QueryCacheConfig(QUERY_CACHE_NAME)
                         .setPredicateConfig(new PredicateConfig(predicate))

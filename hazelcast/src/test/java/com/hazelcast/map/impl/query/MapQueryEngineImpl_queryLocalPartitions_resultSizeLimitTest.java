@@ -48,7 +48,7 @@ public class MapQueryEngineImpl_queryLocalPartitions_resultSizeLimitTest extends
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "" + PARTITION_COUNT);
         config.setProperty(GroupProperty.QUERY_RESULT_SIZE_LIMIT.getName(), "" + RESULT_SIZE_LIMIT);
 

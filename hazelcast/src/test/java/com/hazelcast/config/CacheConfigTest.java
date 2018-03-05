@@ -384,7 +384,7 @@ public class CacheConfigTest extends HazelcastTestSupport {
     @Test
     public void cacheManagerByInstanceNameTest() throws URISyntaxException {
         final String instanceName = randomName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setInstanceName(instanceName);
         Hazelcast.newHazelcastInstance(config);
 
@@ -512,7 +512,7 @@ public class CacheConfigTest extends HazelcastTestSupport {
 
     @Test
     public void testGetPreConfiguredCache() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addCacheConfig(new CacheSimpleConfig().setName("test"));
 
         int count = 4;
@@ -541,7 +541,7 @@ public class CacheConfigTest extends HazelcastTestSupport {
     }
 
     Config createConfig(String cacheName) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         CacheSimpleConfig cacheSimpleConfig = new CacheSimpleConfig();
         cacheSimpleConfig.setName(cacheName);
         CacheSimpleEntryListenerConfig cacheSimpleEntryListenerConfig = new CacheSimpleEntryListenerConfig();
@@ -566,7 +566,7 @@ public class CacheConfigTest extends HazelcastTestSupport {
         final String cacheName = randomString();
         final String managerPrefix = "hz:";
         final String fullCacheName = managerPrefix + cacheName;
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final CacheConfig cacheConfig = new CacheConfig()
                 .setName(cacheName)
                 .setManagerPrefix(managerPrefix);

@@ -99,7 +99,7 @@ public class Invocation_RetryTest extends HazelcastTestSupport {
 
     @Test
     public void testNoStuckInvocationsWhenRetriedMultipleTimes() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), "3000");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);

@@ -61,7 +61,7 @@ public class CachePartitionLostListenerConfigTest extends HazelcastTestSupport {
     public void testCachePartitionLostListener_registeredViaImplementationInConfigObject() {
         final String cacheName = "myCache";
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         CacheSimpleConfig cacheConfig = config.getCacheConfig(cacheName);
         CachePartitionLostListener listener = mock(CachePartitionLostListener.class);
         cacheConfig.addCachePartitionLostListenerConfig(new CachePartitionLostListenerConfig(listener));

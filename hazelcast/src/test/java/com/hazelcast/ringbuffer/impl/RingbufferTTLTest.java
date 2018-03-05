@@ -42,7 +42,7 @@ public class RingbufferTTLTest extends HazelcastTestSupport {
     private ArrayRingbuffer arrayRingbuffer;
 
     public void setup(RingbufferConfig ringbufferConfig) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(ringbufferConfig);
         hz = createHazelcastInstance(config);
         final String name = ringbufferConfig.getName();

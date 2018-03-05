@@ -1123,7 +1123,7 @@ public class EvictionTest extends HazelcastTestSupport {
                 .setEvictionPolicy(LFU)
                 .setMaxSizeConfig(maxSizeConfig);
         // don't use getConfig(), this test is OSS specific
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "1")
                 .addMapConfig(mapConfig);
 

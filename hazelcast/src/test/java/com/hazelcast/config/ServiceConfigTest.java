@@ -54,7 +54,7 @@ public class ServiceConfigTest extends HazelcastTestSupport {
 
     @Test
     public void testService() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MyServiceConfig configObject = new MyServiceConfig();
         MyService service = new MyService();
         config.getServicesConfig().addServiceConfig(new ServiceConfig().setEnabled(true)

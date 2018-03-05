@@ -48,7 +48,7 @@ public abstract class TransactionalSetAbstractTest extends HazelcastTestSupport 
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addSetConfig(new SetConfig("testAdd_withMaxCapacity*").setMaxSize(1));
 
         instances = newInstances(config);

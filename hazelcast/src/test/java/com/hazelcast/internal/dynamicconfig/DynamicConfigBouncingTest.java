@@ -64,7 +64,7 @@ public class DynamicConfigBouncingTest extends HazelcastTestSupport {
             .build();
 
     public Config getConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     @Test

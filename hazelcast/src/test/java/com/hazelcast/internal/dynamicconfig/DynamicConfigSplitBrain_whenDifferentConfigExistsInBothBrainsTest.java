@@ -50,7 +50,7 @@ public class DynamicConfigSplitBrain_whenDifferentConfigExistsInBothBrainsTest e
 
     @Override
     protected void onAfterSplitBrainHealed(HazelcastInstance[] instances) {
-        MapConfig defaultMapConfig = new Config().findMapConfig("default");
+        MapConfig defaultMapConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().findMapConfig("default");
 
         for (HazelcastInstance instance : instances) {
             MapConfig mapConfig = instance.getConfig().findMapConfig(MAP_NAME);

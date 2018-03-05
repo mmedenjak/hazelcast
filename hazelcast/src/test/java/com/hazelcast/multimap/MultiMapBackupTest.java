@@ -52,7 +52,7 @@ public class MultiMapBackupTest extends HazelcastTestSupport {
 
     @Test
     public void testBackups() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMultiMapConfig(MULTI_MAP_NAME)
                 .setBackupCount(BACKUP_COUNT)
                 .setAsyncBackupCount(0);

@@ -105,7 +105,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
 
     @Test(expected = InvalidConfigurationException.class)
     public void whenStrategyClassNameNotExist_thenFailFast() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISCOVERY_SPI_ENABLED.getName(), "true");
 
         DiscoveryConfig discoveryConfig = new DiscoveryConfig();
@@ -121,7 +121,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
         // ParametrizedDiscoveryStrategy has a static counter and throws an exception when its instantiated  more than
         // than once.
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISCOVERY_SPI_ENABLED.getName(), "true");
 
         JoinConfig join = config.getNetworkConfig().getJoin();
@@ -379,7 +379,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
 
     @Test(expected = IllegalArgumentException.class)
     public void test_enabled_whenDiscoveryConfigIsNull() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISCOVERY_SPI_ENABLED.getName(), "true");
 
         config.getNetworkConfig().getJoin().setDiscoveryConfig(null);
@@ -387,7 +387,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
 
     @Test
     public void testCustomDiscoveryService_whenDiscoveredNodes_isNull() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISCOVERY_SPI_ENABLED.getName(), "true");
 
         DiscoveryServiceProvider discoveryServiceProvider = new DiscoveryServiceProvider() {
@@ -406,7 +406,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
 
     @Test
     public void testCustomDiscoveryService_whenDiscoveredNodes_isEmpty() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISCOVERY_SPI_ENABLED.getName(), "true");
 
         final DiscoveryService discoveryService = mock(DiscoveryService.class);
@@ -430,7 +430,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
     public void testMemberGroup_givenSPIMemberGroupIsActived_whenInstanceStarting_wontThrowNPE() {
         // this test has no assert. it's a regression test checking an instance can start when a SPI-driven member group
         // strategy is configured. see #11681
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISCOVERY_SPI_ENABLED.getName(), "true");
         JoinConfig joinConfig = config.getNetworkConfig().getJoin();
         joinConfig.getMulticastConfig().setEnabled(false);

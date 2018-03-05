@@ -59,7 +59,7 @@ public class IOBalancerStressTest extends HazelcastTestSupport {
 
     @Test
     public void testEachConnectionUseDifferentSelectorEventually() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.IO_BALANCER_INTERVAL_SECONDS.getName(), "1")
                 .setProperty(GroupProperty.IO_THREAD_COUNT.getName(), "2");
 

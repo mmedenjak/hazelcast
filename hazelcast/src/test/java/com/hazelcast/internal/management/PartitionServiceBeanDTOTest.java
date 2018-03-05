@@ -85,7 +85,7 @@ public class PartitionServiceBeanDTOTest extends HazelcastTestSupport {
 
     @Override
     protected Config getConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         // Join is disabled intentionally. will start standalone HazelcastInstance.
         NetworkConfig networkConfig = config.getNetworkConfig();

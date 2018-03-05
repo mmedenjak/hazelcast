@@ -76,7 +76,7 @@ public class ClientMemberAttributeTest extends HazelcastTestSupport {
 
     @Test(timeout = 120000)
     public void testConfigAttributes() throws Exception {
-        Config c = new Config();
+        Config c = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig join = c.getNetworkConfig().getJoin();
         join.getTcpIpConfig().addMember("127.0.0.1").setEnabled(true);
         join.getMulticastConfig().setEnabled(false);
@@ -115,7 +115,7 @@ public class ClientMemberAttributeTest extends HazelcastTestSupport {
 
     @Test(timeout = 120000)
     public void testPresharedAttributes() throws Exception {
-        Config c = new Config();
+        Config c = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig join = c.getNetworkConfig().getJoin();
         join.getTcpIpConfig().addMember("127.0.0.1").setEnabled(true);
         join.getMulticastConfig().setEnabled(false);
@@ -155,7 +155,7 @@ public class ClientMemberAttributeTest extends HazelcastTestSupport {
 
     @Test(timeout = 120000)
     public void testAddAttributes() throws Exception {
-        Config c = new Config();
+        Config c = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig join = c.getNetworkConfig().getJoin();
         join.getTcpIpConfig().addMember("127.0.0.1").setEnabled(true);
         join.getMulticastConfig().setEnabled(false);
@@ -210,7 +210,7 @@ public class ClientMemberAttributeTest extends HazelcastTestSupport {
 
     @Test(timeout = 120000)
     public void testChangeAttributes() throws Exception {
-        Config c = new Config();
+        Config c = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig join = c.getNetworkConfig().getJoin();
         join.getTcpIpConfig().addMember("127.0.0.1").setEnabled(true);
         join.getMulticastConfig().setEnabled(false);
@@ -265,7 +265,7 @@ public class ClientMemberAttributeTest extends HazelcastTestSupport {
 
     @Test(timeout = 120000)
     public void testRemoveAttributes() throws Exception {
-        Config c = new Config();
+        Config c = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         JoinConfig join = c.getNetworkConfig().getJoin();
         join.getTcpIpConfig().addMember("127.0.0.1").setEnabled(true);
         join.getMulticastConfig().setEnabled(false);

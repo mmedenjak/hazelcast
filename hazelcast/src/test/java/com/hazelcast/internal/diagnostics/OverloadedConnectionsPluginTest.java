@@ -54,7 +54,7 @@ public class OverloadedConnectionsPluginTest extends AbstractDiagnosticsPluginTe
     public void setup() {
         Hazelcast.shutdownAll();
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(OverloadedConnectionsPlugin.PERIOD_SECONDS.getName(), "1")
                 .setProperty(OverloadedConnectionsPlugin.SAMPLES.getName(), "10")
                 .setProperty(OverloadedConnectionsPlugin.THRESHOLD.getName(), "10");

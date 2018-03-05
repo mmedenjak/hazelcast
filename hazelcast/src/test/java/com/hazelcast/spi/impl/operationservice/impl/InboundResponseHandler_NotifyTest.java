@@ -52,7 +52,7 @@ public class InboundResponseHandler_NotifyTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "false");
         config.setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "20000");
         local = createHazelcastInstance(config);

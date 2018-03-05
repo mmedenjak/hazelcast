@@ -113,7 +113,7 @@ public class MapQuorumLiteMemberTest extends HazelcastTestSupport {
         QuorumConfig quorumConfig = new QuorumConfig().setName(name).setType(type).setEnabled(true).setSize(size);
         MapConfig mapConfig = new MapConfig(name);
         mapConfig.setQuorumName(name);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addQuorumConfig(quorumConfig);
         config.addMapConfig(mapConfig);
         config.setLiteMember(liteMember);

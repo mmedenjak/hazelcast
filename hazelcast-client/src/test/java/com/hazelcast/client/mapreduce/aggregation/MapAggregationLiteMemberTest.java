@@ -43,7 +43,7 @@ public class MapAggregationLiteMemberTest {
     @Before
     public void before() {
         factory = new TestHazelcastFactory();
-        final HazelcastInstance lite = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        final HazelcastInstance lite = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
         final HazelcastInstance instance1 = factory.newHazelcastInstance();
         final HazelcastInstance instance2 = factory.newHazelcastInstance();
 

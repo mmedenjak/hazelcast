@@ -57,7 +57,7 @@ public class DiagnosticsLogTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(Diagnostics.ENABLED.getName(), "true")
                 .setProperty(Diagnostics.MAX_ROLLED_FILE_SIZE_MB.getName(), "0.2")
                 .setProperty(Diagnostics.MAX_ROLLED_FILE_COUNT.getName(), "3")
@@ -88,7 +88,7 @@ public class DiagnosticsLogTest extends HazelcastTestSupport {
 
     @Test
     public void testDisabledByDefault() {
-        HazelcastProperties hazelcastProperties = new HazelcastProperties(new Config());
+        HazelcastProperties hazelcastProperties = new HazelcastProperties(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
         assertFalse(hazelcastProperties.getBoolean(Diagnostics.ENABLED));
     }
 

@@ -67,7 +67,7 @@ public class TimedMemberStateIntegrationTest extends HazelcastTestSupport {
 
     @Test
     public void testMaxVisibleInstanceCount() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MC_MAX_VISIBLE_INSTANCE_COUNT.getName(), "3");
         HazelcastInstance hz = createHazelcastInstance(config);
         TimedMemberStateFactory factory = new TimedMemberStateFactory(getHazelcastInstanceImpl(hz));

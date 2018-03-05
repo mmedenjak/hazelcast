@@ -136,7 +136,7 @@ public class ClientDiscoverySpiTest extends HazelcastTestSupport {
 
     @Test
     public void testNodeStartup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty("hazelcast.discovery.enabled", "true");
 
         config.getNetworkConfig().setPort(50001);
@@ -188,7 +188,7 @@ public class ClientDiscoverySpiTest extends HazelcastTestSupport {
     public void testDiscoveryServiceLifecycleMethodsCalledWhenClientAndServerStartAndShutdown() {
 
         //Given
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty("hazelcast.discovery.enabled", "true");
 
         config.getNetworkConfig().setPort(50001);

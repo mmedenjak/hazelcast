@@ -44,7 +44,7 @@ public abstract class AbstractOutOfMemoryHandlerTest extends HazelcastTestSuppor
     }
 
     protected void initHazelcastInstances() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         NodeContext nodeContext = new TestNodeContext();
         NodeContext nodeContextWithThrowable = new TestNodeContext(new FailingConnectionManager());

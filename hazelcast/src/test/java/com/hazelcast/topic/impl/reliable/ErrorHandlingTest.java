@@ -43,7 +43,7 @@ public class ErrorHandlingTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(new RingbufferConfig("foo")
                 .setCapacity(100)
                 .setTimeToLiveSeconds(0));

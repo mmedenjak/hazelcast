@@ -118,7 +118,7 @@ public class ReplicatedMapMergePolicyTest extends HazelcastTestSupport {
     }
 
     private Config newConfig(String mergePolicy, String mapName) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "5");
         config.setProperty(GroupProperty.MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "3");
         config.getGroupConfig().setName(generateRandomString(10));

@@ -52,7 +52,7 @@ public class ServiceManagerImplTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         ServiceConfig serviceConfig = new ServiceConfig()
                 .setClassName(FooService.class.getName())

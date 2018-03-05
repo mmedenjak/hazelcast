@@ -39,7 +39,7 @@ import static org.junit.Assert.assertEquals;
 public class OperationServiceImpl_invokeOnTargetLiteMemberTest
         extends HazelcastTestSupport {
 
-    private Config liteMemberConfig = new Config().setLiteMember(true);
+    private Config liteMemberConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
 
     private Operation operation;
 

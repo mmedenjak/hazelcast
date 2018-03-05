@@ -82,7 +82,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test(expected = NullPointerException.class)
     public void register_whenNullPlugin() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "true"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "true"));
         diagnostics.start();
         diagnostics.register(null);
     }
@@ -90,7 +90,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test
     public void register_whenMonitorDisabled() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "false"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "false"));
 
         diagnostics.start();
         DiagnosticsPlugin plugin = mock(DiagnosticsPlugin.class);
@@ -104,7 +104,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test(expected = IllegalArgumentException.class)
     public void register_whenMonitorEnabled_andPluginReturnsValueSmallerThanMinesOne() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "true"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "true"));
 
         diagnostics.start();
         DiagnosticsPlugin plugin = mock(DiagnosticsPlugin.class);
@@ -116,7 +116,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test
     public void register_whenMonitorEnabled_andPluginDisabled() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "true"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "true"));
 
         diagnostics.start();
         DiagnosticsPlugin plugin = mock(DiagnosticsPlugin.class);
@@ -130,7 +130,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test
     public void register_whenMonitorEnabled_andPluginStatic() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "true"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "true"));
         diagnostics.start();
 
 
@@ -146,7 +146,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test
     public void start_whenDisabled() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "false"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "false"));
         diagnostics.start();
 
         assertNull(diagnostics.diagnosticsLogFile);
@@ -155,7 +155,7 @@ public class DiagnosticsTest extends HazelcastTestSupport {
     @Test
     public void start_whenEnabled() {
         Diagnostics diagnostics = newDiagnostics(
-                new Config().setProperty(Diagnostics.ENABLED.getName(), "true"));
+                com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(Diagnostics.ENABLED.getName(), "true"));
         diagnostics.start();
 
         assertNotNull(diagnostics.diagnosticsLogFile);

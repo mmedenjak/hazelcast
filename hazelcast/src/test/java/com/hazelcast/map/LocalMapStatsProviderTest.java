@@ -37,7 +37,7 @@ public class LocalMapStatsProviderTest extends HazelcastTestSupport {
     //https://github.com/hazelcast/hazelcast/issues/11598
     @Test
     public void testRedundantPartitionMigrationWhenManCenterConfigured() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getManagementCenterConfig().setEnabled(true);
         config.getManagementCenterConfig().setUrl(format("http://localhost:%d%s/", 8085, "/mancenter"));
 

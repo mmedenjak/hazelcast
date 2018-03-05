@@ -63,7 +63,7 @@ public class ReplicatedMapAntiEntropyTest extends ReplicatedMapAbstractTest {
         SerializationConfig serializationConfig = new SerializationConfig()
                 .addSerializerConfig(serializerConfig);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setSerializationConfig(serializationConfig);
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();

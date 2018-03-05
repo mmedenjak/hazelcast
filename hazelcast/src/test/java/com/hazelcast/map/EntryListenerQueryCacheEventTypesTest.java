@@ -38,7 +38,7 @@ public class EntryListenerQueryCacheEventTypesTest extends AbstractEntryEventTyp
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getProperties().put("hazelcast.map.entry.filtering.natural.event.types", "true");
         instance = createHazelcastInstance(config);
         map = instance.getMap("EntryListenerEventTypesTestMap");

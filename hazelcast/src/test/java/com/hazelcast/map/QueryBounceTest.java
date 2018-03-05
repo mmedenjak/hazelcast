@@ -82,7 +82,7 @@ public class QueryBounceTest {
     }
 
     protected Config getConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     private void prepareAndRunQueryTasks() {

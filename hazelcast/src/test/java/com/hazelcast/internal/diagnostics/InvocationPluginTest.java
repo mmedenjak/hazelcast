@@ -42,7 +42,7 @@ public class InvocationPluginTest extends AbstractDiagnosticsPluginTest {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(InvocationPlugin.SAMPLE_PERIOD_SECONDS.getName(), "1")
                 .setProperty(InvocationPlugin.SLOW_THRESHOLD_SECONDS.getName(), "5");
 

@@ -48,7 +48,7 @@ public abstract class QueueAbstractTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addQueueConfig(new QueueConfig("testOffer_whenFull*").setMaxSize(100));
         config.addQueueConfig(new QueueConfig("testOfferWithTimeout*").setMaxSize(100));
 

@@ -51,7 +51,7 @@ public class MapClassLoaderTest extends HazelcastTestSupport {
     // https://github.com/hazelcast/hazelcast/issues/2721
     @Test
     public void testIssue2721() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         // get map config
         final MapConfig mapConfig = config.getMapConfig(MAP_NAME);

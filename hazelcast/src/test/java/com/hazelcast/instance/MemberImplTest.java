@@ -49,7 +49,7 @@ public class MemberImplTest extends HazelcastTestSupport {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        hazelcastInstance = new HazelcastInstanceImpl("test", new Config(), new DefaultNodeContext());
+        hazelcastInstance = new HazelcastInstanceImpl("test", com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), new DefaultNodeContext());
         address = new Address("127.0.0.1", 5701);
     }
 

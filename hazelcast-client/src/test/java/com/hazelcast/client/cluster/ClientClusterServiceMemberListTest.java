@@ -47,7 +47,7 @@ import static org.junit.Assert.assertArrayEquals;
 @Category({QuickTest.class, ParallelTest.class})
 public class ClientClusterServiceMemberListTest extends HazelcastTestSupport {
 
-    private Config liteConfig = new Config().setLiteMember(true);
+    private Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
 
     private TestHazelcastFactory factory;
 

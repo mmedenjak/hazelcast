@@ -59,7 +59,7 @@ public class RingbufferQuorumReadTest extends AbstractQuorumTest {
 
     @BeforeClass
     public static void setUp() {
-        initTestEnvironment(new Config(), new TestHazelcastInstanceFactory());
+        initTestEnvironment(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), new TestHazelcastInstanceFactory());
     }
 
     @AfterClass

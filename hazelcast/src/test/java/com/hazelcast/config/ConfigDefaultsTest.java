@@ -67,7 +67,7 @@ public class ConfigDefaultsTest extends HazelcastTestSupport {
     }
 
     private static Config javaConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     private static Config defaultXmlConfig() {

@@ -35,6 +35,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
+import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static java.util.Arrays.asList;
 
 @RunWith(Parameterized.class)
@@ -52,7 +53,7 @@ public class SetQuorumReadTest extends AbstractQuorumTest {
 
     @BeforeClass
     public static void setUp() {
-        initTestEnvironment(new Config(), new TestHazelcastInstanceFactory());
+        initTestEnvironment(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), new TestHazelcastInstanceFactory());
     }
 
     @AfterClass

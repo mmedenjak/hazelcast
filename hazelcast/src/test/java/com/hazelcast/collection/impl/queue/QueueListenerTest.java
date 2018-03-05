@@ -50,11 +50,11 @@ public class QueueListenerTest extends HazelcastTestSupport {
     private final CountdownItemListener countdownItemListener = new CountdownItemListener(TOTAL_QUEUE_PUT, 0);
     private final ItemListenerConfig itemListenerConfig = new ItemListenerConfig();
     private final QueueConfig queueConfig = new QueueConfig();
-    private final Config config = new Config();
+    private final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
     @Test
     public void testListener_withEvictionViaTTL() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig("queueWithTTL").setEmptyQueueTtl(0);
         HazelcastInstance hz = createHazelcastInstance(config);
 
@@ -80,7 +80,7 @@ public class QueueListenerTest extends HazelcastTestSupport {
 
     @Test
     public void testConfigListenerRegistration() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String name = "queue";
         QueueConfig queueConfig = config.getQueueConfig(name);
         CountdownItemListener listener = new CountdownItemListener(1, 1);

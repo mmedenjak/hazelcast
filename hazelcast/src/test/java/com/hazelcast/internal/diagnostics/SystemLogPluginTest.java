@@ -45,7 +45,7 @@ public class SystemLogPluginTest extends AbstractDiagnosticsPluginTest {
 
     @Before
     public void setup() {
-        config = new Config();
+        config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(LOG_PARTITIONS.getName(), "true");
 
         hzFactory = createHazelcastInstanceFactory(2);

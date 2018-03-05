@@ -343,7 +343,7 @@ public class LocalMapStatsTest extends HazelcastTestSupport {
     @Test
     public void testLocalMapStats_preservedAfterEviction() {
         String mapName = randomMapName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getProperties().setProperty(GroupProperty.PARTITION_COUNT.getName(), "5");
         MapConfig mapConfig = config.getMapConfig(mapName);
         mapConfig.setEvictionPolicy(EvictionPolicy.LRU);

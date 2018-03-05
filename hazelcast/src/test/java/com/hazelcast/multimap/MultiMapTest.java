@@ -96,7 +96,7 @@ public class MultiMapTest extends HazelcastTestSupport {
     public void testIssue1882() {
         String mmName = "mm";
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final MultiMapConfig multiMapConfig = config.getMultiMapConfig(mmName);
         multiMapConfig.setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
         final HazelcastInstance instance1 = factory.newHazelcastInstance(config);
@@ -125,7 +125,7 @@ public class MultiMapTest extends HazelcastTestSupport {
 
     @Test
     public void testPutGetRemoveWhileCollectionTypeSet() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "defMM";
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.SET);
 
@@ -235,7 +235,7 @@ public class MultiMapTest extends HazelcastTestSupport {
 
     @Test
     public void testPutGetRemoveWhileCollectionTypeList() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "defMM";
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
         final int insCount = 4;
@@ -278,7 +278,7 @@ public class MultiMapTest extends HazelcastTestSupport {
      */
     @Test
     public void testCollectionInterfaceMethods() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "defMM";
         config.getMultiMapConfig(name).setValueCollectionType(MultiMapConfig.ValueCollectionType.LIST);
         final int insCount = 4;

@@ -63,7 +63,7 @@ public class CacheReadWriteThroughTest extends HazelcastTestSupport {
     protected CachingProvider cachingProvider;
 
     protected Config createConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     protected CachingProvider createCachingProvider(HazelcastInstance instance) {

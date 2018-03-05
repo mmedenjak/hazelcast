@@ -58,7 +58,7 @@ public class AntiEntropyCleanupTest extends HazelcastTestSupport {
 
     @Test
     public void testCleanup() {
-        Config config = new Config().setProperty(PARTITION_BACKUP_SYNC_INTERVAL.getName(), "1");
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(PARTITION_BACKUP_SYNC_INTERVAL.getName(), "1");
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(nodeCount);
         HazelcastInstance[] instances = factory.newInstances(config, nodeCount);
         warmUpPartitions(instances);

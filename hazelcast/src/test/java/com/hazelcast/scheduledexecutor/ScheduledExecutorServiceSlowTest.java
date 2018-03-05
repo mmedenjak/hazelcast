@@ -151,7 +151,7 @@ public class ScheduledExecutorServiceSlowTest extends ScheduledExecutorServiceTe
                 .setName("s")
                 .setDurability(2);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 // keep the partition count low, makes test faster, and chances of partition loss, less
                 .setProperty("hazelcast.partition.count", "10")
                 .addScheduledExecutorConfig(scheduledExecutorConfig);
@@ -389,7 +389,7 @@ public class ScheduledExecutorServiceSlowTest extends ScheduledExecutorServiceTe
 
     @Test(timeout = 1800000)
     public void schedule_thenDisposeLeakTest() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addScheduledExecutorConfig(new ScheduledExecutorConfig()
                         .setName("s")
                         .setCapacity(10000));

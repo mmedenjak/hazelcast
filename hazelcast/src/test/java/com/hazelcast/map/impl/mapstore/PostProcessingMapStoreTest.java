@@ -68,7 +68,7 @@ public class PostProcessingMapStoreTest extends HazelcastTestSupport {
     @Test
     public void testProcessedValueCarriedToTheBackup() {
         String name = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = config.getMapConfig(name);
         mapConfig.setReadBackupData(true);
         MapStoreConfig mapStoreConfig = new MapStoreConfig();
@@ -172,7 +172,7 @@ public class PostProcessingMapStoreTest extends HazelcastTestSupport {
 
     private IMap<Integer, SampleObject> createInstanceAndGetMap() {
         String name = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = config.getMapConfig(name);
         MapStoreConfig mapStoreConfig = new MapStoreConfig();
         mapStoreConfig.setEnabled(true).setClassName(IncrementerPostProcessingMapStore.class.getName());

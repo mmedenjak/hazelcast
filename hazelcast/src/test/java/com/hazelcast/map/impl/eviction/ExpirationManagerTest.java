@@ -183,7 +183,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void gets_taskPeriodSeconds_from_config() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String taskPeriodSeconds = "77";
         config.setProperty(PROP_TASK_PERIOD_SECONDS, taskPeriodSeconds);
         HazelcastInstance node = createHazelcastInstance(config);
@@ -194,7 +194,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void gets_cleanupPercentage_from_config() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String cleanupPercentage = "99";
         config.setProperty(PROP_CLEANUP_PERCENTAGE, cleanupPercentage);
         HazelcastInstance node = createHazelcastInstance(config);
@@ -205,7 +205,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void gets_cleanupOperationCount_from_config() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String cleanupOperationCount = "777";
         config.setProperty(PROP_CLEANUP_OPERATION_COUNT, cleanupOperationCount);
         HazelcastInstance node = createHazelcastInstance(config);
@@ -216,7 +216,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void stops_running_when_clusterState_turns_passive() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         HazelcastInstance node = createHazelcastInstance(config);
 
@@ -243,7 +243,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void starts_running_when_clusterState_turns_active() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         HazelcastInstance node = createHazelcastInstance(config);
 
@@ -283,7 +283,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void restarts_running_backgroundClearTask_when_lifecycleState_turns_to_MERGED() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         HazelcastInstance node = createHazelcastInstance(config);
 
@@ -313,7 +313,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void clearExpiredRecordsTask_should_not_be_started_if_map_has_no_expirable_records() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         final HazelcastInstance node = createHazelcastInstance(config);
 
@@ -331,11 +331,11 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
 
     @Test
     public void clearExpiredRecordsTask_should_not_be_started_if_member_is_lite() {
-        Config liteMemberConfig = new Config();
+        Config liteMemberConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         liteMemberConfig.setLiteMember(true);
         liteMemberConfig.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
 
-        Config dataMemberConfig = new Config();
+        Config dataMemberConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         dataMemberConfig.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
@@ -358,7 +358,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
     public void clearExpiredRecordsTask_should_be_started_when_mapConfig_ttl_expiry() {
         String mapName = "test";
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         config.getMapConfig(mapName).setTimeToLiveSeconds(2);
         HazelcastInstance node = createHazelcastInstance(config);
@@ -374,7 +374,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
     public void clearExpiredRecordsTask_should_be_started_when_mapConfig_has_idle_expiry() {
         String mapName = "test";
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         config.getMapConfig(mapName).setMaxIdleSeconds(2);
         HazelcastInstance node = createHazelcastInstance(config);
@@ -391,7 +391,7 @@ public class ExpirationManagerTest extends HazelcastTestSupport {
     }
 
     private void backgroundClearTaskStops_whenLifecycleState(LifecycleEvent.LifecycleState lifecycleState) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PROP_TASK_PERIOD_SECONDS, "1");
         HazelcastInstance node = createHazelcastInstance(config);
 

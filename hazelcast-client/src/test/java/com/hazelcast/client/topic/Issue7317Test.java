@@ -58,7 +58,7 @@ public class Issue7317Test {
 
     @Before
     public void setup() {
-        Config serverConfig = new Config();
+        Config serverConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         RingbufferConfig rbConf = new RingbufferConfig(smallRB);
         rbConf.setCapacity(smallRBCapacity);
         serverConfig.addRingBufferConfig(rbConf);

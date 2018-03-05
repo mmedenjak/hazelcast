@@ -53,7 +53,7 @@ public class SlowOperationDetectorBasicTest extends SlowOperationDetectorAbstrac
 
     @Test
     public void testDisabled() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.SLOW_OPERATION_DETECTOR_ENABLED.getName(), "false");
         config.setProperty(SLOW_OPERATION_DETECTOR_THRESHOLD_MILLIS.getName(), "1000");
 
@@ -172,7 +172,7 @@ public class SlowOperationDetectorBasicTest extends SlowOperationDetectorAbstrac
         int numberOfOperations = 40;
         int recursionDepth = 15;
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(SLOW_OPERATION_DETECTOR_THRESHOLD_MILLIS.getName(), "1000")
                 .setProperty(SLOW_OPERATION_DETECTOR_LOG_RETENTION_SECONDS.getName(), valueOf(Integer.MAX_VALUE))
                 .setProperty(PARTITION_OPERATION_THREAD_COUNT.getName(), valueOf(partitionThreads));

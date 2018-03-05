@@ -34,7 +34,7 @@ public class EntryAdapterTest extends HazelcastTestSupport {
     @Test
     public void testEntryAdapterMapEvicted() {
         String mapName = randomMapName();
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TestHazelcastInstanceFactory instanceFactory = createHazelcastInstanceFactory(1);
         HazelcastInstance instance = instanceFactory.newHazelcastInstance(cfg);
@@ -58,7 +58,7 @@ public class EntryAdapterTest extends HazelcastTestSupport {
     @Test
     public void testEntryAdapterMapCleared() {
         String mapName = randomMapName();
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         TestHazelcastInstanceFactory instanceFactory = createHazelcastInstanceFactory(1);
         HazelcastInstance instance = instanceFactory.newHazelcastInstance(cfg);
 

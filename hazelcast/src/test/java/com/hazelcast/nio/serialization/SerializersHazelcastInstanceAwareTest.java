@@ -41,7 +41,7 @@ public class SerializersHazelcastInstanceAwareTest extends HazelcastTestSupport 
     public void testPortableFactoryInstance() {
         HazelcastInstanceAwarePortableFactory factory = new HazelcastInstanceAwarePortableFactory();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig().addPortableFactory(1, factory);
 
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -54,7 +54,7 @@ public class SerializersHazelcastInstanceAwareTest extends HazelcastTestSupport 
 
     @Test
     public void testPortableFactoryClass() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig()
                 .addPortableFactoryClass(1, HazelcastInstanceAwarePortableFactory.class.getName());
 
@@ -69,7 +69,7 @@ public class SerializersHazelcastInstanceAwareTest extends HazelcastTestSupport 
     public void testDataSerializableFactoryInstance() {
         HazelcastInstanceAwareDataSerializableFactory factory = new HazelcastInstanceAwareDataSerializableFactory();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig().addDataSerializableFactory(1, factory);
 
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -81,7 +81,7 @@ public class SerializersHazelcastInstanceAwareTest extends HazelcastTestSupport 
 
     @Test
     public void testDataSerializableFactoryClass() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig().addDataSerializableFactoryClass(1,
                 HazelcastInstanceAwareDataSerializableFactory.class.getName());
 

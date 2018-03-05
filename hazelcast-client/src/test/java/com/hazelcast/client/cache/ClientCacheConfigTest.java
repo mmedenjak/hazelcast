@@ -60,7 +60,7 @@ public class ClientCacheConfigTest extends HazelcastTestSupport {
     public void init() {
         JsrClientTestUtil.setup();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().setPort(5701);
         config.getGroupConfig().setName("cluster1");
@@ -68,7 +68,7 @@ public class ClientCacheConfigTest extends HazelcastTestSupport {
         config.addCacheConfig(simpleConfig);
         Hazelcast.newHazelcastInstance(config);
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config2.getNetworkConfig().setPort(5702);
         config2.getGroupConfig().setName("cluster2");
@@ -171,7 +171,7 @@ public class ClientCacheConfigTest extends HazelcastTestSupport {
         HazelcastInstance server2 = null;
 
         try {
-            Config config = new Config();
+            Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
             CacheSimpleConfig cacheSimpleConfig = new CacheSimpleConfig()
                     .setName(CACHE_NAME)
                     .setBackupCount(1); // Be sure that cache put operation is mirrored to backup node

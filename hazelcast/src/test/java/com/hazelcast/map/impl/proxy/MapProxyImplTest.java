@@ -70,7 +70,7 @@ public class MapProxyImplTest extends HazelcastTestSupport {
     @Test
     public void whenNearCachedMapProxyIsCreated_mapContainerIsNotCreated() {
         String mapName = randomMapName();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         NearCacheConfig nearCacheConfig = new NearCacheConfig()
                 .setName(mapName)
                 .setInMemoryFormat(BINARY)
@@ -88,7 +88,7 @@ public class MapProxyImplTest extends HazelcastTestSupport {
     }
 
     private Config getConfigWithMapStore(String mapName, InitialLoadMode loadMode) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(mapName)
                 .getMapStoreConfig().setClassName("com.hazelcast.config.helpers.DummyMapStore")
                 .setInitialLoadMode(loadMode)

@@ -96,7 +96,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                 .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
                 .setImplementation(new DummyMapLoader());
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -147,7 +147,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                 .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
                 .setImplementation(new DummyMapLoader(keysInMapStore));
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -176,7 +176,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                 .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
                 .setImplementation(new MapLoaderTest.DummyMapLoader(keysInMapStore));
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -239,7 +239,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -306,7 +306,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -369,7 +369,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -439,7 +439,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                     }
                 });
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 
@@ -470,7 +470,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                 .setInitialLoadMode(MapStoreConfig.InitialLoadMode.EAGER)
                 .setImplementation(new MapLoaderTest.DummyMapLoader(keysInMapStore));
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(name)
                 .setMapStoreConfig(mapStoreConfig);
 

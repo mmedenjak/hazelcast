@@ -48,10 +48,10 @@ public class ConfigCheckTest {
 
     @Test
     public void whenGroupNameDifferent_thenFalse() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getGroupConfig().setName("foo");
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getGroupConfig().setName("bar");
 
         ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
@@ -62,11 +62,11 @@ public class ConfigCheckTest {
 
     @Test
     public void whenGroupPasswordDifferent_thenJoin() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getGroupConfig().setName("foo");
         config1.getGroupConfig().setPassword("Here");
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getGroupConfig().setName("foo");
         config2.getGroupConfig().setPassword("There");
 
@@ -78,7 +78,7 @@ public class ConfigCheckTest {
 
     @Test
     public void testGroupPasswordNotLeak_whenVersionAboveThreeNine() {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig()
                 .setEnabled(true).setMulticastTimeoutSeconds(3);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
@@ -110,8 +110,8 @@ public class ConfigCheckTest {
 
     @Test
     public void whenJoinerTypeDifferent_thenConfigMismatchException() {
-        Config config1 = new Config();
-        Config config2 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner1");
         ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner2");
@@ -121,10 +121,10 @@ public class ConfigCheckTest {
 
     @Test
     public void whenDifferentPartitionCount_thenConfigurationMismatchException() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.setProperty(GroupProperty.PARTITION_COUNT.getName(), "100");
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.setProperty(GroupProperty.PARTITION_COUNT.getName(), "200");
 
         ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
@@ -135,10 +135,10 @@ public class ConfigCheckTest {
 
     @Test
     public void whenDifferentApplicationValidationToken_thenConfigurationMismatchException() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.setProperty(GroupProperty.APPLICATION_VALIDATION_TOKEN.getName(), "foo");
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.setProperty(GroupProperty.APPLICATION_VALIDATION_TOKEN.getName(), "bar");
 
         ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
@@ -149,10 +149,10 @@ public class ConfigCheckTest {
 
     @Test
     public void whenGroupPartitionEnabledMismatch_thenConfigurationMismatchException() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getPartitionGroupConfig().setEnabled(false);
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getPartitionGroupConfig().setEnabled(true);
 
         ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
@@ -163,11 +163,11 @@ public class ConfigCheckTest {
 
     @Test
     public void whenPartitionGroupGroupTypeMismatch_thenConfigurationMismatchException() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getPartitionGroupConfig().setEnabled(true);
         config1.getPartitionGroupConfig().setGroupType(PartitionGroupConfig.MemberGroupType.CUSTOM);
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getPartitionGroupConfig().setEnabled(true);
         config2.getPartitionGroupConfig().setGroupType(PartitionGroupConfig.MemberGroupType.PER_MEMBER);
 

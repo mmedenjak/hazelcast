@@ -90,7 +90,7 @@ public class QueryCacheCoalescingTest extends HazelcastTestSupport {
                 .setBufferSize(64)
                 .setDelaySeconds(3);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(PARTITION_COUNT.getName(), "1");
 
         config.getMapConfig(mapName)

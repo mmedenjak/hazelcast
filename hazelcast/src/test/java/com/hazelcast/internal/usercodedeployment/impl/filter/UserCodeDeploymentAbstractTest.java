@@ -45,9 +45,9 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
     @Test
     public void testUserCodeDeploymentIsDisabledByDefault() {
         // this test also validate the EP is filtered locally and has to be loaded from the other member
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
 
@@ -62,12 +62,12 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenSomeMemberCanAccessTheEP_whenTheEPIsFilteredLocally_thenItWillBeLoadedOverNetwork() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()
@@ -80,12 +80,12 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenSomeMemberCanAccessTheEP_whenTheEPIsFilteredLocally_thenItWillBeLoadedOverNetwork_anonymousInnerClasses() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()
@@ -98,13 +98,13 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenTheEPButItIsBlacklisted_whenTheEPIsFilteredLocally_thenItWillFailToLoadIt() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()
@@ -123,12 +123,12 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenTheEPButItIsNotOnTheWhitelist_whenTheEPIsFilteredLocally_thenItWillFailToLoadIt() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()
@@ -147,12 +147,12 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenTheEPIsOnTheWhitelist_whenTheEPIsFilteredLocally_thenItWillLoadIt() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()
@@ -166,12 +166,12 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenProviderFilterUsesMemberAttribute_whenNoMemberHasMatchingAttribute_thenClassLoadingRequestFails() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()
@@ -190,13 +190,13 @@ public abstract class UserCodeDeploymentAbstractTest extends HazelcastTestSuppor
 
     @Test
     public void givenProviderFilterUsesMemberAttribute_whenSomeMemberHasMatchingAttribute_thenClassLoadingRequestSucceed() {
-        Config i1Config = new Config();
+        Config i1Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         i1Config.getMemberAttributeConfig().setStringAttribute("foo", "bar");
         i1Config.getUserCodeDeploymentConfig()
                 .setEnabled(true)
                 .setClassCacheMode(getClassCacheMode());
 
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         i2Config.getUserCodeDeploymentConfig()

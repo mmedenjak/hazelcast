@@ -30,7 +30,7 @@ public class ClientOutBoundPortTest {
 
     @Test
     public void clientOutboundPortRangeTest() {
-        Config config1 = new Config();
+        Config config1 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config1.getGroupConfig().setName("client-out-test");
         Hazelcast.newHazelcastInstance(config1);
 

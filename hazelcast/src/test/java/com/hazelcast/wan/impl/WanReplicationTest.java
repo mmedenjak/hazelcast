@@ -309,7 +309,7 @@ public class WanReplicationTest extends HazelcastTestSupport {
         MapConfig mapConfig = new MapConfig("default")
                 .setWanReplicationRef(wanRef);
 
-        return new Config()
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addWanReplicationConfig(wanConfig)
                 .addMapConfig(mapConfig);
     }

@@ -80,7 +80,7 @@ public class MemberMapMetaDataFetcherTest extends HazelcastTestSupport {
     }
 
     private RepairingTask getRepairingTask(String mapName, int partition, long givenSequence, UUID givenUuid) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(mapName).setNearCacheConfig(new NearCacheConfig());
         HazelcastInstance member = factory.newHazelcastInstance(config);
         MapService mapService = getNodeEngineImpl(member).getService(MapService.SERVICE_NAME);

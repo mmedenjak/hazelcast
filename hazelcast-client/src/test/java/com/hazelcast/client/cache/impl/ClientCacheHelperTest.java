@@ -72,7 +72,7 @@ public class ClientCacheHelperTest extends HazelcastTestSupport {
         CacheSimpleConfig cacheSimpleConfig = new CacheSimpleConfig();
         cacheSimpleConfig.setName(SIMPLE_CACHE_NAME);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addCacheConfig(cacheSimpleConfig);
 
         hazelcastFactory.newHazelcastInstance(config);

@@ -78,7 +78,7 @@ public class MemberMapRecordStateStressTest extends HazelcastTestSupport {
         HazelcastInstance member1 = factory.newHazelcastInstance();
         HazelcastInstance member2 = factory.newHazelcastInstance();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(MAP_NAME).setNearCacheConfig(newNearCacheConfig());
         HazelcastInstance nearCachedMember = factory.newHazelcastInstance(config);
 

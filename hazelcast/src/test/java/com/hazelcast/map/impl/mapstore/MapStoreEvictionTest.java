@@ -152,7 +152,7 @@ public class MapStoreEvictionTest extends HazelcastTestSupport {
     }
 
     private Config newConfig(String mapName, boolean sizeLimited, MapStoreConfig.InitialLoadMode loadMode) {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         cfg.setGroupConfig(new GroupConfig(getClass().getSimpleName()));
         cfg.setProperty("hazelcast.partition.count", "5");
 

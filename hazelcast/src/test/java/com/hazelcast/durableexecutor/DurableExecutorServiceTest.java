@@ -109,7 +109,7 @@ public class DurableExecutorServiceTest extends ExecutorServiceTestSupport {
     public void testFullRingBuffer() throws Exception {
         String name = randomString();
         String key = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getDurableExecutorConfig(name).setCapacity(1);
         HazelcastInstance instance = createHazelcastInstance(config);
         DurableExecutorService service = instance.getDurableExecutorService(name);
@@ -204,7 +204,7 @@ public class DurableExecutorServiceTest extends ExecutorServiceTestSupport {
 
     @Test
     public void testManagedContextAndLocal() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addDurableExecutorConfig(new DurableExecutorConfig("test").setPoolSize(1));
         final AtomicBoolean initialized = new AtomicBoolean();
         config.setManagedContext(new ManagedContext() {
@@ -243,7 +243,7 @@ public class DurableExecutorServiceTest extends ExecutorServiceTestSupport {
 
     @Test
     public void hazelcastInstanceAwareAndLocal() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addDurableExecutorConfig(new DurableExecutorConfig("test").setPoolSize(1));
         HazelcastInstance instance = createHazelcastInstance(config);
         DurableExecutorService executor = instance.getDurableExecutorService("test");
@@ -486,7 +486,7 @@ public class DurableExecutorServiceTest extends ExecutorServiceTestSupport {
     @Test
 //    @Repeat(100)
     public void testStatsIssue2039() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String name = "testStatsIssue2039";
         config.addDurableExecutorConfig(new DurableExecutorConfig(name).setPoolSize(1).setCapacity(1));
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -518,7 +518,7 @@ public class DurableExecutorServiceTest extends ExecutorServiceTestSupport {
     public void testLongRunningCallable() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         long callTimeoutMillis = 3000;
         config.setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), String.valueOf(callTimeoutMillis));
 

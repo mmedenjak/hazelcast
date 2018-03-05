@@ -50,9 +50,9 @@ import static org.junit.Assert.fail;
 @Category(SlowTest.class)
 public class PartitionDistributionTest extends HazelcastTestSupport {
 
-    private Config hostAwareConfig = new Config();
+    private Config hostAwareConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
-    private Config hostAwareLiteMemberConfig = new Config().setLiteMember(true);
+    private Config hostAwareLiteMemberConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
 
     @BeforeClass
     @AfterClass
@@ -154,7 +154,7 @@ public class PartitionDistributionTest extends HazelcastTestSupport {
     }
 
     private void testPartitionDistribution(int partitionCount, int dataNodeCount, int liteNodeCount) {
-        testPartitionDistribution(partitionCount, dataNodeCount, liteNodeCount, new Config(), new Config().setLiteMember(true));
+        testPartitionDistribution(partitionCount, dataNodeCount, liteNodeCount, com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
     }
 
     private void testPartitionDistribution(int partitionCount, int dataNodeCount, int liteNodeCount, Config config,

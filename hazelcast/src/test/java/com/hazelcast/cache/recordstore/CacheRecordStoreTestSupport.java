@@ -60,7 +60,7 @@ public abstract class CacheRecordStoreTestSupport
     }
 
     protected Config createConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     protected CacheConfig createCacheConfig(String cacheName, InMemoryFormat inMemoryFormat) {

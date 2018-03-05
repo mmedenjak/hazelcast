@@ -43,7 +43,7 @@ public class BounceMemberRuleTest {
     private String mapName = randomMapName();
 
     @Rule
-    public BounceMemberRule bounceMemberRule = BounceMemberRule.with(new Config()).clusterSize(3).build();
+    public BounceMemberRule bounceMemberRule = BounceMemberRule.with(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()).clusterSize(3).build();
 
     @Before
     public void setup() {

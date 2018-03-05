@@ -230,7 +230,7 @@ public class ClientReconnectTest extends HazelcastTestSupport {
             }
         });
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setSerializationConfig(serializationConfig);
         hazelcastFactory.newHazelcastInstance(config);
 
@@ -270,7 +270,7 @@ public class ClientReconnectTest extends HazelcastTestSupport {
             }
         });
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setSerializationConfig(serializationConfig);
         hazelcastFactory.newHazelcastInstance(config);
 

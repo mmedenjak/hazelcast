@@ -68,7 +68,7 @@ public class CacheThroughHazelcastInstanceTest extends HazelcastTestSupport {
     public ExpectedException thrown = ExpectedException.none();
 
     protected Config createConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     protected CacheSimpleConfig createCacheSimpleConfig(String cacheName) {

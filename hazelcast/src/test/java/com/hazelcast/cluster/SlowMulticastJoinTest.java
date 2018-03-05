@@ -71,7 +71,7 @@ public class SlowMulticastJoinTest extends AbstractJoinTest {
     @Test
     public void testSplitBrainMessagesNotAccumulated_whenClusterIsStableOrNodeIsNotMaster() throws Exception {
         final int clusterSize = 3;
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.WAIT_SECONDS_BEFORE_JOIN.getName(), "0");
         config.setProperty(GroupProperty.MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "10");
         config.setProperty(GroupProperty.MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "15");
@@ -148,7 +148,7 @@ public class SlowMulticastJoinTest extends AbstractJoinTest {
     }
 
     private Config newConfig(String trustedInterface) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "5");
         config.setProperty(GroupProperty.MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "3");
         config.getNetworkConfig().getJoin().getMulticastConfig().addTrustedInterface(trustedInterface);

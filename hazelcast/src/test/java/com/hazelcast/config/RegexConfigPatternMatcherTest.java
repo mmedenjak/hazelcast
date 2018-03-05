@@ -37,7 +37,7 @@ public class RegexConfigPatternMatcherTest {
     public void testQueueConfigWithoutWildcard() {
         QueueConfig queueConfig = new QueueConfig().setName("^someQueue$");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -58,7 +58,7 @@ public class RegexConfigPatternMatcherTest {
     public void testQueueConfigRegexContains() {
         QueueConfig queueConfig = new QueueConfig().setName("abc");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -70,7 +70,7 @@ public class RegexConfigPatternMatcherTest {
     public void testQueueConfigRegexStartsWith() {
         QueueConfig queueConfig = new QueueConfig().setName("^abc");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -82,7 +82,7 @@ public class RegexConfigPatternMatcherTest {
     public void testMapConfigWithoutWildcard() {
         MapConfig mapConfig = new MapConfig().setName("^someMap$");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -103,7 +103,7 @@ public class RegexConfigPatternMatcherTest {
     public void testMapConfigCaseInsensitive() {
         MapConfig mapConfig = new MapConfig().setName("^someMap$");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher(Pattern.CASE_INSENSITIVE));
         config.addMapConfig(mapConfig);
 
@@ -120,7 +120,7 @@ public class RegexConfigPatternMatcherTest {
     public void testMapConfigContains() {
         MapConfig mapConfig = new MapConfig().setName("bc");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -137,7 +137,7 @@ public class RegexConfigPatternMatcherTest {
     public void testMapConfigStartsWith() {
         MapConfig mapConfig = new MapConfig().setName("^abc");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -158,7 +158,7 @@ public class RegexConfigPatternMatcherTest {
     public void testMapConfigEndsWith() {
         MapConfig mapConfig = new MapConfig().setName("bc$");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new RegexConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 

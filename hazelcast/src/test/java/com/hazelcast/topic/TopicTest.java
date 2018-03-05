@@ -146,7 +146,7 @@ public class TopicTest extends HazelcastTestSupport {
         final int count = 1000;
         final String randomTopicName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getTopicConfig(randomTopicName).setGlobalOrderingEnabled(false);
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(nodeCount);
@@ -225,7 +225,7 @@ public class TopicTest extends HazelcastTestSupport {
         final int count = 1000;
         final String randomTopicName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getTopicConfig(randomTopicName).setGlobalOrderingEnabled(true);
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(nodeCount);
@@ -365,7 +365,7 @@ public class TopicTest extends HazelcastTestSupport {
     public void testConfigListenerRegistration() throws InterruptedException {
         String topicName = "default";
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         final CountDownLatch latch = new CountDownLatch(1);
         config.getTopicConfig(topicName).addMessageListenerConfig(new ListenerConfig().setImplementation(new MessageListener() {
@@ -514,7 +514,7 @@ public class TopicTest extends HazelcastTestSupport {
     @Test
     public void testTopicCluster() throws InterruptedException {
         String topicName = "TestMessages" + generateRandomString(5);
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance[] instances = factory.newInstances(cfg);
@@ -589,7 +589,7 @@ public class TopicTest extends HazelcastTestSupport {
         final int count = 1000;
         final String randomTopicName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getTopicConfig(randomTopicName).setGlobalOrderingEnabled(false);
         config.getTopicConfig(randomTopicName).setMultiThreadingEnabled(true);
 

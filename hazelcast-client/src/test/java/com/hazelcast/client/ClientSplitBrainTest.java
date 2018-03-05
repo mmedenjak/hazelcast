@@ -59,7 +59,7 @@ public class ClientSplitBrainTest extends ClientTestSupport {
 
     @Test
     public void testClientListeners_InSplitBrain() throws Throwable {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "5")
                 .setProperty(GroupProperty.MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "5");
         HazelcastInstance h1 = Hazelcast.newHazelcastInstance(config);
@@ -160,7 +160,7 @@ public class ClientSplitBrainTest extends ClientTestSupport {
 
     @Test
     public void testClientEngineCleanup_AfterMergeFromSplitBrain() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "10");
         config.setProperty(GroupProperty.MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "10");
         config.setProperty(GroupProperty.MAX_NO_HEARTBEAT_SECONDS.getName(), "5");

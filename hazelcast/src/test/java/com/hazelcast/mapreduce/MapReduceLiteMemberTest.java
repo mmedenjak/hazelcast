@@ -58,8 +58,8 @@ public class MapReduceLiteMemberTest
         factory = createHazelcastInstanceFactory(4);
         instance = factory.newHazelcastInstance();
         instance2 = factory.newHazelcastInstance();
-        lite = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        lite2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        lite = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        lite2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         assertClusterSize(4, instance, lite2);
         assertClusterSizeEventually(4, instance2, lite);

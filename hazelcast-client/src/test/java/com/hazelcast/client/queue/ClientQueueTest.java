@@ -62,7 +62,7 @@ public class ClientQueueTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         QueueConfig queueConfig = config.getQueueConfig(QUEUE_WITH_MAX_SIZE);
         queueConfig.setMaxSize(MAX_SIZE_FOR_QUEUE);

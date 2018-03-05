@@ -179,7 +179,7 @@ public class MapLoaderFailoverTest extends HazelcastTestSupport {
     }
 
     private Config newConfig(String mapName, MapStoreConfig.InitialLoadMode loadMode, int backups, MapLoader loader) {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setGroupConfig(new GroupConfig(getClass().getSimpleName()))
                 .setProperty(GroupProperty.MAP_LOAD_CHUNK_SIZE.getName(), Integer.toString(BATCH_SIZE))
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "13");

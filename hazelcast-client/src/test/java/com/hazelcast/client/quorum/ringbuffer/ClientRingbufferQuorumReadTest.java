@@ -41,7 +41,7 @@ public class ClientRingbufferQuorumReadTest extends RingbufferQuorumReadTest {
     @BeforeClass
     public static void setUp() {
         TestHazelcastFactory factory = new TestHazelcastFactory();
-        initTestEnvironment(new Config(), factory);
+        initTestEnvironment(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), factory);
         clients = new PartitionedClusterClients(cluster, factory);
     }
 

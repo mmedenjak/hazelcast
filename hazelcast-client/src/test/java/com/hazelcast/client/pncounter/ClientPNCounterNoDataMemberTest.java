@@ -33,7 +33,7 @@ public class ClientPNCounterNoDataMemberTest extends BasePNCounterNoDataMemberTe
 
     @Before
     public void setup() {
-        hazelcastFactory.newHazelcastInstance(new Config().setLiteMember(true));
+        hazelcastFactory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
         client = hazelcastFactory.newHazelcastClient();
     }
 

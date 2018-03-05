@@ -220,7 +220,7 @@ public class LockAdvancedTest extends HazelcastTestSupport {
 
     @Test(timeout = 60000)
     public void testLockInterruption() throws InterruptedException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), String.valueOf(TimeUnit.SECONDS.toMillis(30)));
         final HazelcastInstance hz = createHazelcastInstance(config);
 
@@ -385,7 +385,7 @@ public class LockAdvancedTest extends HazelcastTestSupport {
 
     @Test
     public void testLockInterruptibly() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final TestHazelcastInstanceFactory nodeFactory = createHazelcastInstanceFactory(1);
         final HazelcastInstance h1 = nodeFactory.newHazelcastInstance(config);
         final ILock lock = h1.getLock(randomString());
@@ -429,7 +429,7 @@ public class LockAdvancedTest extends HazelcastTestSupport {
 
     @Test
     public void testMaxLockLeaseTime() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.LOCK_MAX_LEASE_TIME_SECONDS.getName(), "1");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);
@@ -448,7 +448,7 @@ public class LockAdvancedTest extends HazelcastTestSupport {
 
     @Test(expected = IllegalArgumentException.class)
     public void testLockFail_whenGreaterThanMaxLeaseTimeUsed() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.LOCK_MAX_LEASE_TIME_SECONDS.getName(), "1");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(1);

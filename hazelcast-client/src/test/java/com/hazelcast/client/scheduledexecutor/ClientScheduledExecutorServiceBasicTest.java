@@ -46,7 +46,7 @@ public class ClientScheduledExecutorServiceBasicTest extends ScheduledExecutorSe
 
     @Override
     protected HazelcastInstance[] createClusterWithCount(int count) {
-        return createClusterWithCount(count, new Config());
+        return createClusterWithCount(count, com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
     }
 
     @Override

@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.hazelcast.instance.TestUtil.getNode;
 import static com.hazelcast.instance.TestUtil.terminateInstance;
 import static com.hazelcast.test.HazelcastTestSupport.getAddress;
+import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static com.hazelcast.util.Preconditions.checkNotNull;
 import static java.util.Collections.EMPTY_SET;
 import static java.util.Collections.emptyList;
@@ -194,7 +195,7 @@ public class TestHazelcastInstanceFactory {
     }
 
     public HazelcastInstance[] newInstances() {
-        return newInstances(new Config());
+        return newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
     }
 
     public HazelcastInstance[] newInstances(Config config, int nodeCount) {

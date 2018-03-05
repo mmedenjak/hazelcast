@@ -51,7 +51,7 @@ public class ClientAggregatorsSpecTest extends AggregatorsSpecTest {
                 .setName("aggr")
                 .setInMemoryFormat(inMemoryFormat);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(PARTITION_COUNT.getName(), String.valueOf(nodeCount))
                 .setProperty(AGGREGATION_ACCUMULATION_PARALLEL_EVALUATION.getName(), String.valueOf(parallelAccumulation))
                 .addMapConfig(mapConfig);

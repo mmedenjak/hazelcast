@@ -48,7 +48,7 @@ public class DurableLongRunningTaskTest extends HazelcastTestSupport {
 
     @Before
     public void setup() {
-        Config config = new Config().setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + CALL_TIMEOUT);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS.getName(), "" + CALL_TIMEOUT);
         hz = createHazelcastInstance(config);
     }
 

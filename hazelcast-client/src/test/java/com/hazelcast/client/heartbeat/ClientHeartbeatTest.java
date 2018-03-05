@@ -285,7 +285,7 @@ public class ClientHeartbeatTest extends ClientTestSupport {
     @Test
     public void testClientEndpointsDelaySeconds_whenHeartbeatResumed() throws Exception {
         int delaySeconds = 2;
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.CLIENT_ENDPOINT_REMOVE_DELAY_SECONDS.getName(), String.valueOf(delaySeconds));
         HazelcastInstance hazelcastInstance = hazelcastFactory.newHazelcastInstance(config);
 

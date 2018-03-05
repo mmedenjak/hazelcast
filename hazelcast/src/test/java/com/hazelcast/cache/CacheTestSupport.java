@@ -94,7 +94,7 @@ public abstract class CacheTestSupport extends HazelcastTestSupport {
     }
 
     protected Config createConfig() {
-        return new Config();
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     }
 
     protected <K, V> CacheConfig<K, V> createCacheConfig() {

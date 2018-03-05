@@ -38,7 +38,7 @@
 //    static final String name = "test";
 //
 //    protected Config createConfig() {
-//        return new Config();
+//        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 //    }
 //
 //    private IAtomicLong getAtomicLong() {

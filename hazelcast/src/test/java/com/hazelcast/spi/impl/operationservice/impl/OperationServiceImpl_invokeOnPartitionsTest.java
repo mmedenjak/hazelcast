@@ -46,7 +46,7 @@ public class OperationServiceImpl_invokeOnPartitionsTest extends HazelcastTestSu
 
     @Test
     public void test() throws Exception {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(PARTITION_COUNT.getName(), "" + 100);
         config.getSerializationConfig().addDataSerializableFactory(123, new SlowOperationSerializationFactory());
         HazelcastInstance hz = createHazelcastInstance(config);
@@ -63,7 +63,7 @@ public class OperationServiceImpl_invokeOnPartitionsTest extends HazelcastTestSu
 
     @Test
     public void testLongRunning() throws Exception {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "2000")
                 .setProperty(PARTITION_COUNT.getName(), "" + 100);
         config.getSerializationConfig().addDataSerializableFactory(123, new SlowOperationSerializationFactory());

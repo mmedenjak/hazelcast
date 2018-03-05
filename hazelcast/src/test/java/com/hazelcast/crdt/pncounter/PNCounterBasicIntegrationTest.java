@@ -66,7 +66,7 @@ public class PNCounterBasicIntegrationTest extends BasePNCounterBasicIntegration
                 .setName("default")
                 .setReplicaCount(replicaCount)
                 .setStatisticsEnabled(true);
-        final Config config = new Config()
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "5")
                 .setCRDTReplicationConfig(new CRDTReplicationConfig()
                         .setReplicationPeriodMillis(200)

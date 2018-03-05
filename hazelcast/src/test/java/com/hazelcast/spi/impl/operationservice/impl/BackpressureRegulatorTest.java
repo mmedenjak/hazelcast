@@ -57,7 +57,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
 
     @Test
     public void testBackPressureDisabledByDefault() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
         BackpressureRegulator regulator = new BackpressureRegulator(hazelcastProperties, logger);
         assertFalse(regulator.isEnabled());
@@ -65,7 +65,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
 
     @Test(expected = IllegalArgumentException.class)
     public void testConstruction_invalidSyncWindow() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "true");
         config.setProperty(BACKPRESSURE_SYNCWINDOW.getName(), "0");
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
@@ -75,7 +75,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
 
     @Test
     public void testConstruction_OneSyncWindow_syncOnEveryCall() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "true");
         config.setProperty(BACKPRESSURE_SYNCWINDOW.getName(), "1");
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
@@ -90,7 +90,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
 
     @Test
     public void newCallIdSequence_whenBackPressureEnabled() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "true");
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
         BackpressureRegulator backpressureRegulator = new BackpressureRegulator(hazelcastProperties, logger);
@@ -103,7 +103,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
 
     @Test
     public void newCallIdSequence_whenBackPressureDisabled() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "false");
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
         BackpressureRegulator backpressureRegulator = new BackpressureRegulator(hazelcastProperties, logger);
@@ -277,7 +277,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
     }
 
     private BackpressureRegulator newEnabledBackPressureService() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "true");
         config.setProperty(BACKPRESSURE_SYNCWINDOW.getName(), String.valueOf(SYNC_WINDOW));
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
@@ -285,7 +285,7 @@ public class BackpressureRegulatorTest extends HazelcastTestSupport {
     }
 
     private BackpressureRegulator newDisabledBackPressureService() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(BACKPRESSURE_ENABLED.getName(), "false");
         HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
         return new BackpressureRegulator(hazelcastProperties, logger);

@@ -283,7 +283,7 @@ public class ClientLockTest extends HazelcastTestSupport {
 
     @Test
     public void testMaxLockLeaseTime() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.LOCK_MAX_LEASE_TIME_SECONDS.getName(), "1");
 
         factory.newHazelcastInstance(config);
@@ -303,7 +303,7 @@ public class ClientLockTest extends HazelcastTestSupport {
 
     @Test(expected = IllegalArgumentException.class)
     public void testLockFail_whenGreaterThanMaxLeaseTimeUsed() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.LOCK_MAX_LEASE_TIME_SECONDS.getName(), "1");
 
         factory.newHazelcastInstance(config);

@@ -53,7 +53,7 @@ public class IOBalancerMemoryLeakTest extends HazelcastTestSupport {
 
     @Test
     public void testMemoryLeak_with_RestConnections() throws IOException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.setProperty(GroupProperty.REST_ENABLED.getName(), "true");
         config.setProperty(GroupProperty.IO_BALANCER_INTERVAL_SECONDS.getName(), "1");
@@ -78,7 +78,7 @@ public class IOBalancerMemoryLeakTest extends HazelcastTestSupport {
 
     @Test
     public void testMemoryLeak_with_SocketConnections() throws IOException {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getGroupConfig().setName(randomName());
         config.setProperty(GroupProperty.IO_BALANCER_INTERVAL_SECONDS.getName(), "1");
         HazelcastInstance instance = Hazelcast.newHazelcastInstance(config);

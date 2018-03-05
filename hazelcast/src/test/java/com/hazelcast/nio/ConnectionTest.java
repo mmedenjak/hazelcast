@@ -179,7 +179,7 @@ public class ConnectionTest extends HazelcastTestSupport {
 
     private void testDanglingSocketsOnTerminate(boolean withSocketInterceptor) throws Exception {
         final int port = 5701;
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().setPort(port).setPortAutoIncrement(false);
 
         if (withSocketInterceptor) {

@@ -46,7 +46,7 @@ public class Invocation_DetectHeartbeatTimeoutTest extends HazelcastTestSupport 
 
     @Test
     public void whenCallTimeoutDisabled() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "1000");
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance local = factory.newHazelcastInstance();
@@ -103,7 +103,7 @@ public class Invocation_DetectHeartbeatTimeoutTest extends HazelcastTestSupport 
 
     @Test
     public void whenCallTimeoutExpired_ButOperationHeartbeatHasNot() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "5000");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
@@ -126,7 +126,7 @@ public class Invocation_DetectHeartbeatTimeoutTest extends HazelcastTestSupport 
      */
     @Test
     public void whenExpiresEventually() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "5000");
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);

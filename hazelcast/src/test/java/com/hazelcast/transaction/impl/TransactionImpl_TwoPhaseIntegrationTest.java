@@ -339,7 +339,7 @@ public class TransactionImpl_TwoPhaseIntegrationTest extends HazelcastTestSuppor
 
     @Override
     protected Config getConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getSerializationConfig().addDataSerializableFactory(
                 MockTransactionLogRecord.MockTransactionLogRecordSerializerHook.F_ID,
                 new MockTransactionLogRecord.MockTransactionLogRecordSerializerHook().createFactory());

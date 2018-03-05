@@ -57,7 +57,7 @@ public class ClientReliableTopicStressTest extends HazelcastTestSupport {
     public void setup() {
         logger = Logger.getLogger(getClass());
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         RingbufferConfig ringbufferConfig = new RingbufferConfig("foobar");
         ringbufferConfig.setCapacity(10000000);

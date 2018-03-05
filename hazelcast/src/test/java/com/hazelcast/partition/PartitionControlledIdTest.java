@@ -80,7 +80,7 @@ public class PartitionControlledIdTest extends HazelcastTestSupport {
 
     @BeforeClass
     public static void startHazelcastInstances() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         PartitioningStrategy partitioningStrategy = StringAndPartitionAwarePartitioningStrategy.INSTANCE;
         config.getMapConfig("default")
                 .setPartitioningStrategyConfig(new PartitioningStrategyConfig(partitioningStrategy));

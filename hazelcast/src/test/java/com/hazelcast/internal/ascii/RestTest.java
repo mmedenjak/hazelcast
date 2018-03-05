@@ -62,7 +62,7 @@ public class RestTest extends HazelcastTestSupport {
     private HazelcastInstance instance;
     private HazelcastInstance remoteInstance;
     private HTTPCommunicator communicator;
-    private Config config = new Config();
+    private Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
     @BeforeClass
     public static void beforeClass() {

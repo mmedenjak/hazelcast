@@ -73,7 +73,7 @@ public class ClientLoggerConfigurationTest extends HazelcastTestSupport {
     // test its LoggingService produce instances of the expected Logger impl
     protected void testLoggingWithConfiguration(boolean programmaticConfiguration) throws IOException {
         hazelcastFactory = new TestHazelcastFactory();
-        Config cg = new Config();
+        Config cg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         cg.setProperty("hazelcast.logging.type", "jdk");
         hazelcastFactory.newHazelcastInstance(cg);
 

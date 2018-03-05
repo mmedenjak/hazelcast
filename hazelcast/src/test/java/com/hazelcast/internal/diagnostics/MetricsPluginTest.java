@@ -41,7 +41,7 @@ public class MetricsPluginTest extends AbstractDiagnosticsPluginTest {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(Diagnostics.ENABLED.getName(), "true")
                 .setProperty(MetricsPlugin.PERIOD_SECONDS.getName(), "1");
         HazelcastInstance hz = createHazelcastInstance(config);

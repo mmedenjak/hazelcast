@@ -156,7 +156,7 @@ public class InvalidationMemberAddRemoveTest extends NearCacheTestSupport {
     }
 
     protected Config createConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty("hazelcast.invalidation.reconciliation.interval.seconds",
                 Integer.toString(RECONCILIATION_INTERVAL_SECONDS));
         config.setProperty("hazelcast.invalidation.max.tolerated.miss.count", "0");

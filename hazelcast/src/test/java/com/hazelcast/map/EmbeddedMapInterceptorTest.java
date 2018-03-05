@@ -49,7 +49,7 @@ public class EmbeddedMapInterceptorTest extends HazelcastTestSupport {
      * @return The instance started
      */
     public HazelcastInstance startNode(TestHazelcastInstanceFactory nodeFactory) {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         cfg.getMapConfig("default").setInMemoryFormat(InMemoryFormat.OBJECT);
         HazelcastInstance instance = nodeFactory.newHazelcastInstance(cfg);
         IMap<Object, Object> map = instance.getMap(mapName);

@@ -95,7 +95,7 @@ public class QueryCacheConfigTest extends HazelcastTestSupport {
 
         mapConfig.addQueryCacheConfig(queryCacheConfig);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addMapConfig(mapConfig);
 
         return createHazelcastInstance(config);

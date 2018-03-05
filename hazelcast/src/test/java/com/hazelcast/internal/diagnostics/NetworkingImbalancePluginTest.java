@@ -39,7 +39,7 @@ public class NetworkingImbalancePluginTest extends AbstractDiagnosticsPluginTest
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(NetworkingImbalancePlugin.PERIOD_SECONDS.getName(), "1");
 
         // we need to start a real Hazelcast instance here, since the mocked network doesn't have a TcpIpConnectionManager

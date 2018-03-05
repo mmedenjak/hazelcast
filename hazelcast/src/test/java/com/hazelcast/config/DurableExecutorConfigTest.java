@@ -40,7 +40,7 @@ public class DurableExecutorConfigTest {
 
     @Test
     public void testReadOnly() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         DurableExecutorConfig durableExecutorConfig = config.getDurableExecutorConfig(randomString());
         DurableExecutorConfig readOnly = durableExecutorConfig.getAsReadOnly();
 

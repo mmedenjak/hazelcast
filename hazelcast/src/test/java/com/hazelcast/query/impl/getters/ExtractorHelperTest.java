@@ -116,7 +116,7 @@ public class ExtractorHelperTest {
                 new MapAttributeConfig("iq", "com.hazelcast.query.impl.getters.ExtractorHelperTest$IqExtractor");
         MapAttributeConfig nameExtractor =
                 new MapAttributeConfig("name", "com.hazelcast.query.impl.getters.ExtractorHelperTest$NameExtractor");
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         // For other custom class loaders (from OSGi bundles, for example)
         ClassLoader customClassLoader = getClass().getClassLoader();
         config.setClassLoader(customClassLoader);

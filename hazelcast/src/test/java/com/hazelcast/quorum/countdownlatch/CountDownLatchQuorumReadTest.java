@@ -37,6 +37,7 @@ import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
 import java.util.concurrent.TimeUnit;
 
+import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static java.util.Arrays.asList;
 
 @RunWith(Parameterized.class)
@@ -54,7 +55,7 @@ public class CountDownLatchQuorumReadTest extends AbstractQuorumTest {
 
     @BeforeClass
     public static void setUp() {
-        initTestEnvironment(new Config(), new TestHazelcastInstanceFactory());
+        initTestEnvironment(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), new TestHazelcastInstanceFactory());
     }
 
     @AfterClass

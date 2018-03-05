@@ -80,7 +80,7 @@ public class QueueAdvancedTest extends HazelcastTestSupport {
      */
     @Test
     public void testDeadTaker() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final CountDownLatch shutdownLatch = new CountDownLatch(1);
         config.addListenerConfig(new ListenerConfig().setImplementation(new MembershipListener() {
             @Override
@@ -308,7 +308,7 @@ public class QueueAdvancedTest extends HazelcastTestSupport {
 
     @Test
     public void testOfferLong() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig("default").setMaxSize(200);
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance[] instances = factory.newInstances(config);
@@ -607,7 +607,7 @@ public class QueueAdvancedTest extends HazelcastTestSupport {
 
     @Test
     public void testTakeInterruption() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "10000");
 
         HazelcastInstance instance = createHazelcastInstance(config);
@@ -632,7 +632,7 @@ public class QueueAdvancedTest extends HazelcastTestSupport {
 
     @Test
     public void testPutInterruption() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(OPERATION_CALL_TIMEOUT_MILLIS.getName(), "10000");
         config.getQueueConfig("default").setMaxSize(1);
 
@@ -660,7 +660,7 @@ public class QueueAdvancedTest extends HazelcastTestSupport {
 
     private HazelcastInstance[] createHazelcastInstances() {
         String configName = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getQueueConfig(configName).setMaxSize(100);
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);

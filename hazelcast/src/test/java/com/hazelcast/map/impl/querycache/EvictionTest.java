@@ -84,7 +84,7 @@ public class EvictionTest extends HazelcastTestSupport {
                 .setEvictionPolicy(EvictionPolicy.LFU)
                 .setMaximumSizePolicy(EvictionConfig.MaxSizePolicy.ENTRY_COUNT);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         MapConfig mapConfig = config.getMapConfig(mapName);
         mapConfig.addQueryCacheConfig(cacheConfig);

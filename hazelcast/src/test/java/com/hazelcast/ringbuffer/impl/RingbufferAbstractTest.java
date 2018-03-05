@@ -67,7 +67,7 @@ public abstract class RingbufferAbstractTest extends HazelcastTestSupport {
     @Before
     public void setup() {
 
-        config = new Config();
+        config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(new RingbufferConfig("add_overwritingOldData*")
                 .setCapacity(5));
         config.addRingBufferConfig(new RingbufferConfig("add_manyTimesRoundTheRing*")

@@ -71,7 +71,7 @@ public class HazelcastTest extends HazelcastTestSupport {
 
     @Test(expected = IllegalArgumentException.class)
     public void getOrCreateHazelcastInstance_nullName() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         Hazelcast.getOrCreateHazelcastInstance(config);
     }
 
@@ -103,7 +103,7 @@ public class HazelcastTest extends HazelcastTestSupport {
 
     @Test
     public void testNewInstanceByName() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setInstanceName("test");
 
         HazelcastInstance hc1 = Hazelcast.newHazelcastInstance(config);
@@ -116,7 +116,7 @@ public class HazelcastTest extends HazelcastTestSupport {
 
     @Test(expected = DuplicateInstanceNameException.class)
     public void testNewInstanceByNameFail() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setInstanceName("test");
         Hazelcast.newHazelcastInstance(config);
         Hazelcast.newHazelcastInstance(config);

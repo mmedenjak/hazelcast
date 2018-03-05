@@ -54,7 +54,7 @@ abstract class SlowOperationDetectorAbstractTest extends HazelcastTestSupport {
     private List<SlowEntryProcessor> entryProcessors = new ArrayList<SlowEntryProcessor>();
 
     HazelcastInstance getSingleNodeCluster(int slowOperationThresholdMillis) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.SLOW_OPERATION_DETECTOR_THRESHOLD_MILLIS.getName(),
                 valueOf(slowOperationThresholdMillis));
 

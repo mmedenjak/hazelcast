@@ -54,7 +54,7 @@ public class OperationServiceImpl_BasicTest extends HazelcastTestSupport {
 
     @Test
     public void testGetPartitionThreadCount() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(PARTITION_OPERATION_THREAD_COUNT.getName(), "5");
         HazelcastInstance hz = createHazelcastInstance(config);
         OperationServiceImpl operationService = getOperationServiceImpl(hz);
@@ -64,7 +64,7 @@ public class OperationServiceImpl_BasicTest extends HazelcastTestSupport {
 
     @Test
     public void testGetGenericThreadCount() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GENERIC_OPERATION_THREAD_COUNT.getName(), "5");
         config.setProperty(PRIORITY_GENERIC_OPERATION_THREAD_COUNT.getName(), "1");
         HazelcastInstance hz = createHazelcastInstance(config);

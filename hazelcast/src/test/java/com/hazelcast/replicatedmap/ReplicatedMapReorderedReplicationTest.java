@@ -77,7 +77,7 @@ public class ReplicatedMapReorderedReplicationTest extends HazelcastTestSupport 
         updateFactory();
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final HazelcastInstance[] instances = factory
                 .newInstances(config, nodeCount);
 

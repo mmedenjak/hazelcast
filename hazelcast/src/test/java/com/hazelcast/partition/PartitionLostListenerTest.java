@@ -149,7 +149,7 @@ public class PartitionLostListenerTest extends HazelcastTestSupport {
 
     @Test
     public void test_partitionLostListenerInvoked_whenAllPartitionReplicasCrashed() {
-        HazelcastInstance lite = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        HazelcastInstance lite = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         warmUpPartitions(instances);
         warmUpPartitions(lite);

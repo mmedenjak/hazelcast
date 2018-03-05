@@ -76,7 +76,7 @@ public class ClientCacheReconciliationTest extends HazelcastTestSupport {
                 .setMaximumSizePolicy(ENTRY_COUNT)
                 .setSize(MAX_VALUE);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MAP_INVALIDATION_MESSAGE_BATCH_FREQUENCY_SECONDS.getName(), valueOf(Integer.MAX_VALUE));
         config.setProperty(GroupProperty.MAP_INVALIDATION_MESSAGE_BATCH_SIZE.getName(), valueOf(Integer.MAX_VALUE));
 

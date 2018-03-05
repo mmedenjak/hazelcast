@@ -57,7 +57,7 @@ public class InMemoryFormatTest extends HazelcastTestSupport {
     @Test
     public void testIssue2622() {
         final String mapName = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final MapConfig mapConfig = new MapConfig(mapName);
         mapConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
         mapConfig.setStatisticsEnabled(true);
@@ -79,7 +79,7 @@ public class InMemoryFormatTest extends HazelcastTestSupport {
 
     @Test
     public void equals() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addMapConfig(new MapConfig("objectMap").setInMemoryFormat(InMemoryFormat.OBJECT));
         config.addMapConfig(new MapConfig("binaryMap").setInMemoryFormat(InMemoryFormat.BINARY));
 
@@ -105,7 +105,7 @@ public class InMemoryFormatTest extends HazelcastTestSupport {
     public void equalsReadLocalBackup() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addMapConfig(new MapConfig("objectMap").setInMemoryFormat(InMemoryFormat.OBJECT).setReadBackupData(true));
 
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
@@ -135,7 +135,7 @@ public class InMemoryFormatTest extends HazelcastTestSupport {
 
     @Test
     public void countDeserializationsOnContainsValue() {
-        final Config config = new Config()
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .addMapConfig(new MapConfig("default").setInMemoryFormat(InMemoryFormat.OBJECT));
         final HazelcastInstance hz = createHazelcastInstance(config);
         final PartitionService partitionService = hz.getPartitionService();

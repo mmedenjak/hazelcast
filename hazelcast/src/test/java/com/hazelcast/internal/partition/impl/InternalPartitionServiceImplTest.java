@@ -75,7 +75,7 @@ public class InternalPartitionServiceImplTest extends HazelcastTestSupport {
             }
         };
 
-        instance = HazelcastInstanceFactory.newHazelcastInstance(new Config(), randomName(), nodeContext);
+        instance = HazelcastInstanceFactory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), randomName(), nodeContext);
         partitionService = (InternalPartitionServiceImpl) getPartitionService(instance);
         thisAddress = getNode(instance).getThisAddress();
         partitionCount = partitionService.getPartitionCount();

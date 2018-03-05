@@ -192,7 +192,7 @@ public class DurableRetrieveResultTest extends ExecutorServiceTestSupport {
     @Test
     public void testRetrieve_WhenResultOverwritten() throws Exception {
         String name = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getDurableExecutorConfig(name).setCapacity(1).setDurability(0);
         HazelcastInstance instance = createHazelcastInstance(config);
         DurableExecutorService executorService = instance.getDurableExecutorService(name);

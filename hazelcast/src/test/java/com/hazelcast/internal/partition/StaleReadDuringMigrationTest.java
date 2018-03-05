@@ -49,7 +49,7 @@ public class StaleReadDuringMigrationTest extends HazelcastTestSupport {
     @Test
     public void testReadOperationFailsWhenStaleReadDisabledDuringMigration()
             throws ExecutionException, InterruptedException {
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.DISABLE_STALE_READ_ON_PARTITION_MIGRATION.getName(), "true");
 
         final InternalCompletableFuture<Boolean> future = invokeOperation(config);
@@ -64,7 +64,7 @@ public class StaleReadDuringMigrationTest extends HazelcastTestSupport {
     @Test
     public void testReadOperationSucceedsWhenStaleReadEnabledDuringMigration()
             throws ExecutionException, InterruptedException {
-        final InternalCompletableFuture<Boolean> future = invokeOperation(new Config());
+        final InternalCompletableFuture<Boolean> future = invokeOperation(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         assertTrue(future.get());
     }

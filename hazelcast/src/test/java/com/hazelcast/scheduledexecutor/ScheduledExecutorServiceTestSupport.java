@@ -50,7 +50,7 @@ public class ScheduledExecutorServiceTestSupport extends HazelcastTestSupport {
     }
 
     protected HazelcastInstance[] createClusterWithCount(int count) {
-        return createClusterWithCount(count, new Config());
+        return createClusterWithCount(count, com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
     }
 
     protected HazelcastInstance[] createClusterWithCount(int count, Config config) {

@@ -62,7 +62,7 @@ public class RawProtocolAuthenticationTest {
 
     @BeforeClass
     public static void init() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         server = Hazelcast.newHazelcastInstance();
     }

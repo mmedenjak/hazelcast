@@ -65,7 +65,7 @@ public class NearCacheLocalInvalidationTest extends HazelcastTestSupport {
         nearCacheConfig.getEvictionConfig().setEvictionPolicy(EvictionPolicy.NONE);
         nearCacheConfig.setCacheLocalEntries(true);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = config.getMapConfig(MAP_NAME + "*");
         mapConfig.setNearCacheConfig(nearCacheConfig);
 

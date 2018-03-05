@@ -58,7 +58,7 @@ public class ProxyEqualityTest {
 
     @Before
     public void setup() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String groupAName = "GroupA";
         config.getGroupConfig().setName(groupAName);
         hazelcastFactoryGroupA.newHazelcastInstance(config);
@@ -69,7 +69,7 @@ public class ProxyEqualityTest {
         client2GroupA = hazelcastFactoryGroupA.newHazelcastClient(clientConfig);
 
         //setup Group B
-        config = new Config();
+        config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         String groupBName = "GroupB";
         config.getGroupConfig().setName(groupBName);
         hazelcastFactoryGroupB.newHazelcastInstance(config);

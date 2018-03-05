@@ -85,10 +85,10 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         hz.shutdown();
     }
 
-    @Test
-    public void shutdownSingleLiteMember() {
-        HazelcastInstance hz = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        hz.shutdown();
+    private static Config newConfig() {
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
+                .setProperty(GroupProperty.PARTITION_COUNT.getName(), "6")
+                .setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "1");
     }
 
     @Test
@@ -113,9 +113,15 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void shutdownSingleLiteMember() {
+        HazelcastInstance hz = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        hz.shutdown();
+    }
+
+    @Test
     @SuppressWarnings("unused")
     public void shutdownSlaveMember_whilePartitionsMigrating() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.PARTITION_COUNT.getName(), "12")
                 .setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "1");
 
@@ -125,18 +131,6 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         HazelcastInstance hz2 = factory.newHazelcastInstance(config);
         HazelcastInstance hz3 = factory.newHazelcastInstance(config);
 
-        hz2.shutdown();
-
-        assertPartitionAssignments();
-    }
-
-    @Test
-    public void shutdownSlaveLiteMember() {
-        HazelcastInstance hz1 = factory.newHazelcastInstance();
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz3 = factory.newHazelcastInstance();
-
-        warmUpPartitions(hz1, hz2, hz3);
         hz2.shutdown();
 
         assertPartitionAssignments();
@@ -181,13 +175,13 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     @Test
-    public void shutdownMasterLiteMember() {
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz2 = factory.newHazelcastInstance();
+    public void shutdownSlaveLiteMember() {
+        HazelcastInstance hz1 = factory.newHazelcastInstance();
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
         HazelcastInstance hz3 = factory.newHazelcastInstance();
 
         warmUpPartitions(hz1, hz2, hz3);
-        hz1.shutdown();
+        hz2.shutdown();
 
         assertPartitionAssignments();
     }
@@ -202,24 +196,16 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         shutdownAllMembers(true);
     }
 
-    private void shutdownAllMembers(boolean initializePartitions) {
-        final HazelcastInstance[] instances = factory.newInstances(new Config(), 4);
+    @Test
+    public void shutdownMasterLiteMember() {
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz2 = factory.newHazelcastInstance();
+        HazelcastInstance hz3 = factory.newHazelcastInstance();
 
-        if (initializePartitions) {
-            warmUpPartitions(instances);
-        }
+        warmUpPartitions(hz1, hz2, hz3);
+        hz1.shutdown();
 
-        final CountDownLatch latch = new CountDownLatch(instances.length);
-        for (final HazelcastInstance instance : instances) {
-            new Thread() {
-                public void run() {
-                    instance.shutdown();
-                    latch.countDown();
-                }
-            }.start();
-        }
-
-        assertOpenEventually(latch);
+        assertPartitionAssignments();
     }
 
     @Test
@@ -242,30 +228,24 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         shutdownMultipleMembers(true, true);
     }
 
-    private void shutdownMultipleMembers(boolean includeMaster, boolean initializePartitions) {
-        final HazelcastInstance[] instances = factory.newInstances(new Config(), 6);
+    private void shutdownAllMembers(boolean initializePartitions) {
+        final HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 4);
 
         if (initializePartitions) {
             warmUpPartitions(instances);
         }
 
-        final CountDownLatch latch = new CountDownLatch(instances.length / 2);
-        int startIndex = includeMaster ? 0 : 1;
-        for (int i = startIndex; i < instances.length; i += 2) {
-            final int index = i;
+        final CountDownLatch latch = new CountDownLatch(instances.length);
+        for (final HazelcastInstance instance : instances) {
             new Thread() {
                 public void run() {
-                    instances[index].shutdown();
+                    instance.shutdown();
                     latch.countDown();
                 }
             }.start();
         }
 
         assertOpenEventually(latch);
-
-        if (initializePartitions) {
-            assertPartitionAssignments();
-        }
     }
 
     @Test
@@ -299,9 +279,35 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         assertPartitionAssignments();
     }
 
+    private void shutdownMultipleMembers(boolean includeMaster, boolean initializePartitions) {
+        final HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 6);
+
+        if (initializePartitions) {
+            warmUpPartitions(instances);
+        }
+
+        final CountDownLatch latch = new CountDownLatch(instances.length / 2);
+        int startIndex = includeMaster ? 0 : 1;
+        for (int i = startIndex; i < instances.length; i += 2) {
+            final int index = i;
+            new Thread() {
+                public void run() {
+                    instances[index].shutdown();
+                    latch.countDown();
+                }
+            }.start();
+        }
+
+        assertOpenEventually(latch);
+
+        if (initializePartitions) {
+            assertPartitionAssignments();
+        }
+    }
+
     @Test
     public void shutdownAndTerminateSlaveMembers_concurrently() {
-        HazelcastInstance[] instances = factory.newInstances(new Config(), 5);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 5);
         int shutdownIndex = RandomPicker.getInt(1, instances.length);
         int terminateIndex;
         do {
@@ -313,18 +319,9 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
     @Test
     public void shutdownMasterAndTerminateSlaveMember_concurrently() {
-        HazelcastInstance[] instances = factory.newInstances(new Config(), 5);
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 5);
         int shutdownIndex = 0;
         int terminateIndex = RandomPicker.getInt(1, instances.length);
-
-        shutdownAndTerminateMembers_concurrently(instances, shutdownIndex, terminateIndex);
-    }
-
-    @Test
-    public void shutdownSlaveAndTerminateMasterMember_concurrently() {
-        HazelcastInstance[] instances = factory.newInstances(new Config(), 5);
-        int shutdownIndex = RandomPicker.getInt(1, instances.length);
-        int terminateIndex = 0;
 
         shutdownAndTerminateMembers_concurrently(instances, shutdownIndex, terminateIndex);
     }
@@ -393,8 +390,27 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         shutdownMember_whenClusterNotActive(false, true, ClusterState.PASSIVE);
     }
 
+    @Test
+    public void shutdownSlaveAndTerminateMasterMember_concurrently() {
+        HazelcastInstance[] instances = factory.newInstances(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), 5);
+        int shutdownIndex = RandomPicker.getInt(1, instances.length);
+        int terminateIndex = 0;
+
+        shutdownAndTerminateMembers_concurrently(instances, shutdownIndex, terminateIndex);
+    }
+
+    @Test
+    public void shutdownMemberAndCluster_withoutPartitionInitialization() {
+        shutdownMemberAndCluster(false);
+    }
+
+    @Test
+    public void shutdownMemberAndCluster_withPartitionInitialization() {
+        shutdownMemberAndCluster(true);
+    }
+
     private void shutdownMember_whenClusterNotActive(boolean shutdownMaster, boolean initializePartitions, ClusterState state) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         HazelcastInstance master = factory.newHazelcastInstance(config);
         HazelcastInstance[] slaves = factory.newInstances(config, 3);
 
@@ -417,17 +433,17 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
     }
 
     @Test
-    public void shutdownMemberAndCluster_withoutPartitionInitialization() {
-        shutdownMemberAndCluster(false);
+    public void shutdownMemberAndCluster_concurrently_withoutPartitionInitialization() throws Exception {
+        shutdownMemberAndCluster_concurrently(false);
     }
 
     @Test
-    public void shutdownMemberAndCluster_withPartitionInitialization() {
-        shutdownMemberAndCluster(true);
+    public void shutdownMemberAndCluster_concurrently_withPartitionInitialization() throws Exception {
+        shutdownMemberAndCluster_concurrently(true);
     }
 
     private void shutdownMemberAndCluster(boolean initializePartitions) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         HazelcastInstance master = factory.newHazelcastInstance(config);
         HazelcastInstance[] slaves = factory.newInstances(config, 3);
 
@@ -439,45 +455,6 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
 
         changeClusterStateEventually(slaves[0], ClusterState.PASSIVE);
         slaves[0].getCluster().shutdown();
-    }
-
-    @Test
-    public void shutdownMemberAndCluster_concurrently_withoutPartitionInitialization() throws Exception {
-        shutdownMemberAndCluster_concurrently(false);
-    }
-
-    @Test
-    public void shutdownMemberAndCluster_concurrently_withPartitionInitialization() throws Exception {
-        shutdownMemberAndCluster_concurrently(true);
-    }
-
-    private void shutdownMemberAndCluster_concurrently(boolean initializePartitions) throws Exception {
-        Config config = new Config();
-
-        final HazelcastInstance master = factory.newHazelcastInstance(config);
-        final HazelcastInstance[] slaves = factory.newInstances(config, 3);
-
-        if (initializePartitions) {
-            warmUpPartitions(master);
-        }
-
-        Future f1 = spawn(new Runnable() {
-            @Override
-            public void run() {
-                master.shutdown();
-            }
-        });
-
-        Future f2 = spawn(new Runnable() {
-            @Override
-            public void run() {
-                changeClusterStateEventually(slaves[0], ClusterState.PASSIVE);
-                slaves[0].getCluster().shutdown();
-            }
-        });
-
-        f1.get();
-        f2.get();
     }
 
     private void assertPartitionAssignments() {
@@ -510,9 +487,32 @@ public class GracefulShutdownTest extends HazelcastTestSupport {
         return partitionService.getPartitionStateManager().getPartitionsCopy();
     }
 
-    private static Config newConfig() {
-        return new Config()
-                .setProperty(GroupProperty.PARTITION_COUNT.getName(), "6")
-                .setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "1");
+    private void shutdownMemberAndCluster_concurrently(boolean initializePartitions) throws Exception {
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
+
+        final HazelcastInstance master = factory.newHazelcastInstance(config);
+        final HazelcastInstance[] slaves = factory.newInstances(config, 3);
+
+        if (initializePartitions) {
+            warmUpPartitions(master);
+        }
+
+        Future f1 = spawn(new Runnable() {
+            @Override
+            public void run() {
+                master.shutdown();
+            }
+        });
+
+        Future f2 = spawn(new Runnable() {
+            @Override
+            public void run() {
+                changeClusterStateEventually(slaves[0], ClusterState.PASSIVE);
+                slaves[0].getCluster().shutdown();
+            }
+        });
+
+        f1.get();
+        f2.get();
     }
 }

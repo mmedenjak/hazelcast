@@ -103,7 +103,7 @@ public class EventQueuePluginTest extends AbstractDiagnosticsPluginTest {
 
     @Before
     public void setup() {
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(EventQueuePlugin.PERIOD_SECONDS.getName(), "1")
                 .setProperty(EventQueuePlugin.SAMPLES.getName(), "100")
                 .setProperty(EventQueuePlugin.THRESHOLD.getName(), "10");

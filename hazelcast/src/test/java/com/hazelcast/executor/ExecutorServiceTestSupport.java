@@ -57,13 +57,13 @@ public class ExecutorServiceTestSupport extends HazelcastTestSupport {
 
     IExecutorService createSingleNodeExecutorService(String name, int poolSize, boolean statsEnabled) {
         ExecutorConfig executorConfig = new ExecutorConfig(name, poolSize).setStatisticsEnabled(statsEnabled);
-        HazelcastInstance instance = createHazelcastInstance(new Config().addExecutorConfig(executorConfig));
+        HazelcastInstance instance = createHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addExecutorConfig(executorConfig));
         return instance.getExecutorService(name);
     }
 
     protected DurableExecutorService createSingleNodeDurableExecutorService(String name, int poolSize) {
         DurableExecutorConfig executorConfig = new DurableExecutorConfig(name).setPoolSize(poolSize);
-        HazelcastInstance instance = createHazelcastInstance(new Config().addDurableExecutorConfig(executorConfig));
+        HazelcastInstance instance = createHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addDurableExecutorConfig(executorConfig));
         return instance.getDurableExecutorService(name);
     }
 

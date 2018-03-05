@@ -60,7 +60,7 @@ public class GenericOperationTest extends HazelcastTestSupport {
                 .setCapacity(CAPACITY)
                 .setTimeToLiveSeconds(10);
 
-        Config config = new Config().addRingBufferConfig(rbConfig);
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().addRingBufferConfig(rbConfig);
 
         hz = createHazelcastInstance(config);
         nodeEngine = getNodeEngineImpl(hz);

@@ -75,7 +75,7 @@ public class RingbufferAsyncAddWithBackoffStressTest extends HazelcastTestSuppor
     }
 
     public void test(RingbufferConfig ringbufferConfig) throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addRingBufferConfig(ringbufferConfig);
         HazelcastInstance[] instances = createHazelcastInstanceFactory(2).newInstances(config);
         ringbuffer = instances[0].getRingbuffer(ringbufferConfig.getName());

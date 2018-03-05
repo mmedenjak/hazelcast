@@ -71,7 +71,7 @@ import static org.powermock.api.mockito.PowerMockito.mockStatic;
 public class DefaultAddressPickerInterfacesTest {
 
     private final ILogger logger = Logger.getLogger(AddressPicker.class);
-    private final Config config = new Config();
+    private final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
     private final HazelcastProperties hazelcastProperties = new HazelcastProperties(config);
 
     @Rule

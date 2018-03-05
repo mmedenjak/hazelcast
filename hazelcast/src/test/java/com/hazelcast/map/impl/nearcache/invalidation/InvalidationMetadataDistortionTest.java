@@ -59,7 +59,7 @@ public class InvalidationMetadataDistortionTest extends NearCacheTestSupport {
     }
 
     protected Config createConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty("hazelcast.invalidation.max.tolerated.miss.count", "0");
         config.setProperty("hazelcast.map.invalidation.batch.enabled", "true");
         config.setProperty("hazelcast.map.invalidation.batch.size", "10000");

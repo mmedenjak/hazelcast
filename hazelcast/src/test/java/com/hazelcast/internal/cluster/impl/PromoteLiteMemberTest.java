@@ -75,9 +75,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void liteMaster_promoted() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         hz1.getCluster().promoteLocalLiteMember();
         assertFalse(getMember(hz1).isLiteMember());
@@ -91,9 +91,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void liteMember_promoted() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         hz2.getCluster().promoteLocalLiteMember();
         assertFalse(getMember(hz2).isLiteMember());
@@ -107,8 +107,8 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void normalMember_promotion_shouldFail_onLocal() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         exception.expect(IllegalStateException.class);
         hz1.getCluster().promoteLocalLiteMember();
@@ -118,9 +118,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void normalMember_promotion_shouldFail_onNonMaster() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         PromoteLiteMemberOp op = new PromoteLiteMemberOp();
         op.setCallerUuid(getMember(hz2).getUuid());
@@ -135,8 +135,8 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void normalMember_promotion_shouldBeNoop_onMaster() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         PromoteLiteMemberOp op = new PromoteLiteMemberOp();
         op.setCallerUuid(getMember(hz2).getUuid());
@@ -150,8 +150,8 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void notExistingMember_promotion_shouldFail() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         PromoteLiteMemberOp op = new PromoteLiteMemberOp();
         op.setCallerUuid(UuidUtil.newUnsecureUuidString());
@@ -166,7 +166,7 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void standaloneLiteMember_promoted() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        HazelcastInstance hz = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         hz.getCluster().promoteLocalLiteMember();
         assertFalse(getMember(hz).isLiteMember());
@@ -180,9 +180,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void promotedMasterLiteMember_shouldHave_partitionsAssigned() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         warmUpPartitions(hz1, hz2, hz3);
         assertNoPartitionsAssigned(hz1);
@@ -196,9 +196,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void promotedLiteMember_shouldHave_partitionsAssigned() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         warmUpPartitions(hz1, hz2, hz3);
         assertNoPartitionsAssigned(hz2);
@@ -226,9 +226,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     private void promotion_shouldFail_whenClusterState_NotAllowMigration(ClusterState state) {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config());
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
 
         warmUpPartitions(hz1, hz2, hz3);
         changeClusterStateEventually(hz2, state);
@@ -241,8 +241,8 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void promotion_shouldFail_whenMastershipClaimInProgress_duringPromotion() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         // artificially set mastership claim flag
         ClusterServiceImpl clusterService = getNode(hz1).getClusterService();
@@ -257,9 +257,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void promotion_shouldFail_whenMasterLeaves_duringPromotion() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
-        HazelcastInstance hz3 = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         assertClusterSizeEventually(3, hz2);
 
@@ -290,9 +290,9 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
     public void promotion_shouldFail_whenMasterIsSuspected_duringPromotion() throws Exception {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
 
-        HazelcastInstance hz1 = factory.newHazelcastInstance(new Config());
-        final HazelcastInstance hz2 = factory.newHazelcastInstance(new Config());
-        final HazelcastInstance hz3 = factory.newHazelcastInstance(new Config().setLiteMember(true));
+        HazelcastInstance hz1 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        final HazelcastInstance hz2 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
+        final HazelcastInstance hz3 = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true));
 
         assertClusterSizeEventually(3, hz2);
 
@@ -341,8 +341,8 @@ public class PromoteLiteMemberTest extends HazelcastTestSupport {
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory();
         HazelcastInstance[] instances = new HazelcastInstance[2];
-        instances[0] = factory.newHazelcastInstance(new Config().setLiteMember(isMaster));
-        instances[1] = factory.newHazelcastInstance(new Config().setLiteMember(!isMaster));
+        instances[0] = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(isMaster));
+        instances[1] = factory.newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(!isMaster));
 
         HazelcastInstance hz = instances[isMaster ? 0 : 1];
 

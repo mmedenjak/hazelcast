@@ -61,7 +61,7 @@ public class ProxyFactoryTest {
                 .setName(SERVICE_NAME)
                 .setImplementation(new CustomService());
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getServicesConfig()
                 .addServiceConfig(serviceConfigWithContext)
                 .addServiceConfig(serviceConfig);

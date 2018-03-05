@@ -55,7 +55,7 @@ public class ExecutorServiceLiteMemberTest {
 
     private TestHazelcastFactory factory;
 
-    private Config liteConfig = new Config().setLiteMember(true);
+    private Config liteConfig = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setLiteMember(true);
 
     @Before
     public void before() {

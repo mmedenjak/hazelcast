@@ -43,7 +43,7 @@ public class BadConfigurationMemberStartTest {
 
     @Test(expected = InvalidConfigurationException.class)
     public void testMulticastAndTcpEnabled() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         NetworkConfig networkConfig = config.getNetworkConfig();
 

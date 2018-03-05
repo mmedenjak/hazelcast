@@ -81,12 +81,12 @@ public class RepairingTaskTest extends HazelcastTestSupport {
     }
 
     private static Config getConfigWithMaxToleratedMissCount(int maxToleratedMissCount) {
-        return new Config()
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(MAX_TOLERATED_MISS_COUNT.getName(), Integer.toString(maxToleratedMissCount));
     }
 
     private static Config getConfigWithReconciliationInterval(int reconciliationIntervalSeconds) {
-        return new Config()
+        return com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(RECONCILIATION_INTERVAL_SECONDS.getName(), Integer.toString(reconciliationIntervalSeconds));
     }
 

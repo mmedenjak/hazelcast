@@ -61,7 +61,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
 
     @Test
     public void testQueueStoreLoadMoreThanMaxSize() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int maxSize = 2000;
         QueueConfig queueConfig = config.getQueueConfig("testQueueStore");
         queueConfig.setMaxSize(maxSize);
@@ -124,7 +124,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
     @Test
     public void testRemoveAll() {
         int maxSize = 2000;
-        final Config config = new Config();
+        final Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final QueueStoreConfig queueStoreConfig = new QueueStoreConfig()
                 .setStoreImplementation(new TestQueueStore())
                 .setProperty("bulk-load", String.valueOf(200));
@@ -154,7 +154,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
         queueStoreConfig.setProperty("memory-limit", "0");
         queueStoreConfig.setProperty("bulk-load", "100");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QueueConfig queueConfig = config.getQueueConfig("test");
         queueConfig.setMaxSize(10);
         queueConfig.setQueueStoreConfig(queueStoreConfig);
@@ -174,7 +174,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
 
     @Test
     public void testQueueStore() throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         int maxSize = 2000;
         QueueConfig queueConfig = config.getQueueConfig("testQueueStore");
         queueConfig.setMaxSize(maxSize);
@@ -213,7 +213,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
 
     @Test
     public void testStoreId_whenNodeDown() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QueueConfig queueConfig = config.getQueueConfig("default");
         IdCheckerQueueStore idCheckerQueueStore = new IdCheckerQueueStore();
         QueueStoreConfig queueStoreConfig = new QueueStoreConfig();
@@ -238,7 +238,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
     @Test
     public void testQueueStoreFactory() {
         String queueName = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QueueConfig queueConfig = config.getQueueConfig(queueName);
         QueueStoreConfig queueStoreConfig = new QueueStoreConfig();
         queueStoreConfig.setEnabled(true);
@@ -261,7 +261,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
     @Test
     public void testQueueStoreFactoryIsNotInitialized_whenDisabledInQueueStoreConfig() {
         String queueName = randomString();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QueueConfig queueConfig = config.getQueueConfig(queueName);
         QueueStoreConfig queueStoreConfig = new QueueStoreConfig();
         queueStoreConfig.setEnabled(false);
@@ -289,7 +289,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
         QueueConfig queueConfig = new QueueConfig();
         queueConfig.setName(queueName);
         queueConfig.setQueueStoreConfig(queueStoreConfig);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.addQueueConfig(queueConfig);
 
         HazelcastInstance node = createHazelcastInstance(config);
@@ -317,7 +317,7 @@ public class QueueStoreTest extends HazelcastTestSupport {
 
 
     private Config getConfigForDrainToTest(int maxSize, int bulkLoadSize, QueueStore queueStore) {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         QueueConfig queueConfig = config.getQueueConfig("testQueueStore");
         queueConfig.setMaxSize(maxSize);
 

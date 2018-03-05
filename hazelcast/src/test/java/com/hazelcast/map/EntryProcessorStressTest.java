@@ -51,7 +51,7 @@ public class EntryProcessorStressTest extends HazelcastTestSupport {
     public void droppedEntryProcessorTest_withKeyOwningNodeTermination() throws Exception {
         String mapName = randomString();
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getMapConfig(mapName).setInMemoryFormat(InMemoryFormat.OBJECT);
 
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(MAX_ITERATIONS + 1);

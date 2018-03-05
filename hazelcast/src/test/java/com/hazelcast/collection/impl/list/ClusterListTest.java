@@ -120,7 +120,7 @@ public class ClusterListTest extends HazelcastTestSupport {
 
     @Test
     public void testMigration() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = randomString();
         config.addListConfig(new ListConfig().setName(name).setBackupCount(1));
         final int insCount = 4;
@@ -158,7 +158,7 @@ public class ClusterListTest extends HazelcastTestSupport {
 
     @Test
     public void testMaxSize() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         final String name = "defList";
         config.addListConfig(new ListConfig().setName(name).setBackupCount(1).setMaxSize(100));
 

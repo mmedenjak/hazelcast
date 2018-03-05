@@ -148,7 +148,7 @@ public class PartitioningStrategyFactoryTest extends HazelcastTestSupport {
 
     @Override
     protected Config getConfig() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         MapConfig mapConfig = new MapConfig(mapName);
         PartitioningStrategyConfig partitioningStrategyConfig = new PartitioningStrategyConfig();
         partitioningStrategyConfig.setPartitioningStrategyClass("com.hazelcast.partition.strategy.StringPartitioningStrategy");

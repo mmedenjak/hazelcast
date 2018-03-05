@@ -83,7 +83,7 @@ public class ClientCacheNearCacheStaleReadTest extends HazelcastTestSupport {
         failed = new AtomicBoolean(false);
         assertionViolationCount = new AtomicInteger(0);
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.CACHE_INVALIDATION_MESSAGE_BATCH_FREQUENCY_SECONDS.getName(), "2");
         member = factory.newHazelcastInstance(config);
 

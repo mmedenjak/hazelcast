@@ -57,7 +57,7 @@ public class ClientUserCodeDeploymentExceptionTest extends HazelcastTestSupport 
     }
 
     private Config createNodeConfig() {
-        Config i2Config = new Config();
+        Config i2Config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         FilteringClassLoader filteringCL = new FilteringClassLoader(singletonList("usercodedeployment"), null);
         i2Config.setClassLoader(filteringCL);
         return i2Config;

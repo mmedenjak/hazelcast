@@ -32,7 +32,7 @@ public class DynamicConfigSlowPreJoinBouncingTest extends DynamicConfigBouncingT
 
     public Config getConfig() {
         DelaysPreparingPreJoinOpService service = new DelaysPreparingPreJoinOpService();
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getServicesConfig().addServiceConfig(
                 new ServiceConfig().setEnabled(true).setName(DelaysPreparingPreJoinOpService.SERVICE_NAME)
                         .setImplementation(service));

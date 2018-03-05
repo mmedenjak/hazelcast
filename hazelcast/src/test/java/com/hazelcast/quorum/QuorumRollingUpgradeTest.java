@@ -54,7 +54,7 @@ public class QuorumRollingUpgradeTest extends AbstractQuorumTest {
     @BeforeClass
     public static void setUp() {
         System.setProperty(HAZELCAST_INTERNAL_OVERRIDE_VERSION, "3.9");
-        initTestEnvironment(new Config(), new TestHazelcastInstanceFactory());
+        initTestEnvironment(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig(), new TestHazelcastInstanceFactory());
     }
 
     @AfterClass

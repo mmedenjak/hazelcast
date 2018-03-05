@@ -55,7 +55,7 @@ public class AsyncInboundResponseHandlerTest extends HazelcastTestSupport {
         ILogger logger = Logger.getLogger(getClass());
         responsePacketHandler = mock(PacketHandler.class);
         asyncHandler = new AsyncInboundResponseHandler(getClass().getClassLoader(), "hz", logger,
-                responsePacketHandler, new HazelcastProperties(new Config()));
+                responsePacketHandler, new HazelcastProperties(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()));
         asyncHandler.start();
         serializationService = new DefaultSerializationServiceBuilder().build();
     }

@@ -37,7 +37,7 @@ public class MapListenerAdapterTest extends HazelcastTestSupport {
     @Test
     public void testMapListenerAdapter_whenEntryExpired() {
         String mapName = randomMapName();
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         TestHazelcastInstanceFactory instanceFactory = createHazelcastInstanceFactory(1);
         HazelcastInstance instance = instanceFactory.newHazelcastInstance(cfg);

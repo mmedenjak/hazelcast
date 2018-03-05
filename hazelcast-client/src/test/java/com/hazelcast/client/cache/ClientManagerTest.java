@@ -46,7 +46,7 @@ public class ClientManagerTest {
 
     @Before
     public void init() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config.getNetworkConfig().setPort(5701);
         config.getGroupConfig().setName("cluster1");
@@ -54,7 +54,7 @@ public class ClientManagerTest {
 
         Hazelcast.newHazelcastInstance(config);
 
-        Config config2 = new Config();
+        Config config2 = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config2.getNetworkConfig().getJoin().getMulticastConfig().setEnabled(false);
         config2.getNetworkConfig().setPort(5702);
         config2.getGroupConfig().setName("cluster2");

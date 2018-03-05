@@ -199,7 +199,7 @@ public class PartitionReplicaStateCheckerTest extends HazelcastTestSupport {
 
     @Test
     public void shouldNotBeSafe_whenReplicasAreNotSync() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         ServiceConfig serviceConfig = TestMigrationAwareService.createServiceConfig(1);
         config.getServicesConfig().addServiceConfig(serviceConfig);
 

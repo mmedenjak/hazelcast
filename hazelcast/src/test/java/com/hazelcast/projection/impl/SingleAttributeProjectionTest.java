@@ -133,7 +133,7 @@ public class SingleAttributeProjectionTest extends HazelcastTestSupport {
                 .setName("aggr")
                 .setInMemoryFormat(InMemoryFormat.OBJECT);
 
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(PARTITION_COUNT.getName(), "3")
                 .addMapConfig(mapConfig);
 

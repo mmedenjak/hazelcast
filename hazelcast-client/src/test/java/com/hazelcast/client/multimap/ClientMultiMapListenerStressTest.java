@@ -57,7 +57,7 @@ public class ClientMultiMapListenerStressTest {
 
     @Before
     public void setup() {
-        Config cfg = new Config();
+        Config cfg = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         cfg.setProperty("hazelcast.event.queue.capacity", "5000000");
         server = hazelcastFactory.newHazelcastInstance(cfg);
     }

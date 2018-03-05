@@ -52,7 +52,7 @@ public class QueryCacheGuaranteesTest extends HazelcastTestSupport {
         String mapName = randomString();
         String queryCacheName = randomString();
         TestHazelcastInstanceFactory instanceFactory = createHazelcastInstanceFactory(3);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "271");
 
         QueryCacheConfig queryCacheConfig = new QueryCacheConfig(queryCacheName);
@@ -98,7 +98,7 @@ public class QueryCacheGuaranteesTest extends HazelcastTestSupport {
         String mapName = randomString();
         String queryCacheName = randomString();
         TestHazelcastInstanceFactory instanceFactory = createHazelcastInstanceFactory(3);
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
 
         QueryCacheConfig queryCacheConfig = new QueryCacheConfig(queryCacheName);
         queryCacheConfig.setBatchSize(100);

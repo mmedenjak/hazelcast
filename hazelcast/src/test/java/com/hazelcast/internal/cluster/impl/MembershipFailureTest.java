@@ -259,7 +259,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void slave_heartbeat_timeout() {
-        Config config = new Config().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
                 .setProperty(HEARTBEAT_INTERVAL_SECONDS.getName(), "1");
         HazelcastInstance master = newHazelcastInstance(config);
         HazelcastInstance slave1 = newHazelcastInstance(config);
@@ -276,7 +276,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void master_heartbeat_timeout() {
-        Config config = new Config().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
                 .setProperty(HEARTBEAT_INTERVAL_SECONDS.getName(), "1")
                 .setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "3");
         HazelcastInstance master = newHazelcastInstance(config);
@@ -296,7 +296,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void heartbeat_not_sent_to_suspected_member() {
-        Config config = new Config().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "10")
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "10")
                 .setProperty(HEARTBEAT_INTERVAL_SECONDS.getName(), "1");
         HazelcastInstance master = newHazelcastInstance(config);
         HazelcastInstance slave1 = newHazelcastInstance(config);
@@ -315,7 +315,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void slave_heartbeat_removes_suspicion() {
-        Config config = new Config().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "10")
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "10")
                 .setProperty(HEARTBEAT_INTERVAL_SECONDS.getName(), "1");
         HazelcastInstance master = newHazelcastInstance(config);
         HazelcastInstance slave1 = newHazelcastInstance(config);
@@ -347,7 +347,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
     @Test
     public void slave_receives_member_list_from_non_master() {
         String infiniteTimeout = Integer.toString(Integer.MAX_VALUE);
-        Config config = new Config().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), infiniteTimeout)
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), infiniteTimeout)
                 .setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
 
         HazelcastInstance master = newHazelcastInstance(config);
@@ -379,7 +379,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void master_candidate_has_stale_member_list() {
-        Config config = new Config().setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
         HazelcastInstance master = newHazelcastInstance(config);
         HazelcastInstance slave1 = newHazelcastInstance(config);
 
@@ -409,7 +409,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void master_candidate_discovers_member_list_recursively() {
-        Config config = new Config().setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
         HazelcastInstance master = newHazelcastInstance(config);
         HazelcastInstance slave1 = newHazelcastInstance(config);
         HazelcastInstance slave2 = newHazelcastInstance(config);
@@ -456,7 +456,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void master_candidate_and_new_member_splits_on_master_failure() {
-        Config config = new Config().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig().setProperty(MAX_NO_HEARTBEAT_SECONDS.getName(), "15")
                 .setProperty(HEARTBEAT_INTERVAL_SECONDS.getName(), "1")
                 .setProperty(MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
         HazelcastInstance master = newHazelcastInstance(config);
@@ -482,7 +482,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void slave_splits_and_eventually_merges_back() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(MERGE_FIRST_RUN_DELAY_SECONDS.getName(), "15")
                 .setProperty(MERGE_NEXT_RUN_DELAY_SECONDS.getName(), "5");
         final HazelcastInstance member1 = newHazelcastInstance(config);
@@ -528,7 +528,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
     }
 
     private void masterCandidate_canGracefullyShutdown_whenMasterGoesDown(boolean terminate) throws Exception {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         // slow down the migrations
         config.setProperty(GroupProperty.PARTITION_MIGRATION_INTERVAL.getName(), "1");
         config.setProperty(GroupProperty.PARTITION_COUNT.getName(), "12");
@@ -559,12 +559,12 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void secondMastershipClaimByYounger_shouldRetry_when_firstMastershipClaimByElder_accepted() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
 
         HazelcastInstance member1 = newHazelcastInstance(config);
         final HazelcastInstance member2 = newHazelcastInstance(config);
-        HazelcastInstance member3 = newHazelcastInstance(new Config()
+        HazelcastInstance member3 = newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 .setProperty(GroupProperty.MASTERSHIP_CLAIM_TIMEOUT_SECONDS.getName(), "10"));
         final HazelcastInstance member4 = newHazelcastInstance(config);
 
@@ -606,7 +606,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
 
     @Test
     public void secondMastershipClaimByElder_shouldFail_when_firstMastershipClaimByYounger_accepted() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setProperty(GroupProperty.MEMBER_LIST_PUBLISH_INTERVAL_SECONDS.getName(), "5");
 
         HazelcastInstance member1 = newHazelcastInstance(config);
@@ -697,7 +697,7 @@ public class MembershipFailureTest extends HazelcastTestSupport {
     }
 
     HazelcastInstance newHazelcastInstance() {
-        return newHazelcastInstance(new Config());
+        return newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
     }
 
     HazelcastInstance newHazelcastInstance(Config config) {

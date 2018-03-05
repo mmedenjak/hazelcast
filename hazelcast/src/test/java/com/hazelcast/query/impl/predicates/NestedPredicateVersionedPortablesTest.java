@@ -50,7 +50,7 @@ public class NestedPredicateVersionedPortablesTest extends HazelcastTestSupport 
 
     @Before
     public void setup() {
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         setUpFactory(config);
         HazelcastInstance instance = createHazelcastInstance(config);
         map = instance.getMap("map");

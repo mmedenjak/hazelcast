@@ -44,7 +44,7 @@ public class MembershipFailureTest_withTCP extends MembershipFailureTest {
 
     @Override
     HazelcastInstance newHazelcastInstance() {
-        return newHazelcastInstance(new Config());
+        return newHazelcastInstance(com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig());
     }
 
     @Override

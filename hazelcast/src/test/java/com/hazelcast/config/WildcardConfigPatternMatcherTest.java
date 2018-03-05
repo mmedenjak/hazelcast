@@ -35,7 +35,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testQueueConfigWithoutWildcard() {
         QueueConfig queueConfig = new QueueConfig().setName("someQueue");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -52,7 +52,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testQueueConfigWildcardDocumentationExample1() {
         QueueConfig queueConfig = new QueueConfig().setName("*hazelcast.test.myQueue");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -63,7 +63,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testQueueConfigWildcardDocumentationExample2() {
         QueueConfig queueConfig = new QueueConfig().setName("com.hazelcast.*.myQueue");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -74,7 +74,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testQueueConfigWildcard() {
         QueueConfig queueConfig = new QueueConfig().setName("abc*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addQueueConfig(queueConfig);
 
@@ -86,7 +86,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWithoutWildcard() {
         MapConfig mapConfig = new MapConfig().setName("someMap");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -103,7 +103,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardDocumentationExample1() {
         MapConfig mapConfig = new MapConfig().setName("com.hazelcast.test.*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -114,7 +114,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardDocumentationExample2() {
         MapConfig mapConfig = new MapConfig().setName("com.hazel*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -125,7 +125,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardDocumentationExample3() {
         MapConfig mapConfig = new MapConfig().setName("*.test.myMap");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -136,7 +136,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardDocumentationExample4() {
         MapConfig mapConfig = new MapConfig().setName("com.*test.myMap");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -149,7 +149,7 @@ public class WildcardConfigPatternMatcherTest {
         MapConfig mapConfig2 = new MapConfig().setName("com.hazelcast.test.*");
         MapConfig mapConfig3 = new MapConfig().setName("com.hazelcast.test.sub.*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig1);
         config.addMapConfig(mapConfig2);
@@ -162,7 +162,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardStartsWith() {
         MapConfig mapConfig = new MapConfig().setName("bc*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -179,7 +179,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardEndsWith() {
         MapConfig mapConfig = new MapConfig().setName("*ab");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 
@@ -196,7 +196,7 @@ public class WildcardConfigPatternMatcherTest {
     public void testMapConfigWildcardOnly() {
         MapConfig mapConfig = new MapConfig().setName("*");
 
-        Config config = new Config();
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig();
         config.setConfigPatternMatcher(new WildcardConfigPatternMatcher());
         config.addMapConfig(mapConfig);
 

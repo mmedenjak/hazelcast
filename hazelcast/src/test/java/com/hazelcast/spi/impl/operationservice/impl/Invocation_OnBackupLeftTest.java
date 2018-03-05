@@ -61,7 +61,7 @@ public class Invocation_OnBackupLeftTest extends HazelcastTestSupport {
     @Before
     public void setup() {
         instanceFactory = createHazelcastInstanceFactory();
-        Config config = new Config()
+        Config config = com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig()
                 // a long timeout is configured to verify that the fast timeout is kicking in
                 .setProperty(GroupProperty.OPERATION_BACKUP_TIMEOUT_MILLIS.getName(), "100000")
                 .setProperty(GroupProperty.MAX_JOIN_SECONDS.getName(), "5");
