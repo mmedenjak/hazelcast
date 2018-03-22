@@ -44,6 +44,7 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
 
     private final RecordFactory<R> recordFactory;
     private final StorageSCHM<R> records;
+    private final SerializationService serializationService;
 
     // not final for testing purposes.
     private EntryCostEstimator<Data, Record> entryCostEstimator;
@@ -52,6 +53,7 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
         this.recordFactory = recordFactory;
         this.entryCostEstimator = createMapSizeEstimator(inMemoryFormat);
         this.records = new StorageSCHM<>(serializationService);
+        this.serializationService = serializationService;
     }
 
     @Override
@@ -167,8 +169,8 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
     }
 
     @Override
-    public MapEntriesWithCursor fetchEntries(int tableIndex, int size, SerializationService serializationService) {
-        List<Map.Entry<Data, R>> entries = new ArrayList<>(size);
+    public MapEntriesWithCursor fetchEntries(int tableIndex, int size) {
+        List<Map.Entry<Data, R>> entries = new ArrayList<Map.Entry<Data, R>>(size);
         int newTableIndex = records.fetchEntries(tableIndex, size, entries);
         List<Map.Entry<Data, Data>> entriesData = new ArrayList<>(entries.size());
         for (Map.Entry<Data, R> entry : entries) {

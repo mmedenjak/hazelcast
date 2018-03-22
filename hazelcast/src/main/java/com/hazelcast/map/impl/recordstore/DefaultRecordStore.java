@@ -208,7 +208,7 @@ public class DefaultRecordStore extends AbstractEvictableRecordStore {
 
     @Override
     public MapEntriesWithCursor fetchEntries(int tableIndex, int size) {
-        return storage.fetchEntries(tableIndex, size, serializationService);
+        return storage.fetchEntries(tableIndex, size);
     }
 
     @Override

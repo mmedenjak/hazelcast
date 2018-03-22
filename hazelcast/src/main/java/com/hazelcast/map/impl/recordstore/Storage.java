@@ -21,7 +21,6 @@ import com.hazelcast.map.impl.EntryCostEstimator;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
 import com.hazelcast.map.impl.iterator.MapKeysWithCursor;
 import com.hazelcast.map.impl.record.Record;
-import com.hazelcast.spi.serialization.SerializationService;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -60,7 +59,7 @@ public interface Storage<K, R> {
      * Because fail fast may not be the desired behaviour always. For example if you are caching an iterator as in
      * {@link AbstractEvictableRecordStore#expirationIterator} and you know that in next rounds you will
      * eventually visit all entries, you don't need fail fast behaviour.
-     *
+     * <p>
      * Note that returned iterator is not thread-safe !!!
      *
      * @return new iterator instance
@@ -93,11 +92,14 @@ public interface Storage<K, R> {
     Iterable<EntryView> getRandomSamples(int sampleCount);
 
     /**
-     * Fetch minimally {@code size} keys from the {@code tableIndex} position. The key is fetched on-heap.
+     * Fetch minimally {@code size} keys from the {@code tableIndex} position.
+     * The key is fetched on-heap.
      * <p>
-     * NOTE: The implementation is free to return more than {@code size} items. This can happen if we cannot easily resume
-     * from the last returned item by receiving the {@code tableIndex} of the last item. The index can represent a bucket
-     * with multiple items and in this case the returned object will contain all items in that bucket, regardless if we exceed
+     * NOTE: The implementation is free to return more than {@code size} items.
+     * This can happen if we cannot easily resume from the last returned item
+     * by receiving the {@code tableIndex} of the last item. The index can
+     * represent a bucket with multiple items and in this case the returned
+     * object will contain all items in that bucket, regardless if we exceed
      * the requested {@code size}.
      *
      * @param tableIndex the index (position) from which to resume
@@ -107,18 +109,22 @@ public interface Storage<K, R> {
     MapKeysWithCursor fetchKeys(int tableIndex, int size);
 
     /**
-     * Fetch minimally {@code size} items from the {@code tableIndex} position. Both the key and value are fetched on-heap.
+     * Fetch minimally {@code size} items from the {@code tableIndex} position.
+     * Both the key and value are fetched on-heap.
      * <p>
-     * NOTE: The implementation is free to return more than {@code size} items. This can happen if we cannot easily resume
-     * from the last returned item by receiving the {@code tableIndex} of the last item. The index can represent a bucket
-     * with multiple items and in this case the returned object will contain all items in that bucket, regardless if we exceed
+     * NOTE: The implementation is free to return more than {@code size} items.
+     * This can happen if we cannot easily resume from the last returned item
+     * by receiving the {@code tableIndex} of the last item. The index can
+     * represent a bucket with multiple items and in this case the returned
+     * object will contain all items in that bucket, regardless if we exceed
      * the requested {@code size}.
      *
      * @param tableIndex the index (position) from which to resume
      * @param size       the minimal count of returned items
-     * @return fetched entries and the table index for entries AFTER the last returned entry
+     * @return fetched entries and the table index for entries AFTER the last returned
+     * entry
      */
-    MapEntriesWithCursor fetchEntries(int tableIndex, int size, SerializationService serializationService);
+    MapEntriesWithCursor fetchEntries(int tableIndex, int size);
 
     Record extractRecordFromLazy(EntryView entryView);
 }
