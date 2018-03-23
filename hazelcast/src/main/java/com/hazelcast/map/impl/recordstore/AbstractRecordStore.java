@@ -26,6 +26,7 @@ import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.journal.MapEventJournal;
 import com.hazelcast.map.impl.mapstore.MapDataStore;
 import com.hazelcast.map.impl.mapstore.MapStoreContext;
+import com.hazelcast.map.impl.operation.CleanMerkleTree;
 import com.hazelcast.map.impl.record.Record;
 import com.hazelcast.map.impl.record.RecordComparator;
 import com.hazelcast.map.impl.record.RecordFactory;
@@ -36,12 +37,18 @@ import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.query.impl.Indexes;
 import com.hazelcast.query.impl.QueryableEntry;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.Operation;
+import com.hazelcast.spi.OperationResponseHandler;
+import com.hazelcast.spi.OperationService;
+import com.hazelcast.spi.TaskScheduler;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.Clock;
 
 import java.util.Collection;
 
 import static com.hazelcast.map.impl.ExpirationTimeSetter.setTTLAndUpdateExpiryTime;
+import static com.hazelcast.map.impl.MapService.SERVICE_NAME;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 /**
@@ -205,6 +212,35 @@ abstract class AbstractRecordStore implements RecordStore<Record> {
 
     public Storage<Data, ? extends Record> getStorage() {
         return storage;
+    }
+
+    @Override
+    public void scheduleMerkleTreeClean(NodeEngine nodeEngine) {
+        final TaskScheduler scheduler = nodeEngine.getExecutionService().getGlobalTaskScheduler();
+        final OperationService os = nodeEngine.getOperationService();
+        final Operation op = new CleanMerkleTree()
+                .setNodeEngine(nodeEngine)
+                .setCallerUuid(nodeEngine.getLocalMember().getUuid())
+                .setPartitionId(partitionId)
+                .setValidateTarget(false)
+                .setServiceName(SERVICE_NAME)
+                .setOperationResponseHandler(new OperationResponseHandler() {
+                    @Override
+                    public void sendResponse(Operation op, Object response) {
+                        // NOOP
+                    }
+                });
+        scheduler.scheduleWithRepetition(new Runnable() {
+            @Override
+            public void run() {
+                os.execute(op);
+            }
+        }, 1, 1, SECONDS);
+    }
+
+    @Override
+    public void cleanMerkleTree() {
+        storage.cleanMerkleTree();
     }
 
     protected void updateStatsOnPut(boolean countAsAccess, long now) {

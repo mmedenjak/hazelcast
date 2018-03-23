@@ -21,6 +21,7 @@ import com.hazelcast.config.MapConfig;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.map.impl.query.IndexProvider;
 import com.hazelcast.map.impl.recordstore.RecordStore;
+import com.hazelcast.map.impl.recordstore.StorageImpl;
 import com.hazelcast.query.impl.Indexes;
 import com.hazelcast.query.impl.getters.Extractors;
 import com.hazelcast.spi.ExecutionService;
@@ -124,6 +125,9 @@ public class PartitionContainer {
         }
         RecordStore recordStore = serviceContext.createRecordStore(mapContainer, partitionId, keyLoader);
         recordStore.init();
+        if (StorageImpl.ASYNC_MERKLE_TREE) {
+            recordStore.scheduleMerkleTreeClean(nodeEngine);
+        }
         return recordStore;
     }
 

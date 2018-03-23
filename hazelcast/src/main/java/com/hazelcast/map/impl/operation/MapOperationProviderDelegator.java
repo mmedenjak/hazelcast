@@ -41,6 +41,11 @@ abstract class MapOperationProviderDelegator implements MapOperationProvider {
     abstract MapOperationProvider getDelegate();
 
     @Override
+    public OperationFactory createMapPartitionHashOperationFactory(String name) {
+        return getDelegate().createMapPartitionHashOperationFactory(name);
+    }
+
+    @Override
     public MapOperation createPutOperation(String name, Data key, Data value, long ttl) {
         return getDelegate().createPutOperation(name, key, value, ttl);
     }

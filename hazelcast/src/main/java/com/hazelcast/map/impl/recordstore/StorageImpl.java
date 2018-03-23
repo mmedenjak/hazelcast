@@ -43,21 +43,24 @@ import static com.hazelcast.map.impl.OwnedEntryCostEstimatorFactory.createMapSiz
 public class StorageImpl<R extends Record> implements Storage<Data, R> {
 
     private final RecordFactory<R> recordFactory;
-    private final StorageSCHM<R> records;
+    public static final boolean ASYNC_MERKLE_TREE = false;
 
     // not final for testing purposes.
     private EntryCostEstimator<Data, Record> entryCostEstimator;
+    public final StorageSCHM<R> records;
+    private MerkleTreeNode tree;
 
     StorageImpl(RecordFactory<R> recordFactory, InMemoryFormat inMemoryFormat, SerializationService serializationService) {
         this.recordFactory = recordFactory;
         this.entryCostEstimator = createMapSizeEstimator(inMemoryFormat);
         this.records = new StorageSCHM<R>(serializationService);
+        this.tree = new MerkleTreeNode<R>(5, Integer.MIN_VALUE, Integer.MAX_VALUE, records);
     }
 
     @Override
     public void clear(boolean isDuringShutdown) {
         records.clear();
-
+        tree.clear();
         entryCostEstimator.reset();
     }
 
@@ -84,6 +87,12 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
             updateCostEstimate(-entryCostEstimator.calculateValueCost(previousRecord));
             updateCostEstimate(entryCostEstimator.calculateValueCost(record));
         }
+
+        if (ASYNC_MERKLE_TREE) {
+            tree.markDirty(records.hashOf(key));
+        } else {
+            tree.update(records.hashOf(key));
+        }
     }
 
     @Override
@@ -93,11 +102,27 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
         recordFactory.setValue(record, value);
 
         updateCostEstimate(entryCostEstimator.calculateValueCost(record));
+
+        if (ASYNC_MERKLE_TREE) {
+            tree.markDirty(records.hashOf(key));
+        } else {
+            tree.update(records.hashOf(key));
+        }
     }
 
     @Override
     public R get(Data key) {
         return records.get(key);
+    }
+
+    @Override
+    public MerkleTreeNode getTree() {
+        return tree;
+    }
+
+    @Override
+    public void cleanMerkleTree() {
+        tree.clean();
     }
 
     @Override
@@ -139,6 +164,12 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
         records.remove(key);
 
         updateCostEstimate(-entryCostEstimator.calculateEntryCost(key, record));
+
+        if (ASYNC_MERKLE_TREE) {
+            tree.markDirty(records.hashOf(key));
+        } else {
+            tree.update(records.hashOf(key));
+        }
     }
 
     protected void updateCostEstimate(long entrySize) {
@@ -177,6 +208,11 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
             entriesData.add(new AbstractMap.SimpleEntry<Data, Data>(entry.getKey(), dataValue));
         }
         return new MapEntriesWithCursor(entriesData, newTableIndex);
+    }
+
+    @Override
+    public Collection<R> fetchRecords(int rangeMinHash, int rangeMaxHash) {
+        return records.getValues(rangeMinHash, rangeMaxHash);
     }
 
 }

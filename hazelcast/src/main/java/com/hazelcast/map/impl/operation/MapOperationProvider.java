@@ -151,6 +151,8 @@ public interface MapOperationProvider {
 
     OperationFactory createMapSizeOperationFactory(String name);
 
+    OperationFactory createMapPartitionHashOperationFactory(String name);
+
     OperationFactory createPutAllOperationFactory(String name, int[] partitions, MapEntries[] mapEntries);
 
     OperationFactory createMergeOperationFactory(String name, int[] partitions,

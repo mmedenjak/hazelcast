@@ -26,8 +26,15 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IBiFunction;
 import com.hazelcast.core.IMap;
 import com.hazelcast.core.MapEvent;
+import com.hazelcast.internal.partition.InternalPartitionService;
+import com.hazelcast.map.impl.MapService;
+import com.hazelcast.map.impl.recordstore.RecordStore;
+import com.hazelcast.map.impl.recordstore.Storage;
+import com.hazelcast.nio.Address;
 import com.hazelcast.query.PagingPredicate;
 import com.hazelcast.query.Predicate;
+import com.hazelcast.spi.impl.NodeEngineImpl;
+import com.hazelcast.spi.partition.IPartition;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
@@ -85,6 +92,42 @@ public class BasicMapTest extends HazelcastTestSupport {
 
     HazelcastInstance getInstance() {
         return instances[RANDOM.nextInt(INSTANCE_COUNT)];
+    }
+
+    @Test
+    public void lala() {
+        IMap<Integer, Integer> map = getInstance().getMap("testPrimitives");
+        for (int i = 0; i < 10; i++) {
+            map.put(i, i);
+        }
+        final InternalPartitionService ps = getNodeEngineImpl(getInstance()).getPartitionService();
+        for (IPartition p : ps.getPartitions()) {
+            final Address owner = p.getReplicaAddress(0);
+            final Address backup1 = p.getReplicaAddress(1);
+            Storage storageOwner = null;
+            Storage storageBackup = null;
+
+            for (HazelcastInstance instance : instances) {
+                final NodeEngineImpl i = getNodeEngineImpl(instance);
+                if (i.getThisAddress().equals(owner)) {
+                    storageOwner = getStorage(map, p, i);
+                } else if (i.getThisAddress().equals(backup1)) {
+                    storageBackup = getStorage(map, p, i);
+                }
+            }
+            assertEquals(storageOwner.getTree().digest, storageBackup.getTree().digest);
+        }
+
+
+    }
+
+    private Storage getStorage(IMap<Integer, Integer> map, IPartition p, NodeEngineImpl i) {
+
+        final MapService mapService = i.getService(MapService.SERVICE_NAME);
+        final RecordStore rs = mapService.getMapServiceContext()
+                                         .getPartitionContainer(p.getPartitionId())
+                                         .getRecordStore(map.getName());
+        return rs.getStorage();
     }
 
     @Test

@@ -24,6 +24,7 @@ package com.hazelcast.util;
 
 import com.hazelcast.core.IBiFunction;
 import com.hazelcast.core.IFunction;
+import com.hazelcast.map.impl.record.Record;
 import com.hazelcast.nio.serialization.SerializableByConvention;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -36,6 +37,7 @@ import java.lang.ref.WeakReference;
 import java.util.AbstractCollection;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.ConcurrentModificationException;
 import java.util.EnumSet;
@@ -295,7 +297,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
         return segments[(hash >>> segmentShift) & segmentMask];
     }
 
-    private int hashOf(Object key) {
+    public int hashOf(Object key) {
         return hash(identityComparisons ? System.identityHashCode(key) : key.hashCode());
     }
 
@@ -640,6 +642,40 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
                 }
             }
             return null;
+        }
+
+        public int getValuesHashFor(int keyHash) {
+            int result = 1;
+            if (count != 0) {
+                HashEntry<K, V> e = getFirst(keyHash);
+                while (e != null) {
+                    if (e.hash == keyHash) {
+                        final Object opaque = e.valueRef;
+                        final V v = opaque != null ? e.dereferenceValue(opaque) : readValueUnderLock(e);
+                        result = 31 * result + ((Record) v).getValue().hashCode();
+                    }
+                    e = e.next;
+                }
+            }
+            return result;
+        }
+
+        public Collection<V> getValues(int keyMinHash, int keyMaxHash) {
+            final ArrayList<V> r = new ArrayList<V>();
+            if (count != 0) {
+                for (int keyHash = keyMinHash; keyHash <= keyMaxHash ; keyHash++) {
+                    HashEntry<K, V> e = getFirst(keyHash);
+                    while (e != null) {
+                        if (e.hash == keyHash) {
+                            final Object opaque = e.valueRef;
+                            final V v = opaque != null ? e.dereferenceValue(opaque) : readValueUnderLock(e);
+                            r.add(v);
+                        }
+                        e = e.next;
+                    }
+                }
+            }
+            return r;
         }
 
         boolean containsKey(Object key, int hash) {
@@ -1782,7 +1818,7 @@ public class ConcurrentReferenceHashMap<K, V> extends AbstractMap<K, V>
      * changes to the underlying map.
      */
     @SerializableByConvention
-    protected class WriteThroughEntry extends SimpleEntry<K, V> {
+    public class WriteThroughEntry extends SimpleEntry<K, V> {
         private static final long serialVersionUID = -7900634345345313646L;
 
         protected WriteThroughEntry(K k, V v) {

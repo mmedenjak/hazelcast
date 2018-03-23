@@ -29,6 +29,7 @@ import com.hazelcast.map.impl.record.RecordFactory;
 import com.hazelcast.map.merge.MapMergePolicy;
 import com.hazelcast.monitor.LocalRecordStoreStats;
 import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.exception.RetryableHazelcastException;
 import com.hazelcast.spi.merge.MergingEntry;
 import com.hazelcast.spi.merge.SplitBrainMergePolicy;
@@ -472,4 +473,8 @@ public interface RecordStore<R extends Record> {
      * for this map.
      */
     boolean hasQueryCache();
+
+    void scheduleMerkleTreeClean(NodeEngine nodeEngine);
+
+    void cleanMerkleTree();
 }

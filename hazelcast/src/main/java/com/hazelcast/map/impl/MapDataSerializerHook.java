@@ -56,6 +56,9 @@ import com.hazelcast.map.impl.operation.EvictOperation;
 import com.hazelcast.map.impl.operation.GetAllOperation;
 import com.hazelcast.map.impl.operation.GetEntryViewOperation;
 import com.hazelcast.map.impl.operation.GetOperation;
+import com.hazelcast.map.impl.operation.GetPartitionHashesWanOperation;
+import com.hazelcast.map.impl.operation.GetPartitionSubhashesOperation;
+import com.hazelcast.map.impl.operation.GetPartitionSubhashesWanOperation;
 import com.hazelcast.map.impl.operation.IsEmptyOperationFactory;
 import com.hazelcast.map.impl.operation.IsKeyLoadFinishedOperation;
 import com.hazelcast.map.impl.operation.IsPartitionLoadedOperation;
@@ -87,6 +90,8 @@ import com.hazelcast.map.impl.operation.MultipleEntryOperationFactory;
 import com.hazelcast.map.impl.operation.MultipleEntryWithPredicateBackupOperation;
 import com.hazelcast.map.impl.operation.MultipleEntryWithPredicateOperation;
 import com.hazelcast.map.impl.operation.NotifyMapFlushOperation;
+import com.hazelcast.map.impl.operation.GetPartitionHashOperation;
+import com.hazelcast.map.impl.operation.GetPartitionHashOperationFactory;
 import com.hazelcast.map.impl.operation.PartitionWideEntryBackupOperation;
 import com.hazelcast.map.impl.operation.PartitionWideEntryOperation;
 import com.hazelcast.map.impl.operation.PartitionWideEntryOperationFactory;
@@ -153,6 +158,7 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.query.impl.IndexInfo;
 import com.hazelcast.query.impl.MapIndexInfo;
 import com.hazelcast.util.ConstructorFunction;
+import com.hazelcast.wan.PartitionDiff;
 
 import static com.hazelcast.internal.serialization.impl.FactoryIdHelper.MAP_DS_FACTORY;
 import static com.hazelcast.internal.serialization.impl.FactoryIdHelper.MAP_DS_FACTORY_ID;
@@ -309,7 +315,14 @@ public final class MapDataSerializerHook implements DataSerializerHook {
     public static final int MERGE_FACTORY = 146;
     public static final int MERGE = 147;
 
-    private static final int LEN = MERGE + 1;
+    public static final int GET_PARTITION_HASH_FACTORY = 148;
+    public static final int GET_PARTITION_HASH = 149;
+    public static final int GET_PARTITION_HASHES_WAN = 150;
+    public static final int GET_PARTITION_RANGE_SUB_HASHES = 151;
+    public static final int GET_PARTITION_RANGE_SUB_HASHES_WAN = 152;
+    public static final int PARTITION_DIFF = 153;
+
+    private static final int LEN = PARTITION_DIFF + 1;
 
     @Override
     public int getFactoryId() {
@@ -1038,6 +1051,36 @@ public final class MapDataSerializerHook implements DataSerializerHook {
         constructors[MERGE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
             public IdentifiedDataSerializable createNew(Integer arg) {
                 return new MergeOperation();
+            }
+        };
+        constructors[GET_PARTITION_HASH_FACTORY] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new GetPartitionHashOperationFactory();
+            }
+        };
+        constructors[GET_PARTITION_HASH] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new GetPartitionHashOperation();
+            }
+        };
+        constructors[GET_PARTITION_HASHES_WAN] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new GetPartitionHashesWanOperation();
+            }
+        };
+        constructors[GET_PARTITION_RANGE_SUB_HASHES] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new GetPartitionSubhashesOperation();
+            }
+        };
+        constructors[GET_PARTITION_RANGE_SUB_HASHES_WAN] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new GetPartitionSubhashesWanOperation();
+            }
+        };
+        constructors[PARTITION_DIFF] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new PartitionDiff();
             }
         };
 

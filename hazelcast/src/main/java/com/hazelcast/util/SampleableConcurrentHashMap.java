@@ -21,6 +21,7 @@ import com.hazelcast.internal.util.ThreadLocalRandomProvider;
 import com.hazelcast.nio.serialization.SerializableByConvention;
 
 import java.util.AbstractMap;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Iterator;
@@ -84,6 +85,14 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
             }
         }
         return nextTableIndex;
+    }
+
+    public int getHashFor(int hash) {
+        return segmentFor(hash).getValuesHashFor(hash);
+    }
+
+    public Collection<V> getValues(int keyMinHash, int keyMaxHash) {
+        return segments[0].getValues(keyMinHash, keyMaxHash);
     }
 
     /**

@@ -19,6 +19,7 @@ package com.hazelcast.map.impl.recordstore;
 import com.hazelcast.map.impl.EntryCostEstimator;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
 import com.hazelcast.map.impl.iterator.MapKeysWithCursor;
+import com.hazelcast.map.impl.record.Record;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.util.Collection;
@@ -38,6 +39,10 @@ public interface Storage<K, R> {
     void updateRecordValue(K key, R record, Object value);
 
     R get(K key);
+
+    MerkleTreeNode getTree();
+
+    void cleanMerkleTree();
 
     /**
      * Gives the same result as {@link #get(Object)}, but with the additional constraint
@@ -115,4 +120,5 @@ public interface Storage<K, R> {
      */
     MapEntriesWithCursor fetchEntries(int tableIndex, int size, SerializationService serializationService);
 
+    Collection<R> fetchRecords(int rangeMinHash, int rangeMaxHash);
 }

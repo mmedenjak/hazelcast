@@ -34,6 +34,8 @@ import com.hazelcast.map.impl.nearcache.MapNearCacheManager;
 import com.hazelcast.map.impl.operation.BasePutOperation;
 import com.hazelcast.map.impl.operation.BaseRemoveOperation;
 import com.hazelcast.map.impl.operation.GetOperation;
+import com.hazelcast.map.impl.operation.GetPartitionHashOperationFactory;
+import com.hazelcast.map.impl.operation.GetPartitionSubhashesOperation;
 import com.hazelcast.map.impl.operation.MapOperationProvider;
 import com.hazelcast.map.impl.operation.MapOperationProviders;
 import com.hazelcast.map.impl.operation.MapPartitionDestroyTask;
@@ -83,6 +85,7 @@ import com.hazelcast.util.ConstructorFunction;
 import com.hazelcast.util.ContextMutexFactory;
 import com.hazelcast.util.ExceptionUtil;
 import com.hazelcast.util.executor.ManagedExecutorService;
+import com.hazelcast.wan.PartitionDiff;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -109,6 +112,7 @@ import static com.hazelcast.spi.properties.GroupProperty.AGGREGATION_ACCUMULATIO
 import static com.hazelcast.spi.properties.GroupProperty.INDEX_COPY_BEHAVIOR;
 import static com.hazelcast.spi.properties.GroupProperty.OPERATION_CALL_TIMEOUT_MILLIS;
 import static com.hazelcast.spi.properties.GroupProperty.QUERY_PREDICATE_PARALLEL_EVALUATION;
+import static com.hazelcast.util.ExceptionUtil.rethrow;
 
 /**
  * Default implementation of {@link MapServiceContext}.
@@ -804,5 +808,28 @@ class MapServiceContextImpl implements MapServiceContext {
     @Override
     public IndexCopyBehavior getIndexCopyBehavior() {
         return nodeEngine.getProperties().getEnum(INDEX_COPY_BEHAVIOR, IndexCopyBehavior.class);
+    }
+
+    @Override
+    public Map<PartitionDiff, int[]> getLocalSubrangeHashes(String mapName, Set<PartitionDiff> diffPartitions) {
+        final HashMap<PartitionDiff, int[]> subrangeHashes = new HashMap<PartitionDiff, int[]>();
+        for (PartitionDiff p : diffPartitions) {
+            final GetPartitionSubhashesOperation op = new GetPartitionSubhashesOperation(mapName, p.rangeMinHash, p.rangeMaxHash);
+            final int[] hashes = (int[]) nodeEngine.getOperationService().invokeOnPartition(SERVICE_NAME, op, p.partitionId).join();
+            subrangeHashes.put(p, hashes);
+        }
+        return subrangeHashes;
+    }
+
+    @Override
+    public Map getLocalHashes(String mapName, Collection<Integer> localPartitions) {
+        try {
+            return nodeEngine.getOperationService().invokeOnPartitions(
+                    SERVICE_NAME,
+                    new GetPartitionHashOperationFactory(mapName),
+                    localPartitions);
+        } catch (Throwable t) {
+            throw rethrow(t);
+        }
     }
 }

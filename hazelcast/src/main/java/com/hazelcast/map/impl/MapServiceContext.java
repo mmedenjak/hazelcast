@@ -43,9 +43,11 @@ import com.hazelcast.query.impl.predicates.QueryOptimizer;
 import com.hazelcast.spi.EventFilter;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
+import com.hazelcast.wan.PartitionDiff;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -185,4 +187,8 @@ public interface MapServiceContext extends MapServiceContextInterceptorSupport, 
     String addLocalListenerAdapter(ListenerAdapter listenerAdaptor, String mapName);
 
     IndexCopyBehavior getIndexCopyBehavior();
+
+    Map<PartitionDiff, int[]> getLocalSubrangeHashes(String mapName, Set<PartitionDiff> diffPartitions);
+
+    Map getLocalHashes(String mapName, Collection<Integer> localPartitions);
 }

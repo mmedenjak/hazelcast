@@ -200,6 +200,11 @@ public class WANAwareOperationProvider extends MapOperationProviderDelegator {
         return getDelegate().createMultipleEntryOperationFactory(name, keys, entryProcessor);
     }
 
+    @Override
+    public OperationFactory createMapPartitionHashOperationFactory(String name) {
+        return getDelegate().createMapPartitionHashOperationFactory(name);
+    }
+
     /**
      * Checks if WAN replication is enabled for the provided map {@code name}
      * and if the WAN queues have reached their capacity.

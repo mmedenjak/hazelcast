@@ -51,6 +51,11 @@ public class DefaultMapOperationProvider implements MapOperationProvider {
     }
 
     @Override
+    public OperationFactory createMapPartitionHashOperationFactory(String name) {
+        return new GetPartitionHashOperationFactory(name);
+    }
+
+    @Override
     public MapOperation createPutOperation(String name, Data key, Data value, long ttl) {
         return new PutOperation(name, key, value, ttl);
     }
