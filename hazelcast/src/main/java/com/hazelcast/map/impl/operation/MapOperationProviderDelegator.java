@@ -17,6 +17,7 @@
 package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.core.EntryView;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.EntryProcessor;
 import com.hazelcast.map.impl.MapEntries;
 import com.hazelcast.map.impl.query.Query;
@@ -248,13 +249,13 @@ abstract class MapOperationProviderDelegator implements MapOperationProvider {
     }
 
     @Override
-    public MapOperation createFetchKeysOperation(String name, int lastTableIndex, int fetchSize) {
-        return getDelegate().createFetchKeysOperation(name, lastTableIndex, fetchSize);
+    public MapOperation createFetchKeysOperation(String name, IterationPointer[] pointers, int fetchSize) {
+        return getDelegate().createFetchKeysOperation(name, pointers, fetchSize);
     }
 
     @Override
-    public MapOperation createFetchEntriesOperation(String name, int lastTableIndex, int fetchSize) {
-        return getDelegate().createFetchEntriesOperation(name, lastTableIndex, fetchSize);
+    public MapOperation createFetchEntriesOperation(String name, IterationPointer[] pointers, int fetchSize) {
+        return getDelegate().createFetchEntriesOperation(name, pointers, fetchSize);
     }
 
     @Override
@@ -268,7 +269,8 @@ abstract class MapOperationProviderDelegator implements MapOperationProvider {
     }
 
     @Override
-    public MapOperation createFetchWithQueryOperation(String name, int lastTableIndex, int fetchSize, Query query) {
-        return getDelegate().createFetchWithQueryOperation(name, lastTableIndex, fetchSize, query);
+    public MapOperation createFetchWithQueryOperation(String name, IterationPointer[] pointers, int fetchSize,
+                                                      Query query) {
+        return getDelegate().createFetchWithQueryOperation(name, pointers, fetchSize, query);
     }
 }

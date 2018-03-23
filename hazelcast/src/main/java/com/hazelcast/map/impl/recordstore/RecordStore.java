@@ -18,6 +18,7 @@ package com.hazelcast.map.impl.recordstore;
 
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.EntryView;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.internal.nearcache.impl.invalidation.InvalidationQueue;
 import com.hazelcast.map.impl.MapContainer;
 import com.hazelcast.map.impl.MapEntries;
@@ -212,18 +213,38 @@ public interface RecordStore<R extends Record> {
     Iterator<Record> iterator(long now, boolean backup);
 
     /**
-     * Fetches specified number of keys from provided tableIndex.
+     * Fetch minimally {@code size} keys from the {@code pointers} position.
+     * The key is fetched on-heap.
+     * <p>
+     * NOTE: The implementation is free to return more than {@code size} items.
+     * This can happen if we cannot easily resume from the last returned item
+     * by receiving the {@code tableIndex} of the last item. The index can
+     * represent a bucket with multiple items and in this case the returned
+     * object will contain all items in that bucket, regardless if we exceed
+     * the requested {@code size}.
      *
-     * @return {@link MapKeysWithCursor} which is a holder for keys and next index to read from.
+     * @param pointers the pointers defining the state of iteration
+     * @param size     the minimal count of returned items
+     * @return fetched keys and the new iteration state
      */
-    MapKeysWithCursor fetchKeys(int tableIndex, int size);
+    MapKeysWithCursor fetchKeys(IterationPointer[] pointers, int size);
 
     /**
-     * Fetches specified number of entries from provided tableIndex.
+     * Fetch minimally {@code size} items from the {@code pointers} position.
+     * Both the key and value are fetched on-heap.
+     * <p>
+     * NOTE: The implementation is free to return more than {@code size} items.
+     * This can happen if we cannot easily resume from the last returned item
+     * by receiving the {@code tableIndex} of the last item. The index can
+     * represent a bucket with multiple items and in this case the returned
+     * object will contain all items in that bucket, regardless if we exceed
+     * the requested {@code size}.
      *
-     * @return {@link MapEntriesWithCursor} which is a holder for entries and next index to read from.
+     * @param pointers the pointers defining the state of iteration
+     * @param size     the minimal count of returned items
+     * @return fetched entries and the new iteration state
      */
-    MapEntriesWithCursor fetchEntries(int tableIndex, int size);
+    MapEntriesWithCursor fetchEntries(IterationPointer[] pointers, int size);
 
     /**
      * Iterates over record store entries but first waits map store to load.

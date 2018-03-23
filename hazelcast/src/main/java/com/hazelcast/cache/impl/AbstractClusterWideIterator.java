@@ -16,6 +16,7 @@
 
 package com.hazelcast.cache.impl;
 
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.serialization.Data;
 
 import javax.cache.Cache;
@@ -46,6 +47,7 @@ import java.util.NoSuchElementException;
  * </ul>
  * This implementation iterates over partitions and for each partition it iterates over the internal map using the
  * internal table index of the map {@link com.hazelcast.util.SampleableConcurrentHashMap}.
+ * TODO
  * </p>
  * <p>
  * <h2>Fetching data from cluster:</h2>
@@ -69,7 +71,7 @@ import java.util.NoSuchElementException;
  *
  * @param <K> the type of key.
  * @param <V> the type of value.
- * @see com.hazelcast.cache.impl.CacheRecordStore#fetchKeys(int tableIndex, int size)
+ * @see com.hazelcast.cache.impl.CacheRecordStore#fetchKeys(IterationPointer[], int)
  * @see com.hazelcast.cache.impl.ClusterWideIterator
  * @see CacheKeyIterationResult
  */
@@ -84,13 +86,13 @@ public abstract class AbstractClusterWideIterator<K, V> implements Iterator<Cach
     protected int partitionIndex = -1;
 
     /**
-     * The table is segment table of hash map, which is an array that stores the actual records.
-     * This field is used to mark where the latest entry is read.
-     * <p>
-     * The iteration will start from highest index available to the table.
-     * It will be converted to array size on the server side.
+     * The iteration pointers define the iteration state over a backing map.
+     * Each array item represents an iteration state for a certain size of the
+     * backing map structure (either allocated slot count for HD or table size
+     * for on-heap). Each time the table is resized, this array will carry an
+     * additional iteration pointer.
      */
-    protected int lastTableIndex = Integer.MAX_VALUE;
+    protected IterationPointer[] pointers;
 
     protected final int fetchSize;
     protected boolean prefetchValues;
@@ -103,6 +105,7 @@ public abstract class AbstractClusterWideIterator<K, V> implements Iterator<Cach
         this.partitionCount = partitionCount;
         this.fetchSize = fetchSize;
         this.prefetchValues = prefetchValues;
+        resetPointers();
     }
 
     @Override
@@ -144,9 +147,10 @@ public abstract class AbstractClusterWideIterator<K, V> implements Iterator<Cach
 
     protected boolean advance() {
         while (partitionIndex < getPartitionCount()) {
-            if (result == null || result.size() < fetchSize || lastTableIndex < 0) {
+            if (result == null || result.size() < fetchSize
+                    || pointers[pointers.length - 1].getIndex() < 0) {
                 partitionIndex++;
-                lastTableIndex = Integer.MAX_VALUE;
+                resetPointers();
                 result = null;
                 if (partitionIndex == getPartitionCount()) {
                     return false;
@@ -193,9 +197,23 @@ public abstract class AbstractClusterWideIterator<K, V> implements Iterator<Cach
         }
     }
 
-    protected void setLastTableIndex(List response, int lastTableIndex) {
+    /**
+     * Resets the iteration state.
+     */
+    protected void resetPointers() {
+        pointers = new IterationPointer[]{new IterationPointer(Integer.MAX_VALUE, -1)};
+    }
+
+    /**
+     * Sets the iteration state to the state defined by the {@code pointers}
+     * if the given response contains items.
+     *
+     * @param response the iteration response
+     * @param pointers the pointers defining the state of iteration
+     */
+    protected void setLastTableIndex(List response, IterationPointer[] pointers) {
         if (response != null && response.size() > 0) {
-            this.lastTableIndex = lastTableIndex;
+            this.pointers = pointers;
         }
     }
 

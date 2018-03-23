@@ -16,6 +16,7 @@
 
 package com.hazelcast.cache.impl;
 
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.OperationFactory;
@@ -53,9 +54,21 @@ public interface CacheOperationProvider {
 
     Operation createEntryProcessorOperation(Data key, Integer completionId, EntryProcessor entryProcessor, Object... args);
 
-    Operation createKeyIteratorOperation(int lastTableIndex, int fetchSize);
+    /**
+     * Creates an operation for fetching a segment of a keys from a single
+     * partition.
+     *
+     * @see CacheProxy#iterator(int, int, boolean)
+     */
+    Operation createKeyIteratorOperation(IterationPointer[] pointers, int fetchSize);
 
-    Operation createEntryIteratorOperation(int lastTableIndex, int fetchSize);
+    /**
+     * Creates an operation for fetching a segment of a entries from a single
+     * partition.
+     *
+     * @see CacheProxy#iterator(int, int, boolean)
+     */
+    Operation createEntryIteratorOperation(IterationPointer[] pointers, int fetchSize);
 
     Operation createMergeOperation(String name, List<MergingEntry<Data, Data>> mergingEntries,
                                    SplitBrainMergePolicy policy);

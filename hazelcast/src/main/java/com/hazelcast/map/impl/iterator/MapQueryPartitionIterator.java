@@ -55,7 +55,7 @@ public class MapQueryPartitionIterator<K, V, R> extends AbstractMapQueryPartitio
 
     protected List<Data> fetch() {
         final MapOperation op = mapProxy.getOperationProvider()
-                                        .createFetchWithQueryOperation(mapProxy.getName(), lastTableIndex, fetchSize, query);
+                                        .createFetchWithQueryOperation(mapProxy.getName(), pointers, fetchSize, query);
 
         final ResultSegment segment = invoke(op);
         final QueryResult queryResult = (QueryResult) segment.getResult();
@@ -65,7 +65,7 @@ public class MapQueryPartitionIterator<K, V, R> extends AbstractMapQueryPartitio
             serialized.add(row.getValue());
         }
 
-        setLastTableIndex(serialized, segment.getNextTableIndexToReadFrom());
+        setLastTableIndex(serialized, segment.getPointers());
         return serialized;
     }
 

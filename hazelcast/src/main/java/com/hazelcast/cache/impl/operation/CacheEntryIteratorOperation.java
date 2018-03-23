@@ -18,6 +18,8 @@ package com.hazelcast.cache.impl.operation;
 
 import com.hazelcast.cache.impl.CacheDataSerializerHook;
 import com.hazelcast.cache.impl.CacheEntryIterationResult;
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.internal.serialization.impl.HeapData;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -32,19 +34,19 @@ import java.io.IOException;
  * {@link com.hazelcast.cache.impl.ICacheRecordStore} with the last table index.
  * </p>
  *
- * @see com.hazelcast.cache.impl.ICacheRecordStore#fetchEntries(int, int) (int, int)
+ * @see com.hazelcast.cache.impl.ICacheRecordStore#fetchEntries(IterationPointer[], int)
  */
 public class CacheEntryIteratorOperation extends AbstractCacheOperation implements ReadonlyOperation {
 
-    private int tableIndex;
+    private IterationPointer[] pointers;
     private int size;
 
     public CacheEntryIteratorOperation() {
     }
 
-    public CacheEntryIteratorOperation(String name, int tableIndex, int size) {
+    public CacheEntryIteratorOperation(String name, IterationPointer[] pointers, int size) {
         super(name, new HeapData());
-        this.tableIndex = tableIndex;
+        this.pointers = pointers;
         this.size = size;
     }
 
@@ -56,7 +58,7 @@ public class CacheEntryIteratorOperation extends AbstractCacheOperation implemen
     @Override
     public void run()
             throws Exception {
-        final CacheEntryIterationResult iterator = this.cache.fetchEntries(tableIndex, size);
+        final CacheEntryIterationResult iterator = this.cache.fetchEntries(pointers, size);
         response = iterator;
     }
 
@@ -64,7 +66,16 @@ public class CacheEntryIteratorOperation extends AbstractCacheOperation implemen
     protected void writeInternal(ObjectDataOutput out)
             throws IOException {
         super.writeInternal(out);
-        out.writeInt(tableIndex);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
         out.writeInt(size);
     }
 
@@ -72,7 +83,18 @@ public class CacheEntryIteratorOperation extends AbstractCacheOperation implemen
     protected void readInternal(ObjectDataInput in)
             throws IOException {
         super.readInternal(in);
-        tableIndex = in.readInt();
+
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
         size = in.readInt();
     }
 }

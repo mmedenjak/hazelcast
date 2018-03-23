@@ -23,6 +23,7 @@ import com.hazelcast.cache.impl.CacheKeyIterationResult;
 import com.hazelcast.internal.eviction.Evictable;
 import com.hazelcast.internal.eviction.EvictionCandidate;
 import com.hazelcast.internal.eviction.EvictionListener;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.SerializableByConvention;
 import com.hazelcast.spi.serialization.SerializationService;
@@ -175,23 +176,23 @@ public class CacheRecordHashMap
     }
 
     @Override
-    public CacheKeyIterationResult fetchKeys(int nextTableIndex, int size) {
+    public CacheKeyIterationResult fetchKeys(IterationPointer[] pointers, int size) {
         List<Data> keys = new ArrayList<Data>(size);
-        int tableIndex = fetchKeys(nextTableIndex, size, keys);
-        return new CacheKeyIterationResult(keys, tableIndex);
+        IterationPointer[] newIterationPointers = fetchKeys(pointers, size, keys);
+        return new CacheKeyIterationResult(keys, newIterationPointers);
     }
 
     @Override
-    public CacheEntryIterationResult fetchEntries(int nextTableIndex, int size) {
+    public CacheEntryIterationResult fetchEntries(IterationPointer[] pointers, int size) {
         List<Map.Entry<Data, CacheRecord>> entries = new ArrayList<Map.Entry<Data, CacheRecord>>(size);
-        int newTableIndex = fetchEntries(nextTableIndex, size, entries);
+        IterationPointer[] newIterationPointers = fetchEntries(pointers, size, entries);
         List<Map.Entry<Data, Data>> entriesData = new ArrayList<Map.Entry<Data, Data>>(entries.size());
         for (Map.Entry<Data, CacheRecord> entry : entries) {
             CacheRecord record = entry.getValue();
             Data dataValue = serializationService.toData(record.getValue());
             entriesData.add(new AbstractMap.SimpleEntry<Data, Data>(entry.getKey(), dataValue));
         }
-        return new CacheEntryIterationResult(entriesData, newTableIndex);
+        return new CacheEntryIterationResult(entriesData, newIterationPointers);
     }
 
     @Override

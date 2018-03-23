@@ -47,11 +47,11 @@ public class MapPartitionIterator<K, V> extends AbstractMapPartitionIterator<K, 
         final String name = mapProxy.getName();
         final MapOperationProvider operationProvider = mapProxy.getOperationProvider();
         final MapOperation operation = prefetchValues
-                    ? operationProvider.createFetchEntriesOperation(name, lastTableIndex, fetchSize)
-                    : operationProvider.createFetchKeysOperation(name, lastTableIndex, fetchSize);
+                    ? operationProvider.createFetchEntriesOperation(name, pointers, fetchSize)
+                    : operationProvider.createFetchKeysOperation(name, pointers, fetchSize);
 
         final AbstractCursor cursor = invoke(operation);
-        setLastTableIndex(cursor.getBatch(), cursor.getNextTableIndexToReadFrom());
+        setIterationPointers(cursor.getBatch(), cursor.getIterationPointers());
         return cursor.getBatch();
     }
 

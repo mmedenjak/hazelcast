@@ -16,28 +16,31 @@
 
 package com.hazelcast.map.impl.query;
 
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.nio.serialization.impl.Versioned;
 
 import java.io.IOException;
 
 /**
  * Represents a partial query result on a segment of the map.
- * The remaining query results may be retrieved using
- * the {@link #nextTableIndexToReadFrom} which signifies the next query result.
+ * The remaining query results may be retrieved using the {@link #pointers}
+ * which defines the iteration state.
  */
-public class ResultSegment implements IdentifiedDataSerializable {
+public class ResultSegment implements IdentifiedDataSerializable, Versioned {
     private Result result;
-    private int nextTableIndexToReadFrom;
+    private IterationPointer[] pointers;
 
     public ResultSegment() {
     }
 
-    public ResultSegment(Result result, int nextTableIndexToReadFrom) {
+    public ResultSegment(Result result, IterationPointer[] pointers) {
         this.result = result;
-        this.nextTableIndexToReadFrom = nextTableIndexToReadFrom;
+        this.pointers = pointers;
     }
 
     public Result getResult() {
@@ -48,12 +51,18 @@ public class ResultSegment implements IdentifiedDataSerializable {
         this.result = result;
     }
 
-    public int getNextTableIndexToReadFrom() {
-        return nextTableIndexToReadFrom;
+    /**
+     * Returns the iteration pointers representing the current iteration state.
+     */
+    public IterationPointer[] getPointers() {
+        return pointers;
     }
 
-    public void setNextTableIndexToReadFrom(int nextTableIndexToReadFrom) {
-        this.nextTableIndexToReadFrom = nextTableIndexToReadFrom;
+    /**
+     * Sets the iteration pointers representing the current iteration state.
+     */
+    public void setPointers(IterationPointer[] pointers) {
+        this.pointers = pointers;
     }
 
     @Override
@@ -69,12 +78,31 @@ public class ResultSegment implements IdentifiedDataSerializable {
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
         out.writeObject(result);
-        out.writeInt(nextTableIndexToReadFrom);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
     }
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
         result = in.readObject();
-        nextTableIndexToReadFrom = in.readInt();
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
     }
 }

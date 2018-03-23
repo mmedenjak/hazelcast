@@ -67,21 +67,21 @@ public class ClusterWideIterator<K, V>
     protected List fetch() {
         final OperationService operationService = cacheProxy.getNodeEngine().getOperationService();
         if (prefetchValues) {
-            Operation operation = cacheProxy.operationProvider.createEntryIteratorOperation(lastTableIndex, fetchSize);
+            Operation operation = cacheProxy.operationProvider.createEntryIteratorOperation(pointers, fetchSize);
             final InternalCompletableFuture<CacheEntryIterationResult> f = operationService
                     .invokeOnPartition(CacheService.SERVICE_NAME, operation, partitionIndex);
             CacheEntryIterationResult iteratorResult = f.join();
             if (iteratorResult != null) {
-                setLastTableIndex(iteratorResult.getEntries(), iteratorResult.getTableIndex());
+                setLastTableIndex(iteratorResult.getEntries(), iteratorResult.getPointers());
                 return iteratorResult.getEntries();
             }
         } else {
-            Operation operation = cacheProxy.operationProvider.createKeyIteratorOperation(lastTableIndex, fetchSize);
+            Operation operation = cacheProxy.operationProvider.createKeyIteratorOperation(pointers, fetchSize);
             final InternalCompletableFuture<CacheKeyIterationResult> f = operationService
                     .invokeOnPartition(CacheService.SERVICE_NAME, operation, partitionIndex);
             CacheKeyIterationResult iteratorResult = f.join();
             if (iteratorResult != null) {
-                setLastTableIndex(iteratorResult.getKeys(), iteratorResult.getTableIndex());
+                setLastTableIndex(iteratorResult.getKeys(), iteratorResult.getPointers());
                 return iteratorResult.getKeys();
             }
         }

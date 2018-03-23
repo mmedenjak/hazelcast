@@ -18,9 +18,12 @@ package com.hazelcast.cache.impl.operation;
 
 import com.hazelcast.cache.impl.CacheDataSerializerHook;
 import com.hazelcast.cache.impl.CacheKeyIterationResult;
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.internal.serialization.impl.HeapData;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.impl.Versioned;
 import com.hazelcast.spi.ReadonlyOperation;
 
 import java.io.IOException;
@@ -31,21 +34,22 @@ import java.io.IOException;
  * Initializes and grabs a number of keys defined by <code>size</code> parameter from the
  * {@link com.hazelcast.cache.impl.ICacheRecordStore} with the last table index.
  * </p>
- * @see com.hazelcast.cache.impl.ICacheRecordStore#fetchKeys(int, int)
+ *
+ * @see com.hazelcast.cache.impl.ICacheRecordStore#fetchKeys(IterationPointer[], int)
  */
 public class CacheKeyIteratorOperation
         extends AbstractCacheOperation
-        implements ReadonlyOperation {
+        implements ReadonlyOperation, Versioned {
 
-    private int tableIndex;
+    private IterationPointer[] pointers;
     private int size;
 
     public CacheKeyIteratorOperation() {
     }
 
-    public CacheKeyIteratorOperation(String name, int tableIndex, int size) {
+    public CacheKeyIteratorOperation(String name, IterationPointer[] pointers, int size) {
         super(name, new HeapData());
-        this.tableIndex = tableIndex;
+        this.pointers = pointers;
         this.size = size;
     }
 
@@ -57,7 +61,7 @@ public class CacheKeyIteratorOperation
     @Override
     public void run()
             throws Exception {
-        final CacheKeyIterationResult iterator = this.cache.fetchKeys(tableIndex, size);
+        final CacheKeyIterationResult iterator = this.cache.fetchKeys(pointers, size);
         response = iterator;
     }
 
@@ -65,7 +69,16 @@ public class CacheKeyIteratorOperation
     protected void writeInternal(ObjectDataOutput out)
             throws IOException {
         super.writeInternal(out);
-        out.writeInt(tableIndex);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
         out.writeInt(size);
     }
 
@@ -73,7 +86,17 @@ public class CacheKeyIteratorOperation
     protected void readInternal(ObjectDataInput in)
             throws IOException {
         super.readInternal(in);
-        tableIndex = in.readInt();
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
         size = in.readInt();
     }
 

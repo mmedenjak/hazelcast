@@ -16,6 +16,7 @@
 
 package com.hazelcast.map.impl.recordstore;
 
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.EntryCostEstimator;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
 import com.hazelcast.map.impl.iterator.MapKeysWithCursor;
@@ -87,7 +88,7 @@ public interface Storage<K, R> {
     Iterable<LazyEntryViewFromRecord> getRandomSamples(int sampleCount);
 
     /**
-     * Fetch minimally {@code size} keys from the {@code tableIndex} position.
+     * Fetch minimally {@code size} keys from the {@code pointers} position.
      * The key is fetched on-heap.
      * <p>
      * NOTE: The implementation is free to return more than {@code size} items.
@@ -97,14 +98,14 @@ public interface Storage<K, R> {
      * object will contain all items in that bucket, regardless if we exceed
      * the requested {@code size}.
      *
-     * @param tableIndex the index (position) from which to resume
-     * @param size       the minimal count of returned items
-     * @return fetched keys and the table index for keys AFTER the last returned key
+     * @param pointers the pointers defining the state of iteration
+     * @param size     the minimal count of returned items
+     * @return fetched keys and the new iteration state
      */
-    MapKeysWithCursor fetchKeys(int tableIndex, int size);
+    MapKeysWithCursor fetchKeys(IterationPointer[] pointers, int size);
 
     /**
-     * Fetch minimally {@code size} items from the {@code tableIndex} position.
+     * Fetch minimally {@code size} items from the {@code pointers} position.
      * Both the key and value are fetched on-heap.
      * <p>
      * NOTE: The implementation is free to return more than {@code size} items.
@@ -114,11 +115,10 @@ public interface Storage<K, R> {
      * object will contain all items in that bucket, regardless if we exceed
      * the requested {@code size}.
      *
-     * @param tableIndex the index (position) from which to resume
-     * @param size       the minimal count of returned items
-     * @return fetched entries and the table index for entries AFTER the last returned
-     * entry
+     * @param pointers the pointers defining the state of iteration
+     * @param size     the minimal count of returned items
+     * @return fetched entries and the new iteration state
      */
-    MapEntriesWithCursor fetchEntries(int tableIndex, int size);
+    MapEntriesWithCursor fetchEntries(IterationPointer[] pointers, int size);
 
 }

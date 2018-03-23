@@ -17,6 +17,7 @@
 package com.hazelcast.util;
 
 import com.hazelcast.internal.eviction.Expirable;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.internal.util.ThreadLocalRandomProvider;
 import com.hazelcast.nio.serialization.SerializableByConvention;
 
@@ -54,21 +55,22 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
      * Fetches keys from given <code>tableIndex</code> as <code>size</code>
      * and puts them into <code>keys</code> list.
      *
-     * @param tableIndex Index (checkpoint) for starting point of fetch operation
-     * @param size       Count of how many keys will be fetched
-     * @param keys       List that fetched keys will be put into
-     * @return the next index (checkpoint) for later fetches
+     * @param pointers TODO
+     * @param size     Count of how many keys will be fetched
+     * @param keys     List that fetched keys will be put into
+     * @return TODO
      */
-    public int fetchKeys(int tableIndex, int size, List<K> keys) {
+    public IterationPointer[] fetchKeys(IterationPointer[] pointers, int size, List<K> keys) {
+        // TODO
         final long now = Clock.currentTimeMillis();
         final Segment<K, V> segment = segments[0];
         final HashEntry<K, V>[] currentTable = segment.table;
-        int nextTableIndex;
-        if (tableIndex >= 0 && tableIndex < segment.table.length) {
-            nextTableIndex = tableIndex;
-        } else {
-            nextTableIndex = currentTable.length - 1;
-        }
+        int nextTableIndex = -1;
+//        if (tableIndex >= 0 && tableIndex < segment.table.length) {
+//            nextTableIndex = tableIndex;
+//        } else {
+//            nextTableIndex = currentTable.length - 1;
+//        }
         int counter = 0;
         while (nextTableIndex >= 0 && counter < size) {
             HashEntry<K, V> nextEntry = currentTable[nextTableIndex--];
@@ -83,28 +85,30 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
                 nextEntry = nextEntry.next;
             }
         }
-        return nextTableIndex;
+        return new IterationPointer[]{};
+//        return nextTableIndex;
     }
 
     /**
      * Fetches entries from given <code>tableIndex</code> as <code>size</code>
      * and puts them into <code>entries</code> list.
      *
-     * @param tableIndex Index (checkpoint) for starting point of fetch operation
-     * @param size       Count of how many entries will be fetched
-     * @param entries    List that fetched entries will be put into
-     * @return the next index (checkpoint) for later fetches
+     * @param pointers TODO
+     * @param size     Count of how many entries will be fetched
+     * @param entries  List that fetched entries will be put into
+     * @return TODO
      */
-    public int fetchEntries(int tableIndex, int size, List<Map.Entry<K, V>> entries) {
+    public IterationPointer[] fetchEntries(IterationPointer[] pointers, int size, List<Map.Entry<K, V>> entries) {
+        // TODO fix
         final long now = Clock.currentTimeMillis();
         final Segment<K, V> segment = segments[0];
         final HashEntry<K, V>[] currentTable = segment.table;
-        int nextTableIndex;
-        if (tableIndex >= 0 && tableIndex < segment.table.length) {
-            nextTableIndex = tableIndex;
-        } else {
-            nextTableIndex = currentTable.length - 1;
-        }
+        int nextTableIndex = -1;
+//        if (tableIndex >= 0 && tableIndex < segment.table.length) {
+//            nextTableIndex = tableIndex;
+//        } else {
+//            nextTableIndex = currentTable.length - 1;
+//        }
         int counter = 0;
         while (nextTableIndex >= 0 && counter < size) {
             HashEntry<K, V> nextEntry = currentTable[nextTableIndex--];
@@ -120,7 +124,8 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
                 nextEntry = nextEntry.next;
             }
         }
-        return nextTableIndex;
+        return new IterationPointer[]{};
+//        return nextTableIndex;
     }
 
     protected boolean isValidForFetching(V value, long now) {
@@ -199,7 +204,7 @@ public class SampleableConcurrentHashMap<K, V> extends ConcurrentReferenceHashMa
     /**
      * This class is implements both of "Iterable" and "Iterator" interfaces.
      * So we can use only one object (instead of two) both for "Iterable" and "Iterator" interfaces.
-     *
+     * <p>
      * NOTE: Assumed that it is not accessed by multiple threads. So there is no synchronization.
      */
     private final class LazySamplingEntryIterableIterator<E extends SamplingEntry> implements Iterable<E>, Iterator<E> {

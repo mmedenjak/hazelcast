@@ -25,6 +25,7 @@ import com.hazelcast.client.spi.ClientContext;
 import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.client.spi.impl.ClientInvocationFuture;
 import com.hazelcast.core.IMap;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.iterator.AbstractMapPartitionIterator;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.ExceptionUtil;
@@ -61,13 +62,16 @@ public class ClientMapPartitionIterator<K, V> extends AbstractMapPartitionIterat
     }
 
     private List fetchWithoutPrefetchValues(HazelcastClientInstanceImpl client) {
-        ClientMessage request = MapFetchKeysCodec.encodeRequest(mapProxy.getName(), partitionId,
-                lastTableIndex, fetchSize);
+        // TODO
+        ClientMessage request = MapFetchKeysCodec.encodeRequest(
+                mapProxy.getName(), partitionId, pointers[pointers.length - 1].getIndex(), fetchSize);
         ClientInvocation clientInvocation = new ClientInvocation(client, request, mapProxy.getName(), partitionId);
         try {
             ClientInvocationFuture f = clientInvocation.invoke();
             MapFetchKeysCodec.ResponseParameters responseParameters = MapFetchKeysCodec.decodeResponse(f.get());
-            setLastTableIndex(responseParameters.keys, responseParameters.tableIndex);
+            // TODO
+            final IterationPointer[] pointers = {new IterationPointer(responseParameters.tableIndex, -1)};
+            setIterationPointers(responseParameters.keys, pointers);
             return responseParameters.keys;
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);
@@ -75,13 +79,16 @@ public class ClientMapPartitionIterator<K, V> extends AbstractMapPartitionIterat
     }
 
     private List fetchWithPrefetchValues(HazelcastClientInstanceImpl client) {
-        ClientMessage request = MapFetchEntriesCodec.encodeRequest(mapProxy.getName(), partitionId, lastTableIndex,
-                fetchSize);
+        // TODO
+        ClientMessage request = MapFetchEntriesCodec.encodeRequest(
+                mapProxy.getName(), partitionId, pointers[pointers.length - 1].getIndex(), fetchSize);
         ClientInvocation clientInvocation = new ClientInvocation(client, request, mapProxy.getName(), partitionId);
         try {
             ClientInvocationFuture f = clientInvocation.invoke();
             MapFetchEntriesCodec.ResponseParameters responseParameters = MapFetchEntriesCodec.decodeResponse(f.get());
-            setLastTableIndex(responseParameters.entries, responseParameters.tableIndex);
+            // TODO
+            final IterationPointer[] pointers = {new IterationPointer(responseParameters.tableIndex, -1)};
+            setIterationPointers(responseParameters.entries, pointers);
             return responseParameters.entries;
         } catch (Exception e) {
             throw ExceptionUtil.rethrow(e);

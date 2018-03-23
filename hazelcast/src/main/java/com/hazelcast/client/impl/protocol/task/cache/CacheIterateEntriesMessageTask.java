@@ -22,6 +22,7 @@ import com.hazelcast.cache.impl.operation.CacheEntryIteratorOperation;
 import com.hazelcast.client.impl.protocol.ClientMessage;
 import com.hazelcast.client.impl.protocol.codec.CacheIterateEntriesCodec;
 import com.hazelcast.instance.Node;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.Connection;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.security.permission.ActionConstants;
@@ -47,7 +48,9 @@ public class CacheIterateEntriesMessageTask
     @Override
     protected Operation prepareOperation() {
         CacheOperationProvider operationProvider = getOperationProvider(parameters.name);
-        return operationProvider.createEntryIteratorOperation(parameters.tableIndex, parameters.batch);
+        // TODO
+        final IterationPointer[] pointers = {new IterationPointer(parameters.tableIndex, -1)};
+        return operationProvider.createEntryIteratorOperation(pointers, parameters.batch);
     }
 
     @Override
@@ -61,7 +64,10 @@ public class CacheIterateEntriesMessageTask
             return CacheIterateEntriesCodec.encodeResponse(0, Collections.<Map.Entry<Data, Data>>emptyList());
         }
         CacheEntryIterationResult iteratorResult = (CacheEntryIterationResult) response;
-        return CacheIterateEntriesCodec.encodeResponse(iteratorResult.getTableIndex(), iteratorResult.getEntries());
+        // TODO
+        final IterationPointer[] pointers = iteratorResult.getPointers();
+        return CacheIterateEntriesCodec.encodeResponse(
+                pointers[pointers.length - 1].getIndex(), iteratorResult.getEntries());
     }
 
     @Override

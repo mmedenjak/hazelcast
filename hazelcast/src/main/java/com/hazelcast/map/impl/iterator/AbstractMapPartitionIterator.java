@@ -17,6 +17,7 @@
 package com.hazelcast.map.impl.iterator;
 
 import com.hazelcast.core.IMap;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.map.impl.LazyMapEntry;
 import com.hazelcast.nio.serialization.Data;
@@ -45,13 +46,13 @@ public abstract class AbstractMapPartitionIterator<K, V> implements Iterator<Map
     protected boolean prefetchValues;
 
     /**
-     * The table is segment table of hash map, which is an array that stores the actual records.
-     * This field is used to mark where the latest entry is read.
-     * <p>
-     * The iteration will start from highest index available to the table.
-     * It will be converted to array size on the server side.
+     * The iteration pointers define the iteration state over a backing map.
+     * Each array item represents an iteration state for a certain size of the
+     * backing map structure (either allocated slot count for HD or table size
+     * for on-heap). Each time the table is resized, this array will carry an
+     * additional iteration pointer.
      */
-    protected int lastTableIndex = Integer.MAX_VALUE;
+    protected IterationPointer[] pointers;
 
     protected int index;
     protected int currentIndex = -1;
@@ -63,6 +64,7 @@ public abstract class AbstractMapPartitionIterator<K, V> implements Iterator<Map
         this.fetchSize = fetchSize;
         this.partitionId = partitionId;
         this.prefetchValues = prefetchValues;
+        resetPointers();
     }
 
     @Override
@@ -95,8 +97,8 @@ public abstract class AbstractMapPartitionIterator<K, V> implements Iterator<Map
     }
 
     protected boolean advance() {
-        if (lastTableIndex < 0) {
-            lastTableIndex = Integer.MAX_VALUE;
+        if (pointers[pointers.length - 1].getIndex() < 0) {
+            resetPointers();
             return false;
         }
         result = fetch();
@@ -107,9 +109,23 @@ public abstract class AbstractMapPartitionIterator<K, V> implements Iterator<Map
         return false;
     }
 
-    protected void setLastTableIndex(List response, int lastTableIndex) {
+    /**
+     * Resets the iteration state.
+     */
+    private void resetPointers() {
+        pointers = new IterationPointer[]{new IterationPointer(Integer.MAX_VALUE, -1)};
+    }
+
+    /**
+     * Sets the iteration state to the state defined by the {@code pointers}
+     * if the given response contains items.
+     *
+     * @param response the iteration response
+     * @param pointers the pointers defining the state of iteration
+     */
+    protected void setIterationPointers(List response, IterationPointer[] pointers) {
         if (response != null && response.size() > 0) {
-            this.lastTableIndex = lastTableIndex;
+            this.pointers = pointers;
         }
     }
 

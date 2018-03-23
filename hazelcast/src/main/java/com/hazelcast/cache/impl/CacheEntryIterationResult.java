@@ -16,10 +16,13 @@
 
 package com.hazelcast.cache.impl;
 
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.nio.serialization.impl.Versioned;
 
 import java.io.IOException;
 import java.util.AbstractMap;
@@ -35,21 +38,24 @@ import java.util.Map;
  * @see AbstractClusterWideIterator
  * @see com.hazelcast.cache.impl.operation.CacheEntryIteratorOperation
  */
-public class CacheEntryIterationResult implements IdentifiedDataSerializable {
+public class CacheEntryIterationResult implements IdentifiedDataSerializable, Versioned {
 
-    private int tableIndex;
+    private IterationPointer[] pointers;
     private List<Map.Entry<Data, Data>> entries;
 
     public CacheEntryIterationResult() {
     }
 
-    public CacheEntryIterationResult(List<Map.Entry<Data, Data>> entries, int tableIndex) {
+    public CacheEntryIterationResult(List<Map.Entry<Data, Data>> entries, IterationPointer[] pointers) {
         this.entries = entries;
-        this.tableIndex = tableIndex;
+        this.pointers = pointers;
     }
 
-    public int getTableIndex() {
-        return tableIndex;
+    /**
+     * Returns the iteration pointers representing the current iteration state.
+     */
+    public IterationPointer[] getPointers() {
+        return pointers;
     }
 
     public List<Map.Entry<Data, Data>> getEntries() {
@@ -68,7 +74,16 @@ public class CacheEntryIterationResult implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(tableIndex);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
         int size = entries.size();
         out.writeInt(size);
         for (Map.Entry<Data, Data> entry : entries) {
@@ -79,7 +94,17 @@ public class CacheEntryIterationResult implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        tableIndex = in.readInt();
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
         int size = in.readInt();
         entries = new ArrayList<Map.Entry<Data, Data>>(size);
         for (int i = 0; i < size; i++) {
@@ -91,7 +116,7 @@ public class CacheEntryIterationResult implements IdentifiedDataSerializable {
 
     @Override
     public String toString() {
-        return "CacheEntryIteratorResult{tableIndex=" + tableIndex + '}';
+        return "CacheEntryIteratorResult";
     }
 
     public int getCount() {

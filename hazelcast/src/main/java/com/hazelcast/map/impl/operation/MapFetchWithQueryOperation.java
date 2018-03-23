@@ -17,39 +17,44 @@
 package com.hazelcast.map.impl.operation;
 
 import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.map.impl.query.Query;
 import com.hazelcast.map.impl.query.QueryRunner;
 import com.hazelcast.map.impl.query.ResultSegment;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.impl.Versioned;
 import com.hazelcast.spi.ReadonlyOperation;
 
 import java.io.IOException;
 
 /**
- * Fetches by query a batch of {@code fetchSize} items from a single partition ID for a map. The query is run by the query
- * engine which means it supports projections and filtering. The {@code lastTableIndex} denotes the position from which
- * to resume the query on the partition.
- * This is an operation for maps configured with {@link InMemoryFormat#BINARY} or {{@link InMemoryFormat#OBJECT} format.
+ * Fetches by query a batch of {@code fetchSize} items from a single
+ * partition ID for a map. The query is run by the query engine which means
+ * it supports projections and filtering. The {@code pointers} denotes the
+ * iteration state from which to resume the query on the partition.
+ * This is an operation for maps configured with {@link InMemoryFormat#BINARY}
+ * or {{@link InMemoryFormat#OBJECT} format.
  *
- * @see com.hazelcast.map.impl.proxy.MapProxyImpl#iterator(int, int, com.hazelcast.projection.Projection,
- * com.hazelcast.query.Predicate)
+ * @see com.hazelcast.map.impl.proxy.MapProxyImpl#iterator(int, int,
+ * com.hazelcast.projection.Projection, com.hazelcast.query.Predicate)
  * @since 3.9
  */
-public class MapFetchWithQueryOperation extends MapOperation implements ReadonlyOperation {
+public class MapFetchWithQueryOperation extends MapOperation implements ReadonlyOperation, Versioned {
 
     private Query query;
     private int fetchSize;
-    private int lastTableIndex;
+    private IterationPointer[] pointers;
     private transient ResultSegment response;
 
     public MapFetchWithQueryOperation() {
     }
 
-    public MapFetchWithQueryOperation(String name, int lastTableIndex, int fetchSize, Query query) {
+    public MapFetchWithQueryOperation(String name, IterationPointer[] pointers, int fetchSize, Query query) {
         super(name);
-        this.lastTableIndex = lastTableIndex;
+        this.pointers = pointers;
         this.fetchSize = fetchSize;
         this.query = query;
     }
@@ -57,7 +62,7 @@ public class MapFetchWithQueryOperation extends MapOperation implements Readonly
     @Override
     public void run() throws Exception {
         final QueryRunner runner = mapServiceContext.getMapQueryRunner(query.getMapName());
-        response = runner.runPartitionScanQueryOnPartitionChunk(query, getPartitionId(), lastTableIndex, fetchSize);
+        response = runner.runPartitionScanQueryOnPartitionChunk(query, getPartitionId(), pointers, fetchSize);
     }
 
     @Override
@@ -69,7 +74,17 @@ public class MapFetchWithQueryOperation extends MapOperation implements Readonly
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         fetchSize = in.readInt();
-        lastTableIndex = in.readInt();
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
         query = in.readObject();
     }
 
@@ -77,7 +92,16 @@ public class MapFetchWithQueryOperation extends MapOperation implements Readonly
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeInt(fetchSize);
-        out.writeInt(lastTableIndex);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
         out.writeObject(query);
     }
 

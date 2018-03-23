@@ -16,6 +16,8 @@
 
 package com.hazelcast.query.impl;
 
+import com.hazelcast.internal.iteration.IterationPointer;
+
 import java.util.Collection;
 
 /**
@@ -25,18 +27,21 @@ import java.util.Collection;
 public class QueryableEntriesSegment {
 
     private final Collection<QueryableEntry> entries;
-    private final int nextTableIndexToReadFrom;
+    private final IterationPointer[] pointers;
 
-    public QueryableEntriesSegment(Collection<QueryableEntry> entries, int nextTableIndexToReadFrom) {
+    public QueryableEntriesSegment(Collection<QueryableEntry> entries, IterationPointer[] pointers) {
         this.entries = entries;
-        this.nextTableIndexToReadFrom = nextTableIndexToReadFrom;
+        this.pointers = pointers;
     }
 
     public Collection<QueryableEntry> getEntries() {
         return entries;
     }
 
-    public int getNextTableIndexToReadFrom() {
-        return nextTableIndexToReadFrom;
+    /**
+     * Returns the iteration pointers representing the current iteration state.
+     */
+    public IterationPointer[] getPointers() {
+        return pointers;
     }
 }

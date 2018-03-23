@@ -28,8 +28,8 @@ public class ClientCachePartitionIterator<K, V> extends ClientClusterWideIterato
 
     @Override
     protected boolean advance() {
-        if (lastTableIndex < 0) {
-            lastTableIndex = Integer.MAX_VALUE;
+        if (pointers[pointers.length - 1].getIndex() < 0) {
+            resetPointers();
             return false;
         }
         result = fetch();

@@ -19,6 +19,7 @@ package com.hazelcast.cache.impl.record;
 import com.hazelcast.cache.impl.CacheEntryIterationResult;
 import com.hazelcast.cache.impl.CacheKeyIterationResult;
 import com.hazelcast.internal.eviction.EvictableStore;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.serialization.Data;
 
 import java.util.Map;
@@ -43,19 +44,19 @@ public interface CacheRecordMap<K extends Data, V extends CacheRecord>
     /**
      * Fetches keys in bulk as specified <tt>size</tt> at most.
      *
-     * @param nextTableIndex starting point for fetching
-     * @param size           maximum bulk size to fetch the keys
+     * @param pointers the pointers defining the state of iteration
+     * @param size     maximum bulk size to fetch the keys
      * @return the {@link CacheKeyIterationResult} instance contains fetched keys
      */
-    CacheKeyIterationResult fetchKeys(int nextTableIndex, int size);
+    CacheKeyIterationResult fetchKeys(IterationPointer[] pointers, int size);
 
     /**
      * Fetches entries in bulk as specified <tt>size</tt> at most.
      *
-     * @param nextTableIndex starting point for fetching
-     * @param size           maximum bulk size to fetch the entries
+     * @param pointers the pointers defining the state of iteration
+     * @param size     maximum bulk size to fetch the entries
      * @return the {@link CacheEntryIterationResult} instance contains fetched keys
      */
-    CacheEntryIterationResult fetchEntries(int nextTableIndex, int size);
+    CacheEntryIterationResult fetchEntries(IterationPointer[] pointers, int size);
 
 }

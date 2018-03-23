@@ -16,38 +16,47 @@
 
 package com.hazelcast.map.impl.iterator;
 
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.nio.serialization.impl.Versioned;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Base class for a cursor class holding a collection of items and the next position from which to resume fetching.
+ * Base class for a cursor class holding a collection of items and the
+ * pointers representing the items already traversed. These pointers
+ * are a compact way to represent the current iteration state from which
+ * iteration may be resumed.
  *
  * @param <T> the type of item being iterated
  */
-public abstract class AbstractCursor<T> implements IdentifiedDataSerializable {
+public abstract class AbstractCursor<T> implements IdentifiedDataSerializable, Versioned {
     private List<T> objects;
-    private int nextTableIndexToReadFrom;
+    private IterationPointer[] pointers;
 
     public AbstractCursor() {
     }
 
-    public AbstractCursor(List<T> entries, int nextTableIndexToReadFrom) {
+    public AbstractCursor(List<T> entries, IterationPointer[] pointers) {
         this.objects = entries;
-        this.nextTableIndexToReadFrom = nextTableIndexToReadFrom;
+        this.pointers = pointers;
     }
 
     public List<T> getBatch() {
         return objects;
     }
 
-    public int getNextTableIndexToReadFrom() {
-        return nextTableIndexToReadFrom;
+    /**
+     * Returns the iteration pointers representing the current iteration state.
+     */
+    public IterationPointer[] getIterationPointers() {
+        return pointers;
     }
 
     @Override
@@ -61,7 +70,16 @@ public abstract class AbstractCursor<T> implements IdentifiedDataSerializable {
 
     @Override
     public void writeData(ObjectDataOutput out) throws IOException {
-        out.writeInt(nextTableIndexToReadFrom);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
         int size = objects.size();
         out.writeInt(size);
         for (T entry : objects) {
@@ -71,7 +89,17 @@ public abstract class AbstractCursor<T> implements IdentifiedDataSerializable {
 
     @Override
     public void readData(ObjectDataInput in) throws IOException {
-        nextTableIndexToReadFrom = in.readInt();
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
         int size = in.readInt();
         objects = new ArrayList<T>(size);
         for (int i = 0; i < size; i++) {

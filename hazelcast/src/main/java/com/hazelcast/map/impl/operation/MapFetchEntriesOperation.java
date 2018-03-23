@@ -16,38 +16,43 @@
 
 package com.hazelcast.map.impl.operation;
 
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.MapDataSerializerHook;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.impl.Versioned;
 import com.hazelcast.spi.ReadonlyOperation;
 
 import java.io.IOException;
 
 /**
- * Operation for fetching a chunk of entries from a single {@link com.hazelcast.core.IMap} partition.
- * The starting offset is defined by the {@link #lastTableIndex} and the soft limit is defined by the {@link #fetchSize}.
+ * Operation for fetching a chunk of entries from a single
+ * {@link com.hazelcast.core.IMap} partition.
+ * The iteration state is defined by the {@link #pointers} and the soft
+ * limit is defined by the {@link #fetchSize}.
  *
  * @see com.hazelcast.map.impl.proxy.MapProxyImpl#iterator(int, int, boolean)
  */
-public class MapFetchEntriesOperation extends MapOperation implements ReadonlyOperation {
+public class MapFetchEntriesOperation extends MapOperation implements ReadonlyOperation, Versioned {
 
     private int fetchSize;
-    private int lastTableIndex;
+    private IterationPointer[] pointers;
     private transient MapEntriesWithCursor response;
 
     public MapFetchEntriesOperation() {
     }
 
-    public MapFetchEntriesOperation(String name, int lastTableIndex, int fetchSize) {
+    public MapFetchEntriesOperation(String name, IterationPointer[] pointers, int fetchSize) {
         super(name);
-        this.lastTableIndex = lastTableIndex;
+        this.pointers = pointers;
         this.fetchSize = fetchSize;
     }
 
     @Override
     public void run() throws Exception {
-        response = recordStore.fetchEntries(lastTableIndex, fetchSize);
+        response = recordStore.fetchEntries(pointers, fetchSize);
     }
 
     @Override
@@ -59,14 +64,33 @@ public class MapFetchEntriesOperation extends MapOperation implements ReadonlyOp
     protected void readInternal(ObjectDataInput in) throws IOException {
         super.readInternal(in);
         fetchSize = in.readInt();
-        lastTableIndex = in.readInt();
+        if (in.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            final int pointersCount = in.readInt();
+            pointers = new IterationPointer[pointersCount];
+            for (int i = 0; i < pointersCount; i++) {
+                pointers[i] = new IterationPointer(in.readInt(), in.readInt());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            final int tableIndex = in.readInt();
+            pointers = new IterationPointer[]{new IterationPointer(tableIndex, -1)};
+        }
     }
 
     @Override
     protected void writeInternal(ObjectDataOutput out) throws IOException {
         super.writeInternal(out);
         out.writeInt(fetchSize);
-        out.writeInt(lastTableIndex);
+        if (out.getVersion().isGreaterOrEqual(Versions.V3_10)) {
+            out.writeInt(pointers.length);
+            for (IterationPointer pointer : pointers) {
+                out.writeInt(pointer.getIndex());
+                out.writeInt(pointer.getSize());
+            }
+        } else {
+            // RU_COMPAT_3_9
+            out.writeInt(pointers[pointers.length - 1].getIndex());
+        }
     }
 
     @Override

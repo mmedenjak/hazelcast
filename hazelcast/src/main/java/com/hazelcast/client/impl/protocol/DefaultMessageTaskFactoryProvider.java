@@ -21,6 +21,7 @@ import com.hazelcast.client.impl.protocol.task.DeployClassesMessageTask;
 import com.hazelcast.client.impl.protocol.task.MessageTask;
 import com.hazelcast.client.impl.protocol.task.cache.CacheEventJournalReadTask;
 import com.hazelcast.client.impl.protocol.task.cache.CacheEventJournalSubscribeTask;
+import com.hazelcast.client.impl.protocol.task.cache.CacheIterateKeysMessageTask;
 import com.hazelcast.client.impl.protocol.task.cache.Pre38CacheAddInvalidationListenerTask;
 import com.hazelcast.client.impl.protocol.task.cardinality.CardinalityEstimatorAddMessageTask;
 import com.hazelcast.client.impl.protocol.task.cardinality.CardinalityEstimatorEstimateMessageTask;
@@ -381,7 +382,7 @@ public class DefaultMessageTaskFactoryProvider implements MessageTaskFactoryProv
         };
         factories[com.hazelcast.client.impl.protocol.codec.CacheIterateCodec.RequestParameters.TYPE.id()] = new MessageTaskFactory() {
             public MessageTask create(ClientMessage clientMessage, Connection connection) {
-                return new com.hazelcast.client.impl.protocol.task.cache.CacheIterateMessageTask(clientMessage, node, connection);
+                return new CacheIterateKeysMessageTask(clientMessage, node, connection);
             }
         };
         factories[com.hazelcast.client.impl.protocol.codec.CacheAddPartitionLostListenerCodec.RequestParameters.TYPE.id()] = new MessageTaskFactory() {

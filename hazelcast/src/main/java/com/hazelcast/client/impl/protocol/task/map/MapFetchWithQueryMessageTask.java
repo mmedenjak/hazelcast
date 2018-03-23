@@ -19,6 +19,7 @@ package com.hazelcast.client.impl.protocol.task.map;
 import com.hazelcast.client.impl.protocol.ClientMessage;
 import com.hazelcast.client.impl.protocol.codec.MapFetchWithQueryCodec;
 import com.hazelcast.instance.Node;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.MapService;
 import com.hazelcast.map.impl.operation.MapOperationProvider;
 import com.hazelcast.map.impl.query.Query;
@@ -39,8 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Fetches by query a batch of items from a single partition ID for a map. The query is run by the query
- * engine which means it supports projections and filtering.
+ * Fetches by query a batch of items from a single partition ID for a map.
+ * The query is run by the query engine which means it supports projections
+ * and filtering.
  *
  * @see com.hazelcast.map.impl.proxy.MapProxyImpl#iterator(int, int, Projection, Predicate)
  * @since 3.9
@@ -61,8 +63,9 @@ public class MapFetchWithQueryMessageTask extends AbstractMapPartitionMessageTas
                                  .predicate(predicate)
                                  .projection(projection)
                                  .build();
-
-        return operationProvider.createFetchWithQueryOperation(parameters.name, parameters.tableIndex, parameters.batch, query);
+        // TODO
+        final IterationPointer[] pointers = {new IterationPointer(parameters.tableIndex, -1)};
+        return operationProvider.createFetchWithQueryOperation(parameters.name, pointers, parameters.batch, query);
     }
 
     @Override
@@ -79,8 +82,9 @@ public class MapFetchWithQueryMessageTask extends AbstractMapPartitionMessageTas
         for (QueryResultRow row : queryResult) {
             serialized.add(row.getValue());
         }
-
-        return MapFetchWithQueryCodec.encodeResponse(serialized, resp.getNextTableIndexToReadFrom());
+        // TODO
+        final IterationPointer[] pointers = resp.getPointers();
+        return MapFetchWithQueryCodec.encodeResponse(serialized, pointers[pointers.length - 1].getIndex());
     }
 
     @Override

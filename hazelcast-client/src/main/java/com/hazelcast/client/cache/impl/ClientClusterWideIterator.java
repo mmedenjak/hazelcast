@@ -25,6 +25,7 @@ import com.hazelcast.client.impl.protocol.codec.CacheIterateEntriesCodec;
 import com.hazelcast.client.spi.ClientContext;
 import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.client.spi.impl.ClientInvocationFuture;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.serialization.Data;
 
 import javax.cache.Cache;
@@ -35,9 +36,9 @@ import static com.hazelcast.util.ExceptionUtil.rethrow;
 
 /**
  * Client side cluster-wide iterator for {@link com.hazelcast.cache.ICache}.
- *
+ * <p>
  * This implementation is used by client implementation of JCache.
- *
+ * <p>
  * Note: For more information on the iterator details, see {@link AbstractClusterWideIterator}.
  *
  * @param <K> the type of key.
@@ -73,26 +74,32 @@ public class ClientClusterWideIterator<K, V> extends AbstractClusterWideIterator
         HazelcastClientInstanceImpl client = (HazelcastClientInstanceImpl) context.getHazelcastInstance();
         String name = cacheProxy.getPrefixedName();
         if (prefetchValues) {
+            // TODO
             ClientMessage request = CacheIterateEntriesCodec.encodeRequest(name, partitionIndex,
-                    lastTableIndex, fetchSize);
+                    pointers[pointers.length - 1].getIndex(), fetchSize);
             try {
                 ClientInvocation clientInvocation = new ClientInvocation(client, request, name, partitionIndex);
                 ClientInvocationFuture future = clientInvocation.invoke();
                 CacheIterateEntriesCodec.ResponseParameters responseParameters = CacheIterateEntriesCodec.decodeResponse(
                         future.get());
-                setLastTableIndex(responseParameters.entries, responseParameters.tableIndex);
+                // TODO
+                final IterationPointer[] pointers = {new IterationPointer(responseParameters.tableIndex, -1)};
+                setLastTableIndex(responseParameters.entries, pointers);
                 return responseParameters.entries;
             } catch (Exception e) {
                 throw rethrow(e);
             }
         } else {
-            ClientMessage request = CacheIterateCodec.encodeRequest(name, partitionIndex, lastTableIndex,
-                    fetchSize);
+            // TODO
+            ClientMessage request = CacheIterateCodec.encodeRequest(
+                    name, partitionIndex, pointers[pointers.length - 1].getIndex(), fetchSize);
             try {
                 ClientInvocation clientInvocation = new ClientInvocation(client, request, name, partitionIndex);
                 ClientInvocationFuture future = clientInvocation.invoke();
                 CacheIterateCodec.ResponseParameters responseParameters = CacheIterateCodec.decodeResponse(future.get());
-                setLastTableIndex(responseParameters.keys, responseParameters.tableIndex);
+                // TODO
+                final IterationPointer[] pointers = {new IterationPointer(responseParameters.tableIndex, -1)};
+                setLastTableIndex(responseParameters.keys, pointers);
                 return responseParameters.keys;
             } catch (Exception e) {
                 throw rethrow(e);

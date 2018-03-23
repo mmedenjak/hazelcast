@@ -37,6 +37,7 @@ import com.hazelcast.internal.eviction.EvictionListener;
 import com.hazelcast.internal.eviction.EvictionPolicyEvaluatorProvider;
 import com.hazelcast.internal.eviction.impl.evaluator.EvictionPolicyEvaluator;
 import com.hazelcast.internal.eviction.impl.strategy.sampling.SamplingEvictionStrategy;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.MapEntries;
 import com.hazelcast.nio.Address;
 import com.hazelcast.nio.serialization.Data;
@@ -1554,13 +1555,13 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     @Override
-    public CacheKeyIterationResult fetchKeys(int tableIndex, int size) {
-        return records.fetchKeys(tableIndex, size);
+    public CacheKeyIterationResult fetchKeys(IterationPointer[] pointers, int size) {
+        return records.fetchKeys(pointers, size);
     }
 
     @Override
-    public CacheEntryIterationResult fetchEntries(int tableIndex, int size) {
-        return records.fetchEntries(tableIndex, size);
+    public CacheEntryIterationResult fetchEntries(IterationPointer[] pointers, int size) {
+        return records.fetchEntries(pointers, size);
     }
 
     @Override

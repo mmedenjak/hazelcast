@@ -36,6 +36,7 @@ import com.hazelcast.cache.impl.operation.CacheRemoveOperation;
 import com.hazelcast.cache.impl.operation.CacheReplaceOperation;
 import com.hazelcast.cache.impl.operation.CacheSizeOperationFactory;
 import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.OperationFactory;
@@ -111,13 +112,13 @@ public class DefaultOperationProvider implements CacheOperationProvider {
     }
 
     @Override
-    public Operation createKeyIteratorOperation(int lastTableIndex, int fetchSize) {
-        return new CacheKeyIteratorOperation(nameWithPrefix, lastTableIndex, fetchSize);
+    public Operation createKeyIteratorOperation(IterationPointer[] pointers, int fetchSize) {
+        return new CacheKeyIteratorOperation(nameWithPrefix, pointers, fetchSize);
     }
 
     @Override
-    public Operation createEntryIteratorOperation(int lastTableIndex, int fetchSize) {
-        return new CacheEntryIteratorOperation(nameWithPrefix, lastTableIndex, fetchSize);
+    public Operation createEntryIteratorOperation(IterationPointer[] pointers, int fetchSize) {
+        return new CacheEntryIteratorOperation(nameWithPrefix, pointers, fetchSize);
     }
 
     @Override

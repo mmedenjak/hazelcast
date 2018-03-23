@@ -17,6 +17,7 @@
 package com.hazelcast.map.impl.recordstore;
 
 import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.internal.iteration.IterationPointer;
 import com.hazelcast.map.impl.EntryCostEstimator;
 import com.hazelcast.map.impl.iterator.MapEntriesWithCursor;
 import com.hazelcast.map.impl.iterator.MapKeysWithCursor;
@@ -162,23 +163,23 @@ public class StorageImpl<R extends Record> implements Storage<Data, R> {
     }
 
     @Override
-    public MapKeysWithCursor fetchKeys(int tableIndex, int size) {
+    public MapKeysWithCursor fetchKeys(IterationPointer[] pointers, int size) {
         List<Data> keys = new ArrayList<Data>(size);
-        int newTableIndex = records.fetchKeys(tableIndex, size, keys);
-        return new MapKeysWithCursor(keys, newTableIndex);
+        final IterationPointer[] newPointers = records.fetchKeys(pointers, size, keys);
+        return new MapKeysWithCursor(keys, newPointers);
     }
 
     @Override
-    public MapEntriesWithCursor fetchEntries(int tableIndex, int size) {
+    public MapEntriesWithCursor fetchEntries(IterationPointer[] pointers, int size) {
         List<Map.Entry<Data, R>> entries = new ArrayList<Map.Entry<Data, R>>(size);
-        int newTableIndex = records.fetchEntries(tableIndex, size, entries);
+        final IterationPointer[] newPointers = records.fetchEntries(pointers, size, entries);
         List<Map.Entry<Data, Data>> entriesData = new ArrayList<Map.Entry<Data, Data>>(entries.size());
         for (Map.Entry<Data, R> entry : entries) {
             R record = entry.getValue();
             Data dataValue = serializationService.toData(record.getValue());
             entriesData.add(new AbstractMap.SimpleEntry<Data, Data>(entry.getKey(), dataValue));
         }
-        return new MapEntriesWithCursor(entriesData, newTableIndex);
+        return new MapEntriesWithCursor(entriesData, newPointers);
     }
 
 }
