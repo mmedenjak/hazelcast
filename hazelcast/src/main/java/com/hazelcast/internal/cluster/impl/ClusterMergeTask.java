@@ -17,6 +17,7 @@
 package com.hazelcast.internal.cluster.impl;
 
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
+import com.hazelcast.core.PartitionService;
 import com.hazelcast.instance.LifecycleServiceImpl;
 import com.hazelcast.instance.Node;
 import com.hazelcast.internal.cluster.ClusterService;
@@ -29,6 +30,7 @@ import com.hazelcast.util.ExceptionUtil;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import static com.hazelcast.core.LifecycleEvent.LifecycleState.MERGED;
 import static com.hazelcast.core.LifecycleEvent.LifecycleState.MERGE_FAILED;
@@ -70,6 +72,7 @@ class ClusterMergeTask implements Runnable {
             joined = isJoined();
 
             if (joined) {
+                waitForClusterSafeState();
                 try {
                     executeMergeTasks(coreTasks);
                     executeMergeTasks(nonCoreTasks);
@@ -79,6 +82,19 @@ class ClusterMergeTask implements Runnable {
             }
         } finally {
             lifecycleService.fireLifecycleEvent(joined ? MERGED : MERGE_FAILED);
+        }
+    }
+
+    private void waitForClusterSafeState() {
+        long timeout = System.nanoTime() + TimeUnit.MINUTES.toNanos(5);
+        PartitionService partitionService = node.nodeEngine.getHazelcastInstance().getPartitionService();
+        while (!partitionService.isClusterSafe() && System.nanoTime() < timeout) {
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
         }
     }
 
