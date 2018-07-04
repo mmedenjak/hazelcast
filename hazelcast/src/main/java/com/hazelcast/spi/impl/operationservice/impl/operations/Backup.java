@@ -132,15 +132,13 @@ public final class Backup extends Operation implements BackupOperation, AllowedD
     }
 
     private void ensureBackupOperationInitialized() {
-        if (backupOp.getNodeEngine() == null) {
-            backupOp.setNodeEngine(getNodeEngine());
-            backupOp.setPartitionId(getPartitionId());
-            backupOp.setReplicaIndex(getReplicaIndex());
-            backupOp.setCallerUuid(getCallerUuid());
-            OperationAccessor.setCallerAddress(backupOp, getCallerAddress());
-            OperationAccessor.setInvocationTime(backupOp, Clock.currentTimeMillis());
-            backupOp.setOperationResponseHandler(createEmptyResponseHandler());
-        }
+        backupOp.setNodeEngine(getNodeEngine());
+        backupOp.setPartitionId(getPartitionId());
+        backupOp.setReplicaIndex(getReplicaIndex());
+        backupOp.setCallerUuid(getCallerUuid());
+        OperationAccessor.setCallerAddress(backupOp, getCallerAddress());
+        OperationAccessor.setInvocationTime(backupOp, Clock.currentTimeMillis());
+        backupOp.setOperationResponseHandler(createEmptyResponseHandler());
     }
 
     @Override
