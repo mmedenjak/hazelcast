@@ -186,7 +186,7 @@ public class DefaultNodeExtension implements NodeExtension {
             byte version = (byte) node.getProperties().getInteger(GroupProperty.SERIALIZATION_VERSION);
 
             ss = builder.setClassLoader(configClassLoader)
-                        .setNodeEngine(this.node.nodeEngine)
+                        .setNode(this.node)
                     .setConfig(serializationConfig)
                     .setManagedContext(hazelcastInstance.managedContext)
                     .setPartitioningStrategy(partitioningStrategy)

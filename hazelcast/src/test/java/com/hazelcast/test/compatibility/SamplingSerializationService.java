@@ -18,6 +18,7 @@ package com.hazelcast.test.compatibility;
 
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.core.PartitioningStrategy;
+import com.hazelcast.instance.Node;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.internal.serialization.PortableContext;
 import com.hazelcast.nio.BufferObjectDataInput;
@@ -61,7 +62,7 @@ public class SamplingSerializationService implements InternalSerializationServic
     private static final String TEST_PACKAGE_INFIX = ".test";
 
     protected final InternalSerializationService delegate;
-    private NodeEngineImpl nodeEngine;
+    private Node node;
 
     public SamplingSerializationService(InternalSerializationService delegate) {
         this.delegate = delegate;
@@ -193,12 +194,12 @@ public class SamplingSerializationService implements InternalSerializationServic
 
     @Override
     public NodeEngineImpl getNodeEngine() {
-        return nodeEngine;
+        return node.nodeEngine;
     }
 
     @Override
-    public void setNodeEngine(NodeEngineImpl nodeEngine) {
-        this.nodeEngine = nodeEngine;
+    public void setNode(Node node) {
+        this.node = node;
     }
 
     @Override

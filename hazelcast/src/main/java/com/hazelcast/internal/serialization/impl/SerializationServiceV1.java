@@ -101,7 +101,7 @@ public class SerializationServiceV1 extends AbstractSerializationService {
                 new JavaSerializer(builder.enableSharedObject, builder.enableCompression, builder.classNameFilter), this);
         javaExternalizableAdapter = createSerializerAdapter(
                 new JavaDefaultSerializers.ExternalizableSerializer(builder.enableCompression, builder.classNameFilter), this);
-        this.setNodeEngine(builder.nodeEngine);
+        this.setNode(builder.node);
         registerConstantSerializers();
         registerJavaTypeSerializers();
     }

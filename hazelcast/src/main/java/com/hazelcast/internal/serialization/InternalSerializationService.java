@@ -18,6 +18,7 @@ package com.hazelcast.internal.serialization;
 
 import com.hazelcast.config.SerializationConfig;
 import com.hazelcast.core.PartitioningStrategy;
+import com.hazelcast.instance.Node;
 import com.hazelcast.nio.BufferObjectDataInput;
 import com.hazelcast.nio.BufferObjectDataOutput;
 import com.hazelcast.nio.Disposable;
@@ -115,5 +116,5 @@ public interface InternalSerializationService extends SerializationService, Disp
 
     NodeEngineImpl getNodeEngine();
 
-    void setNodeEngine(NodeEngineImpl nodeEngine);
+    void setNode(Node node);
 }

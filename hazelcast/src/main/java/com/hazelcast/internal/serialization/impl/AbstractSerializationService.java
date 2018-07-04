@@ -19,6 +19,7 @@ package com.hazelcast.internal.serialization.impl;
 import com.hazelcast.core.HazelcastInstanceNotActiveException;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.core.PartitioningStrategy;
+import com.hazelcast.instance.Node;
 import com.hazelcast.internal.serialization.InputOutputFactory;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.internal.serialization.impl.bufferpool.BufferPool;
@@ -88,7 +89,7 @@ public abstract class AbstractSerializationService implements InternalSerializat
     private volatile boolean active = true;
     private final byte version;
     private final ILogger logger = Logger.getLogger(InternalSerializationService.class);
-    private NodeEngineImpl nodeEngine;
+    private Node node;
 
     AbstractSerializationService(Builder<?> builder) {
         this.inputOutputFactory = builder.inputOutputFactory;
@@ -343,12 +344,12 @@ public abstract class AbstractSerializationService implements InternalSerializat
 
     @Override
     public NodeEngineImpl getNodeEngine() {
-        return nodeEngine;
+        return node.nodeEngine;
     }
 
     @Override
-    public void setNodeEngine(NodeEngineImpl nodeEngine) {
-        this.nodeEngine = nodeEngine;
+    public void setNode(Node node) {
+        this.node = node;
     }
 
     public void dispose() {
@@ -582,7 +583,7 @@ public abstract class AbstractSerializationService implements InternalSerializat
         private int initialOutputBufferSize;
         private BufferPoolFactory bufferPoolFactory;
         private Supplier<RuntimeException> notActiveExceptionSupplier;
-        public NodeEngineImpl nodeEngine;
+        public Node node;
 
         protected Builder() {
         }
@@ -633,8 +634,8 @@ public abstract class AbstractSerializationService implements InternalSerializat
             return self();
         }
 
-        public final T withNodeEngine(NodeEngineImpl nodeEngine) {
-            this.nodeEngine = nodeEngine;
+        public final T withNode(Node node) {
+            this.node = node;
             return self();
         }
     }

@@ -24,6 +24,7 @@ import com.hazelcast.core.HazelcastInstanceAware;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.core.PartitioningStrategy;
 import com.hazelcast.instance.BuildInfoProvider;
+import com.hazelcast.instance.Node;
 import com.hazelcast.internal.memory.GlobalMemoryAccessorRegistry;
 import com.hazelcast.internal.serialization.InputOutputFactory;
 import com.hazelcast.internal.serialization.InternalSerializationService;
@@ -38,7 +39,6 @@ import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.hazelcast.nio.serialization.Serializer;
 import com.hazelcast.nio.serialization.SerializerHook;
-import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.util.StringUtil;
 import com.hazelcast.util.function.Supplier;
@@ -92,7 +92,7 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
     protected Supplier<RuntimeException> notActiveExceptionSupplier;
 
     protected ClassNameFilter classNameFilter;
-    private NodeEngineImpl nodeEngine;
+    private Node node;
 
     @Override
     public SerializationServiceBuilder setVersion(byte version) {
@@ -225,8 +225,8 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
     }
 
     @Override
-    public SerializationServiceBuilder setNodeEngine(NodeEngineImpl nodeEngine) {
-        this.nodeEngine = nodeEngine;
+    public SerializationServiceBuilder setNode(Node node) {
+        this.node = node;
         return this;
     }
 
@@ -241,7 +241,7 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
 
         InputOutputFactory inputOutputFactory = createInputOutputFactory();
         InternalSerializationService ss = createSerializationService(inputOutputFactory, notActiveExceptionSupplier);
-        ss.setNodeEngine(nodeEngine);
+        ss.setNode(node);
         registerSerializerHooks(ss);
 
         if (config != null) {
@@ -301,7 +301,7 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
                                                                                       .withEnableCompression(enableCompression)
                                                                                       .withEnableSharedObject(enableSharedObject)
                                                                                       .withNotActiveExceptionSupplier(notActiveExceptionSupplier)
-                                                                                      .withNodeEngine(nodeEngine)
+                                                                                      .withNode(node)
                                                                                       .withClassNameFilter(classNameFilter)
                                                                                       .build();
 

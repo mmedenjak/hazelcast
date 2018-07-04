@@ -20,10 +20,10 @@ import com.hazelcast.config.SerializationConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.ManagedContext;
 import com.hazelcast.core.PartitioningStrategy;
+import com.hazelcast.instance.Node;
 import com.hazelcast.nio.serialization.ClassDefinition;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
 import com.hazelcast.nio.serialization.PortableFactory;
-import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.function.Supplier;
 
@@ -69,5 +69,5 @@ public interface SerializationServiceBuilder {
 
     <T extends SerializationService> T build();
 
-    SerializationServiceBuilder setNodeEngine(NodeEngineImpl nodeEngine);
+    SerializationServiceBuilder setNode(Node nodeEngine);
 }
