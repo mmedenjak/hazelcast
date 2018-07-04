@@ -69,6 +69,8 @@ public class Config {
 
     private GroupConfig groupConfig = new GroupConfig();
 
+    private OOMEProtectionConfig oomeProtectionConfig = new OOMEProtectionConfig();
+
     private NetworkConfig networkConfig = new NetworkConfig();
 
     private ConfigPatternMatcher configPatternMatcher = new MatchingPointConfigPatternMatcher();
@@ -3639,6 +3641,14 @@ public class Config {
     public Config setUserCodeDeploymentConfig(UserCodeDeploymentConfig userCodeDeploymentConfig) {
         this.userCodeDeploymentConfig = userCodeDeploymentConfig;
         return this;
+    }
+
+    public OOMEProtectionConfig getOomeProtectionConfig() {
+        return oomeProtectionConfig;
+    }
+
+    public void setOomeProtectionConfig(OOMEProtectionConfig oomeProtectionConfig) {
+        this.oomeProtectionConfig = oomeProtectionConfig;
     }
 
     @Override

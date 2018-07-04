@@ -1,5 +1,6 @@
 package com.hazelcast.spi;
 
+import com.hazelcast.config.OOMEProtectionConfig;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.hazelcast.spi.impl.NodeEngineImpl;
@@ -11,24 +12,39 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.hazelcast.memory.MemorySize.toPrettyString;
+import static com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.getPartitionThreadId;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
 
 
 public class MemoryChecker implements Runnable {
-    public static final double MIN_FREE_PERCENTAGE = 10;
-    public static final double EVICTION_PERCENTAGE = 20;
-    protected static final double ONE_HUNDRED_PERCENT = 100D;
-    protected final MemoryInfoAccessor memoryInfoAccessor = getMemoryInfoAccessor();
+    // fields
+    private static final double ONE_HUNDRED_PERCENT = 100D;
+    private final MemoryInfoAccessor memoryInfoAccessor = getMemoryInfoAccessor();
     private final ILogger logger;
+    private final int partitionThreadCount;
+    private final int checkerPeriod;
+    private final boolean enabled;
+    private final double minFreePercentage;
+    private final double evictPercentage;
     private long totalMemory;
     private long freeMemory;
     private long maxMemory;
     private AtomicLong evict = new AtomicLong();
+    private volatile String serviceName;
+    private volatile int partitionId;
 
     public MemoryChecker(NodeEngineImpl nodeEngine) {
-        nodeEngine.getExecutionService().schedule(this, 1, TimeUnit.SECONDS);
-        logger = nodeEngine.getLogger(this.getClass());
+        final OOMEProtectionConfig oomeProtectionConfig = nodeEngine.getConfig().getOomeProtectionConfig();
+        checkerPeriod = oomeProtectionConfig.getCheckerPeriod();
+        enabled = oomeProtectionConfig.isEnabled();
+        minFreePercentage = oomeProtectionConfig.getMinFreePercentage();
+        evictPercentage = oomeProtectionConfig.getEvictPercentage();
+        this.logger = nodeEngine.getLogger(this.getClass());
+        this.partitionThreadCount = nodeEngine.getOperationService().getPartitionThreadCount();
+        if (enabled && checkerPeriod > 0) {
+            nodeEngine.getExecutionService().schedule(this, checkerPeriod, TimeUnit.SECONDS);
+        }
     }
 
     protected static MemoryInfoAccessor getMemoryInfoAccessor() {
@@ -53,8 +69,45 @@ public class MemoryChecker implements Runnable {
         return evict.addAndGet(-bytes);
     }
 
-    public boolean needsEviction() {
-        return evict.get() > 0;
+    public boolean needsEviction(String callerServiceName, int callerPartitionId) {
+        if (!enabled) {
+            return false;
+        }
+
+        if (checkerPeriod <= 0) {
+            run();
+            this.serviceName = callerServiceName;
+            this.partitionId = callerPartitionId;
+        }
+        return evict.get() > 0
+                && (this.serviceName == null || this.serviceName.equals(callerServiceName))
+                && (callerPartitionId > -1 && samePartitionThread(callerPartitionId));
+    }
+
+    private boolean samePartitionThread(int partitionId) {
+        final boolean evictAnyPartition = this.partitionId < 0;
+        return evictAnyPartition || samePartitionThread(partitionId, this.partitionId);
+    }
+
+    public boolean samePartitionThread(int partitionId1, int partitionId2) {
+        return getPartitionThreadId(partitionId1, partitionThreadCount)
+                == getPartitionThreadId(partitionId2, partitionThreadCount);
+    }
+
+    public String getServiceName() {
+        return serviceName;
+    }
+
+    public void setServiceName(String serviceName) {
+        this.serviceName = serviceName;
+    }
+
+    public int getPartitionId() {
+        return partitionId;
+    }
+
+    public void setPartitionId(int partitionId) {
+        this.partitionId = partitionId;
     }
 
     @Override
@@ -74,21 +127,17 @@ public class MemoryChecker implements Runnable {
         if (this.totalMemory > 0 && this.freeMemory > 0 && this.maxMemory > 0 && availableMemory > 0) {
             double actualFreePercentage = ONE_HUNDRED_PERCENT * availableMemory / this.maxMemory;
 
-            if (MIN_FREE_PERCENTAGE > actualFreePercentage) {
-                this.evict.set((long) ((EVICTION_PERCENTAGE / ONE_HUNDRED_PERCENT) * this.maxMemory));
-            }
-
-            if (logger.isFinestEnabled()) {
-                logger.finest(format(
+            if (minFreePercentage > actualFreePercentage) {
+                this.evict.set((long) ((evictPercentage / ONE_HUNDRED_PERCENT) * this.maxMemory));
+                logger.warning(format(
                         "Running node memory eviction - runtime.max=%s, runtime.used=%s, configuredFree%%=%.2f, actualFree%%=%.2f",
                         toPrettyString(maxMemory),
                         toPrettyString(totalMemory - freeMemory),
-                        MIN_FREE_PERCENTAGE,
+                        minFreePercentage,
                         actualFreePercentage));
             }
         }
     }
-
 
     protected long getTotalMemory() {
         return memoryInfoAccessor.getTotalMemory();

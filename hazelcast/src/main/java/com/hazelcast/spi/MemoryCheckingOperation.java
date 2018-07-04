@@ -16,6 +16,8 @@
 
 package com.hazelcast.spi;
 
+import static com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.getPartitionThreadId;
+
 public class MemoryCheckingOperation extends Operation {
 
     public CallStatus call() throws Exception {
@@ -25,9 +27,13 @@ public class MemoryCheckingOperation extends Operation {
 
     public void yield() {
         final MemoryChecker checker = getNodeEngine().getMemoryChecker();
-        if (checker.needsEviction()) {
-            for (EvictionSupportingService service : getNodeEngine().getServices(EvictionSupportingService.class)) {
-                service.evict(checker);
+        final String serviceName = getServiceName();
+        final int partitionId = this.getPartitionId();
+        if (checker.needsEviction(serviceName, partitionId)) {
+            if (serviceName.equals(checker.getServiceName())) {
+                for (EvictionSupportingService service : getNodeEngine().getServices(EvictionSupportingService.class)) {
+                    service.evict(checker, partitionId);
+                }
             }
         }
     }

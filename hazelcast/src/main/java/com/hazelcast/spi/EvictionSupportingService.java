@@ -18,5 +18,5 @@ package com.hazelcast.spi;
 
 public interface EvictionSupportingService {
 
-    void evict(MemoryChecker checker);
+    void evict(MemoryChecker checker, int runningThreadPartitionId);
 }

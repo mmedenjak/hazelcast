@@ -18,17 +18,25 @@ package com.hazelcast.map.impl;
 
 import com.hazelcast.cluster.ClusterState;
 import com.hazelcast.core.DistributedObject;
+import com.hazelcast.core.EntryView;
 import com.hazelcast.internal.cluster.ClusterStateListener;
 import com.hazelcast.internal.cluster.ClusterVersionListener;
 import com.hazelcast.map.impl.event.MapEventPublishingService;
+import com.hazelcast.map.impl.record.Record;
+import com.hazelcast.map.impl.recordstore.LazyEntryViewFromRecord;
+import com.hazelcast.map.impl.recordstore.RecordStore;
+import com.hazelcast.map.impl.recordstore.Storage;
 import com.hazelcast.monitor.LocalMapStats;
+import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.ClientAwareService;
 import com.hazelcast.spi.DistributedObjectNamespace;
 import com.hazelcast.spi.EventFilter;
 import com.hazelcast.spi.EventPublishingService;
 import com.hazelcast.spi.EventRegistration;
+import com.hazelcast.spi.EvictionSupportingService;
 import com.hazelcast.spi.FragmentedMigrationAwareService;
 import com.hazelcast.spi.ManagedService;
+import com.hazelcast.spi.MemoryChecker;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.NotifiableEventListener;
 import com.hazelcast.spi.ObjectNamespace;
@@ -45,17 +53,24 @@ import com.hazelcast.spi.SplitBrainHandlerService;
 import com.hazelcast.spi.StatisticsAwareService;
 import com.hazelcast.spi.TransactionalService;
 import com.hazelcast.spi.impl.CountingMigrationAwareService;
+import com.hazelcast.spi.partition.IPartition;
 import com.hazelcast.spi.partition.IPartitionLostEvent;
+import com.hazelcast.spi.partition.IPartitionService;
 import com.hazelcast.transaction.TransactionalObject;
 import com.hazelcast.transaction.impl.Transaction;
 import com.hazelcast.version.Version;
 import com.hazelcast.wan.WanReplicationEvent;
 
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentMap;
 
 import static com.hazelcast.core.EntryEventType.INVALIDATION;
+import static com.hazelcast.map.impl.eviction.Evictor.SAMPLE_COUNT;
 
 /**
  * Defines map service behavior.
@@ -78,7 +93,7 @@ public class MapService implements ManagedService, FragmentedMigrationAwareServi
         TransactionalService, RemoteService, EventPublishingService<Object, ListenerAdapter>,
         PostJoinAwareService, SplitBrainHandlerService, ReplicationSupportingService, StatisticsAwareService<LocalMapStats>,
         PartitionAwareService, ClientAwareService, QuorumAwareService, NotifiableEventListener, ClusterStateListener,
-        ClusterVersionListener {
+        ClusterVersionListener, EvictionSupportingService {
 
     public static final String SERVICE_NAME = "hz:impl:mapService";
 
@@ -136,10 +151,16 @@ public class MapService implements ManagedService, FragmentedMigrationAwareServi
         return migrationAwareService.prepareReplicationOperation(event);
     }
 
-    @Override
-    public Operation prepareReplicationOperation(PartitionReplicationEvent event,
-            Collection<ServiceNamespace> namespaces) {
-        return migrationAwareService.prepareReplicationOperation(event, namespaces);
+    private static int removeKeys(Queue<Data> keysToRemove, RecordStore recordStore, boolean backup) {
+        int removedEntryCount = 0;
+
+        while (!keysToRemove.isEmpty()) {
+            Data keyToEvict = keysToRemove.poll();
+            recordStore.evict(keyToEvict, backup);
+            removedEntryCount++;
+        }
+
+        return removedEntryCount;
     }
 
     @Override
@@ -262,4 +283,80 @@ public class MapService implements ManagedService, FragmentedMigrationAwareServi
     public static ObjectNamespace getObjectNamespace(String mapName) {
         return new DistributedObjectNamespace(SERVICE_NAME, mapName);
     }
+
+    @Override
+    public Operation prepareReplicationOperation(PartitionReplicationEvent event,
+                                                 Collection<ServiceNamespace> namespaces) {
+        return migrationAwareService.prepareReplicationOperation(event, namespaces);
+    }
+
+    @Override
+    public void evict(MemoryChecker checker, int runningThreadPartitionId) {
+        final int partitionIdToEvict = checker.getPartitionId();
+        if (partitionIdToEvict > 0) {
+            if (checker.samePartitionThread(partitionIdToEvict, runningThreadPartitionId)) {
+                for (RecordStore recordStore : mapServiceContext.getPartitionContainer(partitionIdToEvict).getMaps().values()) {
+                    forceEvict(recordStore, checker);
+                }
+            }
+        } else {
+            NodeEngine nodeEngine = mapServiceContext.getNodeEngine();
+            int partitionCount = nodeEngine.getPartitionService().getPartitionCount();
+
+            for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
+                if (checker.samePartitionThread(partitionId, runningThreadPartitionId)) {
+                    ConcurrentMap<String, RecordStore> maps = mapServiceContext.getPartitionContainer(partitionId).getMaps();
+                    for (RecordStore recordStore : maps.values()) {
+                        forceEvict(recordStore, checker);
+                    }
+
+                }
+            }
+        }
+
+        checker.setServiceName(null);
+        checker.setPartitionId(-1);
+    }
+
+    public void forceEvict(RecordStore recordStore, MemoryChecker checker) {
+        if (recordStore.size() == 0) {
+            return;
+        }
+        boolean backup = isBackup(recordStore);
+
+        Storage<Data, Record> storage = recordStore.getStorage();
+        Queue<Data> keysToRemove = new LinkedList<Data>();
+        Iterable<LazyEntryViewFromRecord> samples = storage.getRandomSamples(SAMPLE_COUNT);
+
+        for (LazyEntryViewFromRecord candidate : samples) {
+            final long remainingEvict = checker.evict(candidate.getCost());
+            final Record record = candidate.getRecord();
+
+
+            Data key = record.getKey();
+            if (!recordStore.isLocked(key)) {
+                if (!backup) {
+                    recordStore.doPostEvictionOperations(record, backup);
+                }
+                keysToRemove.add(key);
+            }
+
+
+            if (remainingEvict < 0){
+                break;
+            }
+        }
+        int removedKeyCount = removeKeys(keysToRemove, recordStore, backup);
+
+        recordStore.disposeDeferredBlocks();
+    }
+
+    protected boolean isBackup(RecordStore recordStore) {
+        int partitionId = recordStore.getPartitionId();
+        IPartitionService partitionService = mapServiceContext.getNodeEngine().getPartitionService();
+        IPartition partition = partitionService.getPartition(partitionId, false);
+        return !partition.isLocal();
+    }
+
+
 }
