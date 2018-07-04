@@ -17,12 +17,16 @@
 package com.hazelcast.collection.impl.list;
 
 import com.hazelcast.collection.impl.collection.CollectionContainer;
+import com.hazelcast.collection.impl.collection.CollectionItem;
 import com.hazelcast.collection.impl.collection.CollectionService;
 import com.hazelcast.collection.impl.list.operations.ListReplicationOperation;
 import com.hazelcast.collection.impl.txnlist.TransactionalListProxy;
 import com.hazelcast.config.ListConfig;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.partition.strategy.StringPartitioningStrategy;
+import com.hazelcast.spi.MemoryChecker;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionReplicationEvent;
@@ -31,6 +35,7 @@ import com.hazelcast.util.ConstructorFunction;
 import com.hazelcast.util.ContextMutexFactory;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -115,5 +120,50 @@ public class ListService extends CollectionService {
         Object quorumName = getOrPutSynchronized(quorumConfigCache, name, quorumConfigCacheMutexFactory,
                 quorumConfigConstructor);
         return quorumName == NULL_OBJECT ? null : (String) quorumName;
+    }
+
+    @Override
+    public long evict(MemoryChecker checker, int runningThreadPartitionId) {
+        final int partitionIdToEvict = checker.getPartitionId();
+        long totalEvictedCost = 0;
+        if (partitionIdToEvict > 0) {
+            if (checker.samePartitionThread(partitionIdToEvict, runningThreadPartitionId)) {
+                for (Entry<String, ListContainer> containerEntry : containerMap.entrySet()) {
+                    String containerName = containerEntry.getKey();
+                    if (getPartitionId(containerName) == partitionIdToEvict) {
+                        totalEvictedCost += forceEvict(containerEntry.getValue(), checker);
+                    }
+                }
+            }
+        } else {
+            for (Entry<String, ListContainer> containerEntry : containerMap.entrySet()) {
+                String containerName = containerEntry.getKey();
+                if (checker.samePartitionThread(getPartitionId(containerName), runningThreadPartitionId)) {
+                    totalEvictedCost += forceEvict(containerEntry.getValue(), checker);
+                }
+            }
+        }
+
+        checker.setServiceName(null);
+        checker.setPartitionId(-1);
+        return totalEvictedCost;
+    }
+
+    public long forceEvict(ListContainer container, MemoryChecker checker) {
+        if (container.size() == 0) {
+            return 0;
+        }
+        long totalEvictedCost = 0;
+
+        for (int i = 0; i < container.size(); i++) {
+            CollectionItem item = container.remove(0);
+            final int evictedCost = item.getValue().getHeapCost();
+            totalEvictedCost += evictedCost;
+
+            if (checker.evict(evictedCost) < 0) {
+                break;
+            }
+        }
+        return totalEvictedCost;
     }
 }

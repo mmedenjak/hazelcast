@@ -19,7 +19,9 @@ package com.hazelcast.map;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.core.IList;
 import com.hazelcast.core.IMap;
+import com.hazelcast.core.ISet;
 import com.hazelcast.ringbuffer.Ringbuffer;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
@@ -28,6 +30,9 @@ import com.hazelcast.test.annotation.QuickTest;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
+
+import java.util.HashSet;
+import java.util.Random;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
@@ -63,6 +68,34 @@ public class OOMECheckerTest extends HazelcastTestSupport {
 
         for (int i = 0; i < 10000; i++) {
             ringbuffer.add(new byte[100000]);
+        }
+    }
+
+    @Test
+    public void testMixedInstanceOOME() {
+        HashSet<Object> s = new HashSet<Object>();
+        final HazelcastInstance instance = createHazelcastInstance();
+        IMap<Object, Object> map = instance.getMap("map");
+        Ringbuffer<Object> ringbuffer = instance.getRingbuffer("ringbuffer");
+        ISet<Object> set = instance.getSet("set");
+        IList<Object> list = instance.getList("list");
+        Random random = new Random();
+
+        for (int i = 0; i < 10000; i++) {
+
+            switch (random.nextInt(4)){
+                case 0:
+                    map.put(i, new byte[100000]);
+                    break;
+                case 1:
+                    ringbuffer.add(new byte[100000]);
+                    break;
+                case 2:
+                    list.add(new byte[100000]);
+                    break;
+                case 3:
+                    set.add(new byte[100000]);
+            }
         }
     }
 }

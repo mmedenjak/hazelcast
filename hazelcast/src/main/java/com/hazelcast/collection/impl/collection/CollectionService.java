@@ -28,6 +28,7 @@ import com.hazelcast.logging.ILogger;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.partition.strategy.StringPartitioningStrategy;
 import com.hazelcast.spi.EventPublishingService;
+import com.hazelcast.spi.EvictionSupportingService;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.MigrationAwareService;
 import com.hazelcast.spi.NodeEngine;
@@ -57,7 +58,8 @@ import java.util.concurrent.ConcurrentMap;
 import static com.hazelcast.spi.impl.merge.MergingValueFactory.createMergingValue;
 
 public abstract class CollectionService implements ManagedService, RemoteService, EventPublishingService<CollectionEvent,
-        ItemListener<Data>>, TransactionalService, MigrationAwareService, QuorumAwareService, SplitBrainHandlerService {
+        ItemListener<Data>>, TransactionalService, MigrationAwareService, QuorumAwareService, SplitBrainHandlerService,
+        EvictionSupportingService {
 
     protected final NodeEngine nodeEngine;
     protected final SerializationService serializationService;
@@ -131,6 +133,11 @@ public abstract class CollectionService implements ManagedService, RemoteService
                     .setNodeEngine(nodeEngine);
             operationService.invokeOnPartition(operation);
         }
+    }
+
+    protected int getPartitionId(String containerName) {
+        Data data = nodeEngine.getSerializationService().toData(containerName, StringPartitioningStrategy.INSTANCE);
+        return nodeEngine.getPartitionService().getPartitionId(data);
     }
 
     @Override

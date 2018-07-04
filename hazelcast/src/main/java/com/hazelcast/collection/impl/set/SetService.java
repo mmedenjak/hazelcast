@@ -17,12 +17,15 @@
 package com.hazelcast.collection.impl.set;
 
 import com.hazelcast.collection.impl.collection.CollectionContainer;
+import com.hazelcast.collection.impl.collection.CollectionItem;
 import com.hazelcast.collection.impl.collection.CollectionService;
+import com.hazelcast.collection.impl.list.ListContainer;
 import com.hazelcast.collection.impl.set.operations.SetReplicationOperation;
 import com.hazelcast.collection.impl.txnset.TransactionalSetProxy;
 import com.hazelcast.config.SetConfig;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.spi.MemoryChecker;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionReplicationEvent;
@@ -30,7 +33,10 @@ import com.hazelcast.transaction.impl.Transaction;
 import com.hazelcast.util.ConstructorFunction;
 import com.hazelcast.util.ContextMutexFactory;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -96,6 +102,53 @@ public class SetService extends CollectionService {
     @Override
     public TransactionalSetProxy createTransactionalObject(String name, Transaction transaction) {
         return new TransactionalSetProxy(name, transaction, nodeEngine, this);
+    }
+
+    @Override
+    public long evict(MemoryChecker checker, int runningThreadPartitionId) {
+        final int partitionIdToEvict = checker.getPartitionId();
+        long totalEvictedCost = 0;
+        if (partitionIdToEvict > 0) {
+            if (checker.samePartitionThread(partitionIdToEvict, runningThreadPartitionId)) {
+                for (Entry<String, SetContainer> containerEntry : containerMap.entrySet()) {
+                    String containerName = containerEntry.getKey();
+                    if (getPartitionId(containerName) == partitionIdToEvict) {
+                        totalEvictedCost += forceEvict(containerEntry.getValue(), checker);
+                    }
+                }
+            }
+        } else {
+            for (Entry<String, SetContainer> containerEntry : containerMap.entrySet()) {
+                String containerName = containerEntry.getKey();
+                if (checker.samePartitionThread(getPartitionId(containerName), runningThreadPartitionId)) {
+                    totalEvictedCost += forceEvict(containerEntry.getValue(), checker);
+                }
+            }
+        }
+
+        checker.setServiceName(null);
+        checker.setPartitionId(-1);
+        return totalEvictedCost;
+    }
+
+    public long forceEvict(SetContainer container, MemoryChecker checker) {
+        if (container.size() == 0) {
+            return 0;
+        }
+        long totalEvictedCost = 0;
+        Iterator<CollectionItem> iterator = container.getCollection().iterator();
+
+        while (iterator.hasNext()){
+            CollectionItem item = iterator.next();
+            final int evictedCost = item.getValue().getHeapCost();
+            totalEvictedCost += evictedCost;
+
+            iterator.remove();
+            if (checker.evict(evictedCost) < 0) {
+                break;
+            }
+        }
+        return totalEvictedCost;
     }
 
     @Override
