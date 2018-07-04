@@ -29,8 +29,9 @@ public final class OOMEProtectionConfig {
         return enabled;
     }
 
-    public void setEnabled(boolean enabled) {
+    public OOMEProtectionConfig setEnabled(boolean enabled) {
         this.enabled = enabled;
+        return this;
     }
 
     public int getCheckerPeriod() {

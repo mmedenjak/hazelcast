@@ -36,13 +36,14 @@ public class MemoryCheckingOperation extends Operation {
             for (EvictionSupportingService service : getNodeEngine().getServices(EvictionSupportingService.class)) {
                 final long evicted = service.evict(checker, partitionId);
                 totalEvicted += evicted;
-                //logger.warning("Evicted " + evicted + " bytes from " + service);
             }
             final boolean success = checker.needsEviction(serviceName, partitionId);
-            logger.info("Eviction "
-                    + (success ? "" : " not ")
-                    + " complete with evicted "
-                    + MemorySize.toPrettyString(totalEvicted));
+            if (totalEvicted > 0) {
+                logger.info("Eviction "
+                        + (success ? "" : "not ")
+                        + "complete for service " + serviceName + " and partition " + partitionId + " with evicted "
+                        + MemorySize.toPrettyString(totalEvicted));
+            }
         }
     }
 }

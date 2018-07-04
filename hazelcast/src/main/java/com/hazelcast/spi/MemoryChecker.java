@@ -2,6 +2,7 @@ package com.hazelcast.spi;
 
 import com.hazelcast.config.OOMEProtectionConfig;
 import com.hazelcast.logging.ILogger;
+import com.hazelcast.map.impl.MapService;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.impl.NoopMemoryCheckingOperation;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.hazelcast.memory.MemorySize.toPrettyString;
+import static com.hazelcast.spi.impl.OperationResponseHandlerFactory.createEmptyResponseHandler;
 import static com.hazelcast.spi.impl.operationexecutor.impl.OperationExecutorImpl.getPartitionThreadId;
 import static java.lang.String.format;
 import static java.lang.System.getProperty;
@@ -86,8 +88,9 @@ public class MemoryChecker implements Runnable {
             this.serviceName = callerServiceName;
             this.partitionId = callerPartitionId;
         }
+        String localServiceName = this.serviceName;
         return evict.get() > 0
-                && (this.serviceName == null || this.serviceName.equals(callerServiceName))
+                && (localServiceName == null || localServiceName.equals(callerServiceName))
                 && (callerPartitionId > -1 && samePartitionThread(callerPartitionId));
     }
 
@@ -136,6 +139,7 @@ public class MemoryChecker implements Runnable {
 
         if (this.totalMemory > 0 && this.freeMemory > 0 && this.maxMemory > 0 && availableMemory > 0) {
             double actualFreePercentage = ONE_HUNDRED_PERCENT * availableMemory / this.maxMemory;
+            //System.out.println(actualFreePercentage);
 
             if (minFreePercentage > actualFreePercentage) {
                 this.evict.set((long) ((evictPercentage / ONE_HUNDRED_PERCENT) * this.maxMemory));
@@ -157,7 +161,12 @@ public class MemoryChecker implements Runnable {
             }
             for (int partitionId = 0; partitionId < nodeEngine.getPartitionService().getPartitionCount(); partitionId++) {
                 if (getPartitionThreadId(partitionId, partitionThreadCount) == partitionThreadId) {
-                    nodeEngine.getOperationService().execute(new NoopMemoryCheckingOperation().setPartitionId(partitionId));
+                    nodeEngine.getOperationService().execute(new NoopMemoryCheckingOperation()
+                            .setPartitionId(partitionId)
+                            .setValidateTarget(false)
+                            .setNodeEngine(nodeEngine)
+                            .setOperationResponseHandler(createEmptyResponseHandler())
+                            .setServiceName(MapService.SERVICE_NAME));
                 }
             }
         }

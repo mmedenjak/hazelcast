@@ -27,8 +27,10 @@ import com.hazelcast.quorum.QuorumType;
 import com.hazelcast.ringbuffer.impl.operations.MergeOperation;
 import com.hazelcast.ringbuffer.impl.operations.ReplicationOperation;
 import com.hazelcast.spi.DistributedObjectNamespace;
+import com.hazelcast.spi.EvictionSupportingService;
 import com.hazelcast.spi.FragmentedMigrationAwareService;
 import com.hazelcast.spi.ManagedService;
+import com.hazelcast.spi.MemoryChecker;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.ObjectNamespace;
 import com.hazelcast.spi.Operation;
@@ -70,8 +72,8 @@ import static com.hazelcast.util.Preconditions.checkNotNull;
 /**
  * The SPI Service that deals with the {@link com.hazelcast.ringbuffer.Ringbuffer}.
  */
-public class RingbufferService implements ManagedService, RemoteService, FragmentedMigrationAwareService, QuorumAwareService,
-        SplitBrainHandlerService {
+public class RingbufferService implements ManagedService, RemoteService, FragmentedMigrationAwareService,
+        QuorumAwareService, SplitBrainHandlerService, EvictionSupportingService {
 
     /**
      * Prefix of ringbuffers that are created for topics. Using a prefix prevents users accidentally retrieving the ringbuffer.
@@ -339,6 +341,64 @@ public class RingbufferService implements ManagedService, RemoteService, Fragmen
         collector.run();
         return new Merger(collector);
     }
+
+    @Override
+    public long evict(MemoryChecker checker, int runningThreadPartitionId) {
+        final int partitionIdToEvict = checker.getPartitionId();
+        long totalEvictedCost = 0;
+        if (partitionIdToEvict > 0) {
+            if (checker.samePartitionThread(partitionIdToEvict, runningThreadPartitionId)) {
+                final Map<ObjectNamespace, RingbufferContainer> partitionContainers = containers.get(partitionIdToEvict);
+                if (partitionContainers != null) {
+                    for (RingbufferContainer ringbufferContainer : partitionContainers.values()) {
+                        totalEvictedCost += forceEvict(ringbufferContainer, checker);
+                    }
+                }
+            }
+        } else {
+            int partitionCount = nodeEngine.getPartitionService().getPartitionCount();
+
+            for (int partitionId = 0; partitionId < partitionCount; partitionId++) {
+                if (checker.samePartitionThread(partitionId, runningThreadPartitionId)) {
+                    final Map<ObjectNamespace, RingbufferContainer> partitionContainers = containers.get(partitionId);
+                    if (partitionContainers != null) {
+                        for (RingbufferContainer ringbufferContainer : partitionContainers.values()) {
+                            totalEvictedCost += forceEvict(ringbufferContainer, checker);
+                        }
+                    }
+                }
+            }
+        }
+
+        checker.setServiceName(null);
+        checker.setPartitionId(-1);
+        return totalEvictedCost;
+    }
+
+
+    public long forceEvict(RingbufferContainer container, MemoryChecker checker) {
+        if (container.size() == 0) {
+            return 0;
+        }
+        long totalEvictedCost = 0;
+
+        final Ringbuffer ringbuffer = container.getRingbuffer();
+
+        for (long sequence = ringbuffer.headSequence(); sequence <= ringbuffer.tailSequence(); sequence++) {
+            final Data item = (Data) ringbuffer.read(sequence);
+            final int evictedCost = item.getHeapCost();
+            totalEvictedCost += evictedCost;
+
+            ringbuffer.set(sequence, null);
+            ringbuffer.setHeadSequence(sequence + 1);
+
+            if (checker.evict(evictedCost) < 0) {
+                break;
+            }
+        }
+        return totalEvictedCost;
+    }
+
 
     private class Merger
             extends AbstractContainerMerger<RingbufferContainer, RingbufferMergeData, RingbufferMergeTypes> {

@@ -20,6 +20,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import com.hazelcast.ringbuffer.Ringbuffer;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelTest;
@@ -30,22 +31,38 @@ import org.junit.runner.RunWith;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelTest.class})
-public class MapOOMETest extends HazelcastTestSupport {
+public class OOMECheckerTest extends HazelcastTestSupport {
+
+    public static final boolean OOME_PROTECTION = true;
 
     protected Config getConfig() {
         Config cfg = super.getConfig();
-        cfg.getOomeProtectionConfig().setEnabled(true);
+        cfg.getOomeProtectionConfig()
+           .setEnabled(OOME_PROTECTION)
+           .setMinFreePercentage(20)
+           .setEvictPercentage(30);
         cfg.getMapConfig("default").setInMemoryFormat(InMemoryFormat.BINARY);
         return cfg;
     }
 
     @Test
-    public void testInstanceOOME() {
+    public void testMapInstanceOOME() {
         final HazelcastInstance instance = createHazelcastInstance();
         final IMap<Object, Object> map = instance.getMap("mappy");
 
         for (int i = 0; i < 10000; i++) {
             map.put(i, new byte[100000]);
+        }
+    }
+
+
+    @Test
+    public void testRingbufferInstanceOOME() {
+        final HazelcastInstance instance = createHazelcastInstance();
+        Ringbuffer<Object> ringbuffer = instance.getRingbuffer("ringbuffer");
+
+        for (int i = 0; i < 10000; i++) {
+            ringbuffer.add(new byte[100000]);
         }
     }
 }
