@@ -28,12 +28,11 @@ public class MemoryCheckingOperation extends Operation {
 
     public void yield() {
         final MemoryChecker checker = getNodeEngine().getMemoryChecker();
-
         final String serviceName = getServiceName();
         final int partitionId = this.getPartitionId();
-        final ILogger logger = getLogger();
         long totalEvicted = 0;
         if (checker.needsEviction(serviceName, partitionId)) {
+            final ILogger logger = getLogger();
             for (EvictionSupportingService service : getNodeEngine().getServices(EvictionSupportingService.class)) {
                 final long evicted = service.evict(checker, partitionId);
                 totalEvicted += evicted;

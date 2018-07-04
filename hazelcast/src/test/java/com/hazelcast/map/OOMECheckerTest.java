@@ -38,7 +38,7 @@ import java.util.Random;
 @Category({QuickTest.class, ParallelTest.class})
 public class OOMECheckerTest extends HazelcastTestSupport {
 
-    public static final boolean OOME_PROTECTION = true;
+    public static final boolean OOME_PROTECTION = false;
 
     protected Config getConfig() {
         Config cfg = super.getConfig();
@@ -57,6 +57,16 @@ public class OOMECheckerTest extends HazelcastTestSupport {
 
         for (int i = 0; i < 10000; i++) {
             map.put(i, new byte[100000]);
+        }
+    }
+
+    @Test
+    public void testMapInstanceOOME2() {
+        final HazelcastInstance instance = createHazelcastInstance();
+        final IMap<Object, Object> map = instance.getMap("mappy");
+
+        for (int i = 0; i < 1000000; i++) {
+            map.put(i % 100, new byte[100000]);
         }
     }
 
