@@ -201,6 +201,7 @@ public class MapReplicationStateHolder implements IdentifiedDataSerializable, Ve
                     }
 
                     operation.yield();
+
                     if (recordStore.shouldEvict()) {
                         // No need to continue replicating records anymore.
                         // We are already over eviction threshold, each put record will cause another eviction.
