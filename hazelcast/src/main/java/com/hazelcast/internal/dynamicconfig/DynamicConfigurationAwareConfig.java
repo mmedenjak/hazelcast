@@ -41,6 +41,7 @@ import com.hazelcast.config.MemberAttributeConfig;
 import com.hazelcast.config.MultiMapConfig;
 import com.hazelcast.config.NativeMemoryConfig;
 import com.hazelcast.config.NetworkConfig;
+import com.hazelcast.config.OOMEProtectionConfig;
 import com.hazelcast.config.PNCounterConfig;
 import com.hazelcast.config.PartitionGroupConfig;
 import com.hazelcast.config.QueueConfig;
@@ -1303,6 +1304,16 @@ public class DynamicConfigurationAwareConfig extends Config {
     @Override
     public Config setUserCodeDeploymentConfig(UserCodeDeploymentConfig userCodeDeploymentConfig) {
         return staticConfig.setUserCodeDeploymentConfig(userCodeDeploymentConfig);
+    }
+
+    @Override
+    public OOMEProtectionConfig getOomeProtectionConfig() {
+        return staticConfig.getOomeProtectionConfig();
+    }
+
+    @Override
+    public void setOomeProtectionConfig(OOMEProtectionConfig oomeProtectionConfig) {
+        throw new UnsupportedOperationException("Unsupported operation");
     }
 
     @Override
