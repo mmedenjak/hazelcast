@@ -18,34 +18,17 @@ package com.hazelcast.map;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.config.InMemoryFormat;
+import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.hazelcast.test.HazelcastParallelClassRunner;
-import com.hazelcast.test.HazelcastTestSupport;
-import com.hazelcast.test.annotation.ParallelTest;
-import com.hazelcast.test.annotation.QuickTest;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
-import org.junit.runner.RunWith;
 
-@RunWith(HazelcastParallelClassRunner.class)
-@Category({QuickTest.class, ParallelTest.class})
-public class MapOOMETest extends HazelcastTestSupport {
+public class MapOOMEScaleDown {
 
-    protected Config getConfig() {
-        Config cfg = super.getConfig();
-        cfg.getOomeProtectionConfig().setEnabled(true);
+    public static void main(String[] args) {
+        Config cfg = new Config();
+        cfg.getOomeProtectionConfig().setEnabled(false);
         cfg.getMapConfig("default").setInMemoryFormat(InMemoryFormat.BINARY);
-        return cfg;
-    }
 
-    @Test
-    public void testInstanceOOME() {
-        final HazelcastInstance instance = createHazelcastInstance();
-        final IMap<Object, Object> map = instance.getMap("mappy");
-
-        for (int i = 0; i < 10000; i++) {
-            map.put(i, new byte[100000]);
-        }
+        final HazelcastInstance instance = Hazelcast.newHazelcastInstance();
     }
 }
