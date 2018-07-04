@@ -36,6 +36,7 @@ import com.hazelcast.nio.serialization.DataSerializable;
 import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.Serializer;
+import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.util.function.Supplier;
 
 import java.io.Externalizable;
@@ -87,6 +88,7 @@ public abstract class AbstractSerializationService implements InternalSerializat
     private volatile boolean active = true;
     private final byte version;
     private final ILogger logger = Logger.getLogger(InternalSerializationService.class);
+    private NodeEngineImpl nodeEngine;
 
     AbstractSerializationService(Builder<?> builder) {
         this.inputOutputFactory = builder.inputOutputFactory;
@@ -339,6 +341,16 @@ public abstract class AbstractSerializationService implements InternalSerializat
         return version;
     }
 
+    @Override
+    public NodeEngineImpl getNodeEngine() {
+        return nodeEngine;
+    }
+
+    @Override
+    public void setNodeEngine(NodeEngineImpl nodeEngine) {
+        this.nodeEngine = nodeEngine;
+    }
+
     public void dispose() {
         active = false;
         for (SerializerAdapter serializer : typeMap.values()) {
@@ -570,6 +582,7 @@ public abstract class AbstractSerializationService implements InternalSerializat
         private int initialOutputBufferSize;
         private BufferPoolFactory bufferPoolFactory;
         private Supplier<RuntimeException> notActiveExceptionSupplier;
+        public NodeEngineImpl nodeEngine;
 
         protected Builder() {
         }
@@ -617,6 +630,11 @@ public abstract class AbstractSerializationService implements InternalSerializat
 
         public final T withNotActiveExceptionSupplier(Supplier<RuntimeException> notActiveExceptionSupplier) {
             this.notActiveExceptionSupplier = notActiveExceptionSupplier;
+            return self();
+        }
+
+        public final T withNodeEngine(NodeEngineImpl nodeEngine) {
+            this.nodeEngine = nodeEngine;
             return self();
         }
     }

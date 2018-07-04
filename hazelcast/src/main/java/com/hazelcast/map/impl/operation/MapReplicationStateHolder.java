@@ -308,6 +308,7 @@ public class MapReplicationStateHolder implements IdentifiedDataSerializable, Ve
             for (int j = 0; j < recordStoreSize; j++) {
                 RecordReplicationInfo recordReplicationInfo = in.readObject();
                 recordReplicationInfos.add(recordReplicationInfo);
+                operation.yield();
             }
             data.put(name, recordReplicationInfos);
         }

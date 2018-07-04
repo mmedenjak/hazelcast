@@ -27,6 +27,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.DataType;
 import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.test.TestEnvironment;
 
 import java.io.IOException;
@@ -60,6 +61,7 @@ public class SamplingSerializationService implements InternalSerializationServic
     private static final String TEST_PACKAGE_INFIX = ".test";
 
     protected final InternalSerializationService delegate;
+    private NodeEngineImpl nodeEngine;
 
     public SamplingSerializationService(InternalSerializationService delegate) {
         this.delegate = delegate;
@@ -187,6 +189,16 @@ public class SamplingSerializationService implements InternalSerializationServic
     @Override
     public byte getVersion() {
         return delegate.getVersion();
+    }
+
+    @Override
+    public NodeEngineImpl getNodeEngine() {
+        return nodeEngine;
+    }
+
+    @Override
+    public void setNodeEngine(NodeEngineImpl nodeEngine) {
+        this.nodeEngine = nodeEngine;
     }
 
     @Override

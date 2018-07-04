@@ -22,6 +22,8 @@ import com.hazelcast.config.JoinConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
+import com.hazelcast.memory.MemorySize;
+import com.hazelcast.memory.MemoryUnit;
 
 public class MapOOMEScaleDown2 {
 
@@ -38,8 +40,9 @@ public class MapOOMEScaleDown2 {
         final HazelcastInstance instance = Hazelcast.newHazelcastInstance(cfg);
 
         final IMap<Object, Object> map = instance.getMap("mappy");
-        for (int i = 0; i < 10000; i++) {
-            map.put(i, new byte[500000]);
+        for (int i = 0; i < 1600; i++) {
+            final int bytes = (int) MemoryUnit.KILOBYTES.toBytes(500);
+            map.put(i, new byte[bytes]);
         }
         instance.shutdown();
     }

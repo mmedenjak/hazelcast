@@ -715,6 +715,7 @@ public abstract class Operation implements DataSerializable {
             callerUuid = in.readUTF();
         }
 
+        setNodeEngine(in.getSerializationService().getNodeEngine());
         readInternal(in);
     }
 

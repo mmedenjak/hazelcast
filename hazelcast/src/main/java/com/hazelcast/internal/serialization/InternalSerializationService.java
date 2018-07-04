@@ -26,6 +26,7 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.DataType;
 import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.serialization.SerializationService;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ public interface InternalSerializationService extends SerializationService, Disp
     /**
      * Writes the obj to a byte array. This call is exactly the same as calling {@link #toData(Object)} and
      * then calling {@link Data#toByteArray()}. But it doesn't force a HeapData object being created.
-     * <p>
+     *
      * <b>IMPORTANT:</b> The byte order used to serialize {@code obj}'s serializer type ID is always
      * {@link ByteOrder#BIG_ENDIAN}.
      */
@@ -46,24 +47,24 @@ public interface InternalSerializationService extends SerializationService, Disp
 
     /**
      * Writes an object to a byte-array.
-     *
+     * <p>
      * It allows for configurable padding on the left.
-     *
+     * <p>
      * The padded bytes are not zero'd out since they will be written by the caller. Zero'ing them out would be waste of
      * time.
      * <p>
      * If you want to convert an object to a Data (or its byte representation) then you want to have the partition hash, because
      * that is part of the Data-definition.
-     *
+     * <p>
      * But if you want to serialize an object to a byte-array and don't care for the Data partition-hash, the hash can be
      * disabled.
-     * <p>
+     *
      * <b>IMPORTANT:</b> The byte order used to serialize {@code obj}'s serializer type ID is the byte order
      * configured in {@link SerializationConfig#getByteOrder()}.
      *
-     * @param obj                       object to write to byte array
-     * @param leftPadding               offset from beginning of byte array to start writing the object's bytes
-     * @param insertPartitionHash       {@code true} to include the partition hash in the byte array, otherwise {@code false}
+     * @param obj                 object to write to byte array
+     * @param leftPadding         offset from beginning of byte array to start writing the object's bytes
+     * @param insertPartitionHash {@code true} to include the partition hash in the byte array, otherwise {@code false}
      */
     byte[] toBytes(Object obj, int leftPadding, boolean insertPartitionHash);
 
@@ -112,4 +113,7 @@ public interface InternalSerializationService extends SerializationService, Disp
 
     byte getVersion();
 
+    NodeEngineImpl getNodeEngine();
+
+    void setNodeEngine(NodeEngineImpl nodeEngine);
 }

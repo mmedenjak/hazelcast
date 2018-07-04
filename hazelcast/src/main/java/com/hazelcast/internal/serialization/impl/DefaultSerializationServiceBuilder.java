@@ -38,6 +38,7 @@ import com.hazelcast.nio.serialization.HazelcastSerializationException;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.hazelcast.nio.serialization.Serializer;
 import com.hazelcast.nio.serialization.SerializerHook;
+import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.util.StringUtil;
 import com.hazelcast.util.function.Supplier;
@@ -91,6 +92,7 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
     protected Supplier<RuntimeException> notActiveExceptionSupplier;
 
     protected ClassNameFilter classNameFilter;
+    private NodeEngineImpl nodeEngine;
 
     @Override
     public SerializationServiceBuilder setVersion(byte version) {
@@ -223,6 +225,12 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
     }
 
     @Override
+    public SerializationServiceBuilder setNodeEngine(NodeEngineImpl nodeEngine) {
+        this.nodeEngine = nodeEngine;
+        return this;
+    }
+
+    @Override
     public InternalSerializationService build() {
         initVersions();
         if (config != null) {
@@ -233,7 +241,7 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
 
         InputOutputFactory inputOutputFactory = createInputOutputFactory();
         InternalSerializationService ss = createSerializationService(inputOutputFactory, notActiveExceptionSupplier);
-
+        ss.setNodeEngine(nodeEngine);
         registerSerializerHooks(ss);
 
         if (config != null) {
@@ -280,21 +288,23 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
         switch (version) {
             case 1:
                 SerializationServiceV1 serializationServiceV1 = SerializationServiceV1.builder()
-                    .withInputOutputFactory(inputOutputFactory)
-                    .withVersion(version)
-                    .withPortableVersion(portableVersion)
-                    .withClassLoader(classLoader)
-                    .withDataSerializableFactories(dataSerializableFactories)
-                    .withPortableFactories(portableFactories)
-                    .withManagedContext(managedContext)
-                    .withGlobalPartitionStrategy(partitioningStrategy)
-                    .withInitialOutputBufferSize(initialOutputBufferSize)
-                    .withBufferPoolFactory(new BufferPoolFactoryImpl())
-                    .withEnableCompression(enableCompression)
-                    .withEnableSharedObject(enableSharedObject)
-                    .withNotActiveExceptionSupplier(notActiveExceptionSupplier)
-                    .withClassNameFilter(classNameFilter)
-                    .build();
+                                                                                      .withInputOutputFactory(inputOutputFactory)
+                                                                                      .withVersion(version)
+                                                                                      .withPortableVersion(portableVersion)
+                                                                                      .withClassLoader(classLoader)
+                                                                                      .withDataSerializableFactories(dataSerializableFactories)
+                                                                                      .withPortableFactories(portableFactories)
+                                                                                      .withManagedContext(managedContext)
+                                                                                      .withGlobalPartitionStrategy(partitioningStrategy)
+                                                                                      .withInitialOutputBufferSize(initialOutputBufferSize)
+                                                                                      .withBufferPoolFactory(new BufferPoolFactoryImpl())
+                                                                                      .withEnableCompression(enableCompression)
+                                                                                      .withEnableSharedObject(enableSharedObject)
+                                                                                      .withNotActiveExceptionSupplier(notActiveExceptionSupplier)
+                                                                                      .withNodeEngine(nodeEngine)
+                                                                                      .withClassNameFilter(classNameFilter)
+                                                                                      .build();
+
                 serializationServiceV1.registerClassDefinitions(classDefinitions, checkClassDefErrors);
                 return serializationServiceV1;
 
