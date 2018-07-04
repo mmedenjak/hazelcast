@@ -307,4 +307,7 @@ public interface NodeEngine {
      * <b>Note:</b> CoreServices will be placed at the beginning of the list.
      */
     <S> Collection<S> getServices(Class<S> serviceClass);
+
+
+    MemoryChecker getMemoryChecker();
 }

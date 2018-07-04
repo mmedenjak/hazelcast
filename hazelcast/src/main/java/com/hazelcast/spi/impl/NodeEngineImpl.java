@@ -47,6 +47,7 @@ import com.hazelcast.nio.Address;
 import com.hazelcast.nio.Packet;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.quorum.impl.QuorumServiceImpl;
+import com.hazelcast.spi.MemoryChecker;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
@@ -118,6 +119,7 @@ public class NodeEngineImpl implements NodeEngine {
     private final QuorumServiceImpl quorumService;
     private final Diagnostics diagnostics;
     private final SplitBrainMergePolicyProvider splitBrainMergePolicyProvider;
+    private final MemoryChecker memoryChecker;
 
     @SuppressWarnings("checkstyle:executablestatementcount")
     public NodeEngineImpl(Node node) {
@@ -157,6 +159,7 @@ public class NodeEngineImpl implements NodeEngine {
             serviceManager.registerService(OperationParker.SERVICE_NAME, operationParker);
             serviceManager.registerService(UserCodeDeploymentService.SERVICE_NAME, userCodeDeploymentService);
             serviceManager.registerService(ClusterWideConfigurationService.SERVICE_NAME, configurationService);
+            this.memoryChecker = new MemoryChecker(this);
         } catch (Throwable e) {
             try {
                 shutdown(true);
@@ -390,6 +393,11 @@ public class NodeEngineImpl implements NodeEngine {
     @Override
     public <S> Collection<S> getServices(Class<S> serviceClass) {
         return serviceManager.getServices(serviceClass);
+    }
+
+    @Override
+    public MemoryChecker getMemoryChecker() {
+        return memoryChecker;
     }
 
     public Collection<ServiceInfo> getServiceInfos(Class serviceClass) {

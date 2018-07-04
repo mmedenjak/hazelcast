@@ -89,10 +89,10 @@ public class MapNearCacheStateHolder implements IdentifiedDataSerializable {
     }
 
     void applyState() {
-        MapService mapService = mapReplicationOperation.getService();
+        MapService mapService = this.mapReplicationOperation.getService();
         MetaDataGenerator metaDataGenerator = getPartitionMetaDataGenerator(mapService);
 
-        int partitionId = mapReplicationOperation.getPartitionId();
+        int partitionId = this.mapReplicationOperation.getPartitionId();
 
         if (partitionUuid != null) {
             metaDataGenerator.setUuid(partitionId, partitionUuid);
@@ -103,6 +103,7 @@ public class MapNearCacheStateHolder implements IdentifiedDataSerializable {
             long sequence = (Long) mapNameSequencePairs.get(i++);
 
             metaDataGenerator.setCurrentSequence(mapName, partitionId, sequence);
+            mapReplicationOperation.yield();
         }
     }
 

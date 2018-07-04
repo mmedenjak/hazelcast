@@ -104,7 +104,7 @@ public class WriteBehindStateHolder implements IdentifiedDataSerializable {
     void applyState() {
         for (Map.Entry<String, List<DelayedEntry>> entry : delayedEntries.entrySet()) {
             String mapName = entry.getKey();
-            RecordStore recordStore = mapReplicationOperation.getRecordStore(mapName);
+            RecordStore recordStore = this.mapReplicationOperation.getRecordStore(mapName);
             WriteBehindStore mapDataStore = (WriteBehindStore) recordStore.getMapDataStore();
 
             mapDataStore.reset();
@@ -114,6 +114,7 @@ public class WriteBehindStateHolder implements IdentifiedDataSerializable {
             for (DelayedEntry delayedEntry : replicatedEntries) {
                 mapDataStore.add(delayedEntry);
                 mapDataStore.setSequence(delayedEntry.getSequence());
+                mapReplicationOperation.yield();
             }
         }
     }
