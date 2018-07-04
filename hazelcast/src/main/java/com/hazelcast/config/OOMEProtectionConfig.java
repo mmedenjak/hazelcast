@@ -37,23 +37,26 @@ public final class OOMEProtectionConfig {
         return checkerPeriod;
     }
 
-    public void setCheckerPeriod(int checkerPeriod) {
+    public OOMEProtectionConfig setCheckerPeriod(int checkerPeriod) {
         this.checkerPeriod = checkerPeriod;
+        return this;
     }
 
     public double getMinFreePercentage() {
         return minFreePercentage;
     }
 
-    public void setMinFreePercentage(double minFreePercentage) {
+    public OOMEProtectionConfig setMinFreePercentage(double minFreePercentage) {
         this.minFreePercentage = minFreePercentage;
+        return this;
     }
 
     public double getEvictPercentage() {
         return evictPercentage;
     }
 
-    public void setEvictPercentage(double evictPercentage) {
+    public OOMEProtectionConfig setEvictPercentage(double evictPercentage) {
         this.evictPercentage = evictPercentage;
+        return this;
     }
 }

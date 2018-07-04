@@ -18,7 +18,6 @@ package com.hazelcast.spi;
 
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.memory.MemorySize;
-import com.hazelcast.memory.MemoryUnit;
 
 public class MemoryCheckingOperation extends Operation {
 
@@ -28,9 +27,6 @@ public class MemoryCheckingOperation extends Operation {
     }
 
     public void yield() {
-        if (getNodeEngine() == null){
-            System.out.println();
-        }
         final MemoryChecker checker = getNodeEngine().getMemoryChecker();
         final String serviceName = getServiceName();
         final int partitionId = this.getPartitionId();
@@ -44,7 +40,7 @@ public class MemoryCheckingOperation extends Operation {
             }
             final boolean success = checker.needsEviction(serviceName, partitionId);
             logger.info("Eviction "
-                    + (success ? "":" not ")
+                    + (success ? "" : " not ")
                     + " complete with evicted "
                     + MemorySize.toPrettyString(totalEvicted));
         }

@@ -22,10 +22,11 @@ import com.hazelcast.config.JoinConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.IMap;
-import com.hazelcast.memory.MemorySize;
 import com.hazelcast.memory.MemoryUnit;
 
 public class MapOOMEScaleDown2 {
+
+    public static final boolean OOME_PROTECTION = true;
 
     public static void main(String[] args) {
         Config cfg = new Config();
@@ -34,13 +35,18 @@ public class MapOOMEScaleDown2 {
         joinConfig.getTcpIpConfig().setEnabled(true);
         joinConfig.getTcpIpConfig().addMember("127.0.0.1");
 
-        cfg.getOomeProtectionConfig().setEnabled(false);
-        cfg.getMapConfig("default").setInMemoryFormat(InMemoryFormat.BINARY);
+        cfg.getOomeProtectionConfig()
+           .setMinFreePercentage(20)
+           .setEvictPercentage(30)
+           .setEnabled(OOME_PROTECTION);
+        cfg.getMapConfig("default")
+           .setBackupCount(0)
+           .setInMemoryFormat(InMemoryFormat.BINARY);
 
         final HazelcastInstance instance = Hazelcast.newHazelcastInstance(cfg);
 
         final IMap<Object, Object> map = instance.getMap("mappy");
-        for (int i = 0; i < 1600; i++) {
+        for (int i = 0; i < 2000; i++) {
             final int bytes = (int) MemoryUnit.KILOBYTES.toBytes(500);
             map.put(i, new byte[bytes]);
         }

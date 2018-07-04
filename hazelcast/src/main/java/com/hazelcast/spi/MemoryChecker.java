@@ -4,6 +4,7 @@ import com.hazelcast.config.OOMEProtectionConfig;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.hazelcast.spi.impl.NodeEngineImpl;
+import com.hazelcast.spi.impl.NoopMemoryCheckingOperation;
 import com.hazelcast.util.ExceptionUtil;
 import com.hazelcast.util.MemoryInfoAccessor;
 import com.hazelcast.util.RuntimeMemoryInfoAccessor;
@@ -26,6 +27,7 @@ public class MemoryChecker implements Runnable {
     private final boolean enabled;
     private final double minFreePercentage;
     private final double evictPercentage;
+    private final NodeEngineImpl nodeEngine;
     private long totalMemory;
     private long freeMemory;
     private long maxMemory;
@@ -35,6 +37,7 @@ public class MemoryChecker implements Runnable {
 
     public MemoryChecker(NodeEngineImpl nodeEngine) {
         final OOMEProtectionConfig oomeProtectionConfig = nodeEngine.getConfig().getOomeProtectionConfig();
+        this.nodeEngine = nodeEngine;
         checkerPeriod = oomeProtectionConfig.getCheckerPeriod();
         enabled = oomeProtectionConfig.isEnabled();
         minFreePercentage = oomeProtectionConfig.getMinFreePercentage();
@@ -74,7 +77,12 @@ public class MemoryChecker implements Runnable {
         }
 
         if (checkerPeriod <= 0) {
+            final boolean before = evict.get() > 0;
             run();
+            final boolean after = evict.get() > 0;
+            if (before != after) {
+                sendToOtherPartitionThreads(callerPartitionId);
+            }
             this.serviceName = callerServiceName;
             this.partitionId = callerPartitionId;
         }
@@ -117,7 +125,7 @@ public class MemoryChecker implements Runnable {
         if (totalMemory == this.totalMemory && freeMemory == this.freeMemory && maxMemory == this.maxMemory) {
             return;
         }
-        if (this.evict.get() > 0){
+        if (this.evict.get() > 0) {
             return;
         }
 
@@ -140,6 +148,20 @@ public class MemoryChecker implements Runnable {
                         toPrettyString(this.evict.get())));
             }
         }
+    }
+
+    private void sendToOtherPartitionThreads(int callerPartitionId) {
+        for (int partitionThreadId = 0; partitionThreadId < partitionThreadCount; partitionThreadId++) {
+            if (callerPartitionId == partitionThreadId) {
+                continue;
+            }
+            for (int partitionId = 0; partitionId < nodeEngine.getPartitionService().getPartitionCount(); partitionId++) {
+                if (getPartitionThreadId(partitionId, partitionThreadCount) == partitionThreadId) {
+                    nodeEngine.getOperationService().execute(new NoopMemoryCheckingOperation().setPartitionId(partitionId));
+                }
+            }
+        }
+
     }
 
     protected long getTotalMemory() {

@@ -25,6 +25,8 @@ import com.hazelcast.core.IMap;
 
 public class MapOOMEScaleDown {
 
+    public static final boolean OOME_PROTECTION = true;
+
     public static void main(String[] args) {
         Config cfg = new Config();
         final JoinConfig joinConfig = cfg.getNetworkConfig().getJoin();
@@ -32,7 +34,12 @@ public class MapOOMEScaleDown {
         joinConfig.getTcpIpConfig().setEnabled(true);
         joinConfig.getTcpIpConfig().addMember("127.0.0.1");
 
-        cfg.getOomeProtectionConfig().setEnabled(false);
+        cfg.getOomeProtectionConfig()
+           .setMinFreePercentage(20)
+           .setEvictPercentage(30)
+           .setEnabled(OOME_PROTECTION);
+
+
         cfg.getMapConfig("default")
            .setBackupCount(0)
            .setInMemoryFormat(InMemoryFormat.BINARY);
