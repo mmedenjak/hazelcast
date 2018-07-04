@@ -28,6 +28,7 @@ public class MemoryCheckingOperation extends Operation {
 
     public void yield() {
         final MemoryChecker checker = getNodeEngine().getMemoryChecker();
+
         final String serviceName = getServiceName();
         final int partitionId = this.getPartitionId();
         final ILogger logger = getLogger();

@@ -73,7 +73,6 @@ public class OOMECheckerTest extends HazelcastTestSupport {
 
     @Test
     public void testMixedInstanceOOME() {
-        HashSet<Object> s = new HashSet<Object>();
         final HazelcastInstance instance = createHazelcastInstance();
         IMap<Object, Object> map = instance.getMap("map");
         Ringbuffer<Object> ringbuffer = instance.getRingbuffer("ringbuffer");

@@ -10,6 +10,9 @@ import com.hazelcast.util.ExceptionUtil;
 import com.hazelcast.util.MemoryInfoAccessor;
 import com.hazelcast.util.RuntimeMemoryInfoAccessor;
 
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -30,6 +33,7 @@ public class MemoryChecker implements Runnable {
     private final double minFreePercentage;
     private final double evictPercentage;
     private final NodeEngineImpl nodeEngine;
+    private final MemoryMXBean memBean;
     private long totalMemory;
     private long freeMemory;
     private long maxMemory;
@@ -49,6 +53,8 @@ public class MemoryChecker implements Runnable {
         if (enabled && checkerPeriod > 0) {
             nodeEngine.getExecutionService().schedule(this, checkerPeriod, TimeUnit.SECONDS);
         }
+        this.memBean = ManagementFactory.getMemoryMXBean();
+        this.totalMemory = getTotalMemory();
     }
 
     protected static MemoryInfoAccessor getMemoryInfoAccessor() {
@@ -122,35 +128,60 @@ public class MemoryChecker implements Runnable {
 
     @Override
     public void run() {
-        final long totalMemory = getTotalMemory();
-        final long freeMemory = getFreeMemory();
-        final long maxMemory = getMaxMemory();
-        if (totalMemory == this.totalMemory && freeMemory == this.freeMemory && maxMemory == this.maxMemory) {
-            return;
-        }
         if (this.evict.get() > 0) {
             return;
         }
 
-        this.totalMemory = totalMemory;
+        checkWithMBean();
+    }
+
+    private void checkWithMBean() {
+        MemoryUsage heapMemoryUsage = memBean.getHeapMemoryUsage();
+        long used = heapMemoryUsage.getUsed();
+        long committed = heapMemoryUsage.getCommitted();
+        long max = heapMemoryUsage.getMax();
+
+        long availableMemory = max - used;
+
+        double actualFreePercentage = ONE_HUNDRED_PERCENT * availableMemory / max;
+        //System.out.println(actualFreePercentage);
+
+        if (minFreePercentage > actualFreePercentage) {
+            this.evict.set((long) ((evictPercentage / ONE_HUNDRED_PERCENT) * max));
+            logger.warning(format(
+                    "Running node memory eviction - runtime.max=%s, runtime.used=%s, configuredFree%%=%.2f, actualFree%%=%.2f, needToEvict=%s",
+                    toPrettyString(max),
+                    toPrettyString(committed),
+                    minFreePercentage,
+                    actualFreePercentage,
+                    toPrettyString(this.evict.get())));
+        }
+    }
+
+
+    private void checkWithRuntime() {
+        final long freeMemory = getFreeMemory();
+        final long maxMemory = getMaxMemory();
+        if (freeMemory == this.freeMemory && maxMemory == this.maxMemory) {
+            return;
+        }
+
         this.freeMemory = freeMemory;
         this.maxMemory = maxMemory;
         long availableMemory = this.freeMemory + (this.maxMemory - this.totalMemory);
 
-        if (this.totalMemory > 0 && this.freeMemory > 0 && this.maxMemory > 0 && availableMemory > 0) {
-            double actualFreePercentage = ONE_HUNDRED_PERCENT * availableMemory / this.maxMemory;
-            //System.out.println(actualFreePercentage);
+        double actualFreePercentage = ONE_HUNDRED_PERCENT * availableMemory / this.maxMemory;
+        //System.out.println(actualFreePercentage);
 
-            if (minFreePercentage > actualFreePercentage) {
-                this.evict.set((long) ((evictPercentage / ONE_HUNDRED_PERCENT) * this.maxMemory));
-                logger.warning(format(
-                        "Running node memory eviction - runtime.max=%s, runtime.used=%s, configuredFree%%=%.2f, actualFree%%=%.2f, needToEvict=%s",
-                        toPrettyString(maxMemory),
-                        toPrettyString(totalMemory - freeMemory),
-                        minFreePercentage,
-                        actualFreePercentage,
-                        toPrettyString(this.evict.get())));
-            }
+        if (minFreePercentage > actualFreePercentage) {
+            this.evict.set((long) ((evictPercentage / ONE_HUNDRED_PERCENT) * this.maxMemory));
+            logger.warning(format(
+                    "Running node memory eviction - runtime.max=%s, runtime.used=%s, configuredFree%%=%.2f, actualFree%%=%.2f, needToEvict=%s",
+                    toPrettyString(maxMemory),
+                    toPrettyString(totalMemory - freeMemory),
+                    minFreePercentage,
+                    actualFreePercentage,
+                    toPrettyString(this.evict.get())));
         }
     }
 
@@ -178,6 +209,7 @@ public class MemoryChecker implements Runnable {
     }
 
     protected long getFreeMemory() {
+
         return memoryInfoAccessor.getFreeMemory();
     }
 
