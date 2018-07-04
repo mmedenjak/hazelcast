@@ -18,7 +18,6 @@ package com.hazelcast.map.impl;
 
 import com.hazelcast.cluster.ClusterState;
 import com.hazelcast.core.DistributedObject;
-import com.hazelcast.core.EntryView;
 import com.hazelcast.internal.cluster.ClusterStateListener;
 import com.hazelcast.internal.cluster.ClusterVersionListener;
 import com.hazelcast.map.impl.event.MapEventPublishingService;
@@ -62,7 +61,6 @@ import com.hazelcast.version.Version;
 import com.hazelcast.wan.WanReplicationEvent;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
@@ -291,12 +289,13 @@ public class MapService implements ManagedService, FragmentedMigrationAwareServi
     }
 
     @Override
-    public void evict(MemoryChecker checker, int runningThreadPartitionId) {
+    public long evict(MemoryChecker checker, int runningThreadPartitionId) {
         final int partitionIdToEvict = checker.getPartitionId();
+        long totalEvictedCost = 0;
         if (partitionIdToEvict > 0) {
             if (checker.samePartitionThread(partitionIdToEvict, runningThreadPartitionId)) {
                 for (RecordStore recordStore : mapServiceContext.getPartitionContainer(partitionIdToEvict).getMaps().values()) {
-                    forceEvict(recordStore, checker);
+                    totalEvictedCost += forceEvict(recordStore, checker);
                 }
             }
         } else {
@@ -307,29 +306,32 @@ public class MapService implements ManagedService, FragmentedMigrationAwareServi
                 if (checker.samePartitionThread(partitionId, runningThreadPartitionId)) {
                     ConcurrentMap<String, RecordStore> maps = mapServiceContext.getPartitionContainer(partitionId).getMaps();
                     for (RecordStore recordStore : maps.values()) {
-                        forceEvict(recordStore, checker);
+                        totalEvictedCost += forceEvict(recordStore, checker);
                     }
-
                 }
             }
         }
 
         checker.setServiceName(null);
         checker.setPartitionId(-1);
+        return totalEvictedCost;
     }
 
-    public void forceEvict(RecordStore recordStore, MemoryChecker checker) {
+    public long forceEvict(RecordStore recordStore, MemoryChecker checker) {
         if (recordStore.size() == 0) {
-            return;
+            return 0;
         }
         boolean backup = isBackup(recordStore);
 
         Storage<Data, Record> storage = recordStore.getStorage();
         Queue<Data> keysToRemove = new LinkedList<Data>();
         Iterable<LazyEntryViewFromRecord> samples = storage.getRandomSamples(SAMPLE_COUNT);
+        long totalEvictedCost = 0;
 
         for (LazyEntryViewFromRecord candidate : samples) {
-            final long remainingEvict = checker.evict(candidate.getCost());
+            final long evictedCost = candidate.getCost();
+            totalEvictedCost += evictedCost;
+            final long remainingEvict = checker.evict(evictedCost);
             final Record record = candidate.getRecord();
 
 
@@ -346,9 +348,10 @@ public class MapService implements ManagedService, FragmentedMigrationAwareServi
                 break;
             }
         }
-        int removedKeyCount = removeKeys(keysToRemove, recordStore, backup);
+        removeKeys(keysToRemove, recordStore, backup);
 
         recordStore.disposeDeferredBlocks();
+        return totalEvictedCost;
     }
 
     protected boolean isBackup(RecordStore recordStore) {

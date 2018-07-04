@@ -18,7 +18,6 @@ import static java.lang.System.getProperty;
 
 
 public class MemoryChecker implements Runnable {
-    // fields
     private static final double ONE_HUNDRED_PERCENT = 100D;
     private final MemoryInfoAccessor memoryInfoAccessor = getMemoryInfoAccessor();
     private final ILogger logger;
@@ -118,6 +117,9 @@ public class MemoryChecker implements Runnable {
         if (totalMemory == this.totalMemory && freeMemory == this.freeMemory && maxMemory == this.maxMemory) {
             return;
         }
+        if (this.evict.get() > 0){
+            return;
+        }
 
         this.totalMemory = totalMemory;
         this.freeMemory = freeMemory;
@@ -130,11 +132,12 @@ public class MemoryChecker implements Runnable {
             if (minFreePercentage > actualFreePercentage) {
                 this.evict.set((long) ((evictPercentage / ONE_HUNDRED_PERCENT) * this.maxMemory));
                 logger.warning(format(
-                        "Running node memory eviction - runtime.max=%s, runtime.used=%s, configuredFree%%=%.2f, actualFree%%=%.2f",
+                        "Running node memory eviction - runtime.max=%s, runtime.used=%s, configuredFree%%=%.2f, actualFree%%=%.2f, needToEvict=%s",
                         toPrettyString(maxMemory),
                         toPrettyString(totalMemory - freeMemory),
                         minFreePercentage,
-                        actualFreePercentage));
+                        actualFreePercentage,
+                        toPrettyString(this.evict.get())));
             }
         }
     }
