@@ -20,6 +20,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.nio.Address;
 import com.hazelcast.spi.properties.GroupProperty;
+import com.hazelcast.test.annotation.Repeat;
 import org.junit.Test;
 import org.junit.runners.Parameterized;
 
@@ -78,6 +79,7 @@ public abstract class AbstractMigrationCorrectnessTest extends PartitionCorrectn
     }
 
     @Test(timeout = 6000 * 10 * 10)
+    @Repeat(100)
     public void testPartitionData_whenBackupNodesStartedTerminated_withSafetyCheckAfterTerminate() throws InterruptedException {
         testPartitionData_whenBackupNodesStartedTerminated(true);
     }

@@ -43,10 +43,10 @@ public class MigrationCorrectnessTest extends AbstractMigrationCorrectnessTest {
     @Parameters(name = "backups:{0},nodes:{1},fragmented:{2}")
     public static Collection<Object[]> parameters() {
         return asList(new Object[][]{
-                {1, 2, true},
-                {1, 2, false},
-                {2, 3, true},
-                {3, 4, true},
+//                {1, 2, true},
+//                {1, 2, false},
+//                {2, 3, true},
+//                {3, 4, true},
                 {3, 4, false},
         });
     }
