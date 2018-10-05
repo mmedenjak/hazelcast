@@ -32,6 +32,7 @@ import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
+import com.hazelcast.test.annotation.Repeat;
 import com.hazelcast.test.bounce.BounceMemberRule;
 import com.hazelcast.test.bounce.BounceTestConfiguration;
 import org.junit.Before;
@@ -62,6 +63,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(HazelcastSerialParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelTest.class})
+@Repeat(500)
 public class EntryProcessorBouncingNodesTest extends HazelcastTestSupport {
 
     private static final int ENTRIES = 50;
@@ -71,7 +73,7 @@ public class EntryProcessorBouncingNodesTest extends HazelcastTestSupport {
     @Parameters(name = "withPredicate={0}, withIndex={1}")
     public static Collection<Object[]> parameters() {
         return Arrays.asList(new Object[][]{
-                {false, false}, {true, false}, {true, true}
+                /*{false, false}, */{true, false}/*, {true, true}*/
         });
     }
 
