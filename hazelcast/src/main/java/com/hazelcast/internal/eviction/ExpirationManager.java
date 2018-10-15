@@ -24,6 +24,7 @@ import com.hazelcast.core.PartitionService;
 import com.hazelcast.partition.PartitionLostEvent;
 import com.hazelcast.partition.PartitionLostListener;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.PartitionMigrationEvent;
 import com.hazelcast.spi.TaskScheduler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
@@ -129,6 +130,16 @@ public final class ExpirationManager implements LifecycleListener, PartitionLost
         } else {
             rescheduleIfScheduledBefore();
         }
+    }
+
+    /**
+     * On commit migration step, we need to send already queued expired keys if
+     * migration source end point is a primary replica.
+     *
+     * @param event partition migration event
+     */
+    public void onCommitMigration(PartitionMigrationEvent event) {
+        task.sendQueuedExpiredKeys(task.containers[event.getPartitionId()]);
     }
 
     /**
