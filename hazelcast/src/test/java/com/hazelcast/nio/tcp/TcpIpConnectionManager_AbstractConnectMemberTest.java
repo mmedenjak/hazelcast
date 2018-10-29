@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class TcpIpConnectionManager_AbstractConnectMemberTest extends TcpIpConnection_AbstractTest {
 
     @Test
-    @Repeat(20000)
+    //@Repeat(20000)
     public void testConnectionCount() {
         connManagerA.start();
         connManagerB.start();

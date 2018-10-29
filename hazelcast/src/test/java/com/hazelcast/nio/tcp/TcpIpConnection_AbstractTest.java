@@ -63,7 +63,7 @@ public abstract class TcpIpConnection_AbstractTest extends HazelcastTestSupport 
     protected MetricsRegistryImpl metricsRegistryB;
     protected MetricsRegistryImpl metricsRegistryC;
 
-    @Before
+    //@Before
     public void setup() throws Exception {
         addressA = new Address("127.0.0.1", 5701);
         addressB = new Address("127.0.0.1", 5702);
@@ -90,7 +90,7 @@ public abstract class TcpIpConnection_AbstractTest extends HazelcastTestSupport 
         logger.warning("WOOT WOOT Startup " + Thread.currentThread().getId());
     }
 
-    @After
+    //@After
     public void tearDown() {
         connManagerA.shutdown();
         connManagerB.shutdown();
