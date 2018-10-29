@@ -38,6 +38,8 @@ import com.hazelcast.spi.EventService;
 import com.hazelcast.spi.properties.HazelcastProperties;
 import com.hazelcast.util.function.Consumer;
 
+import java.io.IOException;
+import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -46,6 +48,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
 import static com.hazelcast.spi.properties.GroupProperty.IO_INPUT_THREAD_COUNT;
 import static com.hazelcast.spi.properties.GroupProperty.IO_OUTPUT_THREAD_COUNT;
@@ -68,7 +72,7 @@ public class MockIOService implements IOService {
         ServerSocket serverSocket = serverSocketChannel.socket();
         serverSocket.setReuseAddress(true);
         serverSocket.setSoTimeout(1000);
-        serverSocket.bind(new InetSocketAddress("0.0.0.0", port));
+        tryBind(port, serverSocket);
         thisAddress = new Address("127.0.0.1", port);
         this.serializationService = new DefaultSerializationServiceBuilder()
                 .addDataSerializableFactory(TestDataFactory.FACTORY_ID, new TestDataFactory())
@@ -78,6 +82,26 @@ public class MockIOService implements IOService {
         props.put(IO_INPUT_THREAD_COUNT.getName(), "1");
         props.put(IO_OUTPUT_THREAD_COUNT.getName(), "1");
         this.properties = new HazelcastProperties(props);
+    }
+
+    private void tryBind(int port, ServerSocket serverSocket) throws IOException {
+        long start = System.nanoTime();
+        while (true) {
+            try {
+                logger.warning("WOOT WOOT binding at " + System.nanoTime());
+                serverSocket.bind(new InetSocketAddress("0.0.0.0", port));
+                logger.warning("WOOT WOOT managed to bind after " + (System.nanoTime() - start) + " ns");
+                return;
+            } catch (BindException e) {
+                logger.warning("WOOT WOOT bind failure on " + port + ", retrying: " + e);
+                long diff = System.nanoTime() - start;
+                if (diff > TimeUnit.SECONDS.toNanos(10)) {
+                    logger.warning("WOOT WOOT didn't bind after " + diff + " on " + port + ", giving up.", e);
+                    throw e;
+                }
+            }
+        }
+
     }
 
     @Override

@@ -87,6 +87,7 @@ public abstract class TcpIpConnection_AbstractTest extends HazelcastTestSupport 
         serializationService = new DefaultSerializationServiceBuilder()
                 .addDataSerializableFactory(TestDataFactory.FACTORY_ID, new TestDataFactory())
                 .build();
+        logger.warning("WOOT WOOT Startup " + Thread.currentThread().getId());
     }
 
     @After
@@ -98,6 +99,7 @@ public abstract class TcpIpConnection_AbstractTest extends HazelcastTestSupport 
         metricsRegistryA.shutdown();
         metricsRegistryB.shutdown();
         metricsRegistryC.shutdown();
+        logger.warning("WOOT WOOT Shutdown " + Thread.currentThread().getId());
     }
 
     protected void startAllConnectionManagers() {

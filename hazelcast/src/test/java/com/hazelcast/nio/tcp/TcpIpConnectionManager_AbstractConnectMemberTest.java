@@ -19,6 +19,7 @@ package com.hazelcast.nio.tcp;
 import com.hazelcast.nio.Connection;
 import com.hazelcast.nio.ConnectionType;
 import com.hazelcast.test.AssertTask;
+import com.hazelcast.test.annotation.Repeat;
 import org.junit.Test;
 
 import java.net.UnknownHostException;
@@ -35,6 +36,7 @@ import static org.junit.Assert.assertTrue;
 public abstract class TcpIpConnectionManager_AbstractConnectMemberTest extends TcpIpConnection_AbstractTest {
 
     @Test
+    @Repeat(20000)
     public void testConnectionCount() {
         connManagerA.start();
         connManagerB.start();

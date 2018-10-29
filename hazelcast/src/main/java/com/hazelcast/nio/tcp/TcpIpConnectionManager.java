@@ -197,7 +197,7 @@ public class TcpIpConnectionManager implements ConnectionManager, Consumer<Packe
     }
 
     @Override
-    public void accept(Packet packet)  {
+    public void accept(Packet packet) {
         assert packet.getPacketType() == Packet.Type.BIND;
 
         BindMessage bind = ioService.getSerializationService().toObject(packet);
@@ -548,12 +548,13 @@ public class TcpIpConnectionManager implements ConnectionManager, Consumer<Packe
 
     private void closeServerSocket() {
         try {
-            if (logger.isFinestEnabled()) {
-                logger.finest("Closing server socket channel: " + serverSocketChannel);
-            }
+            logger.warning("WOOT WOOT Closing server socket channel: " + serverSocketChannel + " at " + System.nanoTime());
             serverSocketChannel.close();
+            serverSocketChannel.socket().close();
+            logger.warning("WOOT WOOT closed socket channel " + serverSocketChannel + " at " + System.nanoTime());
         } catch (IOException ignore) {
-            logger.finest(ignore);
+            logger.warning("WOOT WOOT ", ignore);
+            //logger.finest(ignore);
         }
     }
 

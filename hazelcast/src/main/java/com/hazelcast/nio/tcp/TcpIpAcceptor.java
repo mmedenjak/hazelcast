@@ -124,7 +124,7 @@ public class TcpIpAcceptor implements MetricsProvider {
             acceptorThread.join(SHUTDOWN_TIMEOUT_MILLIS);
         } catch (InterruptedException e) {
             currentThread().interrupt();
-            logger.finest(e);
+            logger.warning("WOOT WOOT ", e);
         }
     }
 
@@ -249,6 +249,7 @@ public class TcpIpAcceptor implements MetricsProvider {
                     channel = connectionManager.createChannel(socketChannel, false);
                 }
             } catch (Exception e) {
+                logger.warning("WOOT WOOT acceptor error ", e);
                 exceptionCount.inc();
 
                 if (e instanceof ClosedChannelException && !connectionManager.isLive()) {
@@ -262,7 +263,7 @@ public class TcpIpAcceptor implements MetricsProvider {
                     try {
                         serverSocketChannel.close();
                     } catch (Exception ex) {
-                        logger.finest("Closing server socket failed", ex);
+                        logger.warning("WOOT WOOT Closing server socket failed", ex);
                     }
                     ioService.onFatalError(e);
                 }

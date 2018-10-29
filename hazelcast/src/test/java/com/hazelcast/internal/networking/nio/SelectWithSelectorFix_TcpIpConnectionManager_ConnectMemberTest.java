@@ -17,14 +17,17 @@
 package com.hazelcast.internal.networking.nio;
 
 import com.hazelcast.nio.tcp.TcpIpConnectionManager_AbstractConnectMemberTest;
+import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastSerialClassRunner;
+import com.hazelcast.test.annotation.ParallelTest;
+import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.test.annotation.SlowTest;
 import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
-@RunWith(HazelcastSerialClassRunner.class)
-@Category(SlowTest.class)
+@RunWith(HazelcastParallelClassRunner.class)
+@Category({QuickTest.class, ParallelTest.class})
 public class SelectWithSelectorFix_TcpIpConnectionManager_ConnectMemberTest
         extends TcpIpConnectionManager_AbstractConnectMemberTest {
 
