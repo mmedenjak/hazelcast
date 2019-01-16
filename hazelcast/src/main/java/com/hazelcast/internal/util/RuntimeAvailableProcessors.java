@@ -41,7 +41,7 @@ public final class RuntimeAvailableProcessors {
      * @return number of available processors
      */
     public static int get() {
-        return currentAvailableProcessors;
+        return 4;
     }
 
     /**
