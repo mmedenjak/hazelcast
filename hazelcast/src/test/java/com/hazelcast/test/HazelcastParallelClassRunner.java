@@ -55,7 +55,7 @@ public class HazelcastParallelClassRunner extends AbstractHazelcastClassRunner {
         boolean multipleJVM = Boolean.getBoolean("multipleJVM");
         if (multipleJVM) {
             // decrease the amount of resources used when running in multiple JVM
-            RuntimeAvailableProcessors.overrideDefault(min(getRuntime().availableProcessors(), 8));
+            RuntimeAvailableProcessors.overrideDefault(min(getRuntime().availableProcessors(), 4));
         }
     }
 
