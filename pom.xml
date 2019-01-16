@@ -377,6 +377,14 @@
                                         -Dlog4j.configurationFile=log4j2.xml
                                         -Dlog4j.skipJansi=true
                                         -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:StartFlightRecording=duration=2400s,filename=recording-default.jfr
+                                        -Dhazelcast.operation.thread.count=1
+                                        -Dhazelcast.operation.generic.thread.count=1
+                                        -Dhazelcast.event.thread.count=1
+                                        -Dhazelcast.clientengine.blocking.thread.count=1
+                                        -Dhazelcast.io.thread.count=1
+                                        -Dhazelcast.clientengine.blocking.thread.count=1
+                                        -Dhazelcast.clientengine.thread.count=1
+                                        -Dhazelcast.clientengine.query.thread.count=1
                                         ${extraVmArgs}
                                         ${jacocoArgLine}
                                     </argLine>
@@ -421,6 +429,14 @@
                                         -Dlog4j.skipJansi=true
                                         ${extraVmArgs}
                                         -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:StartFlightRecording=duration=2400s,filename=recording-single.jfr
+                                        -Dhazelcast.operation.thread.count=1
+                                        -Dhazelcast.operation.generic.thread.count=1
+                                        -Dhazelcast.event.thread.count=1
+                                        -Dhazelcast.clientengine.blocking.thread.count=1
+                                        -Dhazelcast.io.thread.count=1
+                                        -Dhazelcast.clientengine.blocking.thread.count=1
+                                        -Dhazelcast.clientengine.thread.count=1
+                                        -Dhazelcast.clientengine.query.thread.count=1
                                         ${jacocoArgLine}
                                     </argLine>
                                     <includes>
