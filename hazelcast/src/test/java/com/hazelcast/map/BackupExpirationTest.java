@@ -30,6 +30,7 @@ import com.hazelcast.map.impl.recordstore.RecordStore;
 import com.hazelcast.monitor.LocalMapStats;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.impl.NodeEngineImpl;
+import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastParametersRunnerFactory;
@@ -50,6 +51,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static com.hazelcast.config.InMemoryFormat.BINARY;
 import static com.hazelcast.config.InMemoryFormat.OBJECT;
+import static com.hazelcast.map.impl.eviction.MapClearExpiredRecordsTask.PROP_CLEANUP_PERCENTAGE;
 import static com.hazelcast.map.impl.eviction.MapClearExpiredRecordsTask.PROP_TASK_PERIOD_SECONDS;
 import static com.hazelcast.spi.properties.GroupProperty.PARTITION_COUNT;
 import static java.util.Arrays.asList;
@@ -81,9 +83,13 @@ public class BackupExpirationTest extends HazelcastTestSupport {
                                           int expirationTaskPeriodSeconds) {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(NODE_COUNT);
 
-        Config config = getConfig();
+        Config config = new Config()
+                .setProperty(GroupProperty.PARTITION_OPERATION_THREAD_COUNT.getName(), "10")
+                .setProperty(GroupProperty.GENERIC_OPERATION_THREAD_COUNT.getName(), "10")
+                .setProperty(GroupProperty.EVENT_THREAD_COUNT.getName(), "5");
         config.setProperty(PARTITION_COUNT.getName(), Integer.toString(partitionCount));
         config.setProperty(PROP_TASK_PERIOD_SECONDS, Integer.toString(expirationTaskPeriodSeconds));
+        config.setProperty(PROP_CLEANUP_PERCENTAGE, Integer.toString(90));
         MapConfig mapConfig = config.getMapConfig(MAP_NAME);
         mapConfig.setBackupCount(NODE_COUNT - 1);
         mapConfig.setMaxIdleSeconds(maxIdleSeconds);
@@ -94,14 +100,14 @@ public class BackupExpirationTest extends HazelcastTestSupport {
 
     @Test
     public void all_backups_should_be_empty_eventually() throws Exception {
-        configureAndStartNodes(3, 271, 5);
+        configureAndStartNodes(3, 271, 1);
 
         IMap map = nodes[0].getMap(MAP_NAME);
         for (int i = 0; i < 10; i++) {
             map.put(i, i);
         }
 
-        sleepSeconds(5);
+        //sleepSeconds(5);
 
         assertTrueEventually(new AssertTask() {
             @Override

@@ -126,9 +126,9 @@ public class HazelcastPropertiesTest {
 
     @Test
     public void setProperty_inheritDefaultValueOfParentProperty() {
-        String inputIOThreadCount = defaultProperties.getString(GroupProperty.IO_INPUT_THREAD_COUNT);
+        String inputIOThreadCount = defaultProperties.getString(GroupProperty.IO_BALANCER_INTERVAL_SECONDS);
 
-        assertEquals(GroupProperty.IO_THREAD_COUNT.getDefaultValue(), inputIOThreadCount);
+        assertEquals(GroupProperty.IO_BALANCER_INTERVAL_SECONDS.getDefaultValue(), inputIOThreadCount);
     }
 
     @Test
@@ -162,9 +162,9 @@ public class HazelcastPropertiesTest {
 
     @Test
     public void getInteger() {
-        int ioThreadCount = defaultProperties.getInteger(GroupProperty.IO_THREAD_COUNT);
+        int ioThreadCount = defaultProperties.getInteger(GroupProperty.IO_BALANCER_INTERVAL_SECONDS);
 
-        assertEquals(3, ioThreadCount);
+        assertEquals(20, ioThreadCount);
     }
 
     @Test
