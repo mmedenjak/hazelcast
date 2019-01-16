@@ -29,6 +29,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import static com.hazelcast.test.HazelcastTestSupport.randomMapName;
+import static com.hazelcast.test.HazelcastTestSupport.smallInstanceConfig;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +44,7 @@ public class BounceMemberRuleTest {
     private String mapName = randomMapName();
 
     @Rule
-    public BounceMemberRule bounceMemberRule = BounceMemberRule.with(new Config()).clusterSize(3).build();
+    public BounceMemberRule bounceMemberRule = BounceMemberRule.with(smallInstanceConfig()).clusterSize(3).build();
 
     @Before
     public void setup() {

@@ -27,6 +27,7 @@ import com.hazelcast.logging.Logger;
 import com.hazelcast.spi.annotation.PrivateApi;
 import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.util.ExceptionUtil;
+import org.apache.logging.log4j.ThreadContext;
 
 import java.util.Collections;
 import java.util.Comparator;
@@ -48,7 +49,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 /**
  * Central manager for all Hazelcast members of the JVM.
- *
+ * <p>
  * All creation functionality will be stored here and a particular instance of a member will delegate here.
  */
 @PrivateApi
@@ -136,7 +137,14 @@ public final class HazelcastInstanceFactory {
     }
 
     public static String createInstanceName(Config config) {
-        return "_hzInstance_" + FACTORY_ID_GEN.incrementAndGet() + "_" + config.getGroupConfig().getName();
+        String testClass = ThreadContext.get("test-class");
+        String testName = ThreadContext.get("test-name");
+//        if (testClass == null){
+//            System.out.println("WOOT WOOT lala");
+//            new Exception().printStackTrace(System.out);
+//        }
+        return "_" + testClass + "_" + testName +
+                "_hzInstance_" + FACTORY_ID_GEN.incrementAndGet() + "_" + config.getGroupConfig().getName();
     }
 
     /**

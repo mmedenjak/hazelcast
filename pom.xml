@@ -376,6 +376,7 @@
                                         -Dhazelcast.test.multiple.jvm=true
                                         -Dlog4j.configurationFile=log4j2.xml
                                         -Dlog4j.skipJansi=true
+                                        -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:StartFlightRecording=duration=2400s,filename=recording-default.jfr
                                         ${extraVmArgs}
                                         ${jacocoArgLine}
                                     </argLine>
@@ -419,6 +420,7 @@
                                         -Dlog4j.configurationFile=log4j2.xml
                                         -Dlog4j.skipJansi=true
                                         ${extraVmArgs}
+                                        -XX:+UnlockCommercialFeatures -XX:+FlightRecorder -XX:StartFlightRecording=duration=2400s,filename=recording-single.jfr
                                         ${jacocoArgLine}
                                     </argLine>
                                     <includes>

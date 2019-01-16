@@ -155,6 +155,7 @@ public class HazelcastParallelClassRunner extends AbstractHazelcastClassRunner {
         @Override
         public void run() {
             String testName = testName(method);
+            TestLoggingUtils.setThreadLocalTestClassName(method.getMethod().getDeclaringClass().getSimpleName());
             setThreadLocalTestMethodName(testName);
             try {
                 long start = System.currentTimeMillis();

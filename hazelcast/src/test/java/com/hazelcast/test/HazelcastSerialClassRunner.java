@@ -41,6 +41,7 @@ public class HazelcastSerialClassRunner extends AbstractHazelcastClassRunner {
         // save the current system properties
         Properties currentSystemProperties = System.getProperties();
         String testName = testName(method);
+        TestLoggingUtils.setThreadLocalTestClassName(method.getMethod().getDeclaringClass().getSimpleName());
         setThreadLocalTestMethodName(testName);
         try {
             // use local system properties so se tests don't effect each other
