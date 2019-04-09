@@ -93,7 +93,7 @@ public abstract class AbstractJoiner
     public AbstractJoiner(Node node) {
         this.node = node;
         this.logger = node.loggingService.getLogger(getClass());
-        this.config = node.config;
+        this.config = node.getConfig();
         this.clusterService = node.getClusterService();
         this.clusterJoinManager = clusterService.getClusterJoinManager();
         this.mergeNextRunDelayMs = node.getProperties().getMillis(GroupProperty.MERGE_NEXT_RUN_DELAY_SECONDS);

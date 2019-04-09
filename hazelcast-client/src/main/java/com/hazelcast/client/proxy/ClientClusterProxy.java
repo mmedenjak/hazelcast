@@ -18,6 +18,7 @@ package com.hazelcast.client.proxy;
 
 import com.hazelcast.client.spi.impl.ClientClusterServiceImpl;
 import com.hazelcast.cluster.ClusterState;
+import com.hazelcast.config.Config;
 import com.hazelcast.core.Cluster;
 import com.hazelcast.core.Member;
 import com.hazelcast.core.MembershipListener;
@@ -54,6 +55,11 @@ public class ClientClusterProxy implements Cluster {
     public Set<Member> getMembers() {
         final Collection<Member> members = clusterService.getMemberList();
         return new LinkedHashSet<Member>(members);
+    }
+
+    @Override
+    public void changeConfig(Config newConfig) {
+
     }
 
     @Override

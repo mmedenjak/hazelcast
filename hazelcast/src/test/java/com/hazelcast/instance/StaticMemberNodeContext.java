@@ -43,6 +43,11 @@ public class StaticMemberNodeContext implements NodeContext {
             public String createMemberUuid(Address address) {
                 return uuid;
             }
+
+            @Override
+            public void reinit() {
+
+            }
         };
     }
 

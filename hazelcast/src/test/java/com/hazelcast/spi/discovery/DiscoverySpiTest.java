@@ -158,6 +158,7 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
         }
     }
 
+    public static final ArrayList<DiscoveryNode> DISCOVERED_NODES = new ArrayList<DiscoveryNode>();
 
     public static final class ParametrizedDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
         public static final PropertyDefinition BOOL_PROPERTY = new SimplePropertyDefinition("bool-property", true, BOOLEAN);
@@ -177,6 +178,39 @@ public class DiscoverySpiTest extends HazelcastTestSupport {
             return Collections.singleton(BOOL_PROPERTY);
         }
     }
+
+    public static class ArrayListDiscoveryStrategyFactory implements DiscoveryStrategyFactory {
+        private ArrayListDiscoveryStrategy strategy
+                = new ArrayListDiscoveryStrategy(null, Collections.<String, Comparable>emptyMap());
+
+        @Override
+        public Class<? extends DiscoveryStrategy> getDiscoveryStrategyType() {
+            return ArrayListDiscoveryStrategy.class;
+        }
+
+        @Override
+        public DiscoveryStrategy newDiscoveryStrategy(DiscoveryNode discoveryNode, ILogger logger, Map<String, Comparable> properties) {
+            return strategy;
+        }
+
+        @Override
+        public Collection<PropertyDefinition> getConfigurationProperties() {
+            return null;
+        }
+    }
+
+    public static class ArrayListDiscoveryStrategy extends AbstractDiscoveryStrategy {
+
+        ArrayListDiscoveryStrategy(ILogger logger, Map<String, Comparable> properties) {
+            super(logger, properties);
+        }
+
+        @Override
+        public Iterable<DiscoveryNode> discoverNodes() {
+            return DISCOVERED_NODES;
+        }
+    }
+
 
     @Test
     public void test_metadata_discovery_on_node_startup() throws Exception {

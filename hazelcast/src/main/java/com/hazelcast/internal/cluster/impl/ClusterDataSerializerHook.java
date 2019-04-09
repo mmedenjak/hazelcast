@@ -23,6 +23,8 @@ import com.hazelcast.internal.cluster.MemberInfo;
 import com.hazelcast.internal.cluster.impl.operations.AuthenticationFailureOp;
 import com.hazelcast.internal.cluster.impl.operations.AuthorizationOp;
 import com.hazelcast.internal.cluster.impl.operations.BeforeJoinCheckFailureOp;
+import com.hazelcast.internal.cluster.impl.operations.ChangeConfigAndUpgradeOp;
+import com.hazelcast.internal.cluster.impl.operations.ChangeConfigOp;
 import com.hazelcast.internal.cluster.impl.operations.CommitClusterStateOp;
 import com.hazelcast.internal.cluster.impl.operations.ConfigMismatchOp;
 import com.hazelcast.internal.cluster.impl.operations.ExplicitSuspicionOp;
@@ -107,8 +109,10 @@ public final class ClusterDataSerializerHook implements DataSerializerHook {
     public static final int VECTOR_CLOCK = 43;
     public static final int EXTENDED_BIND_MESSAGE = 44;
     public static final int ENDPOINT_QUALIFIER = 45;
+    public static final int CHANGE_CONFIG_OP = 46;
+    public static final int CHANGE_CONFIG_AND_UPGRADE_OP = 47;
 
-    static final int LEN = ENDPOINT_QUALIFIER + 1;
+    static final int LEN = CHANGE_CONFIG_AND_UPGRADE_OP + 1;
 
     @Override
     public int getFactoryId() {
@@ -344,6 +348,16 @@ public final class ClusterDataSerializerHook implements DataSerializerHook {
         constructors[ENDPOINT_QUALIFIER] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
             public IdentifiedDataSerializable createNew(Integer arg) {
                 return new EndpointQualifier();
+            }
+        };
+        constructors[CHANGE_CONFIG_OP] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new ChangeConfigOp();
+            }
+        };
+        constructors[CHANGE_CONFIG_AND_UPGRADE_OP] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new ChangeConfigAndUpgradeOp();
             }
         };
         return new ArrayDataSerializableFactory(constructors);

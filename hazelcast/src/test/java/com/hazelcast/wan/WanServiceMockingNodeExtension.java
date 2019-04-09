@@ -32,4 +32,9 @@ class WanServiceMockingNodeExtension extends DefaultNodeExtension {
         return clazz.isAssignableFrom(WanReplicationService.class)
                 ? (T) wanReplicationService : super.createService(clazz);
     }
+
+    @Override
+    public void reinit() {
+
+    }
 }

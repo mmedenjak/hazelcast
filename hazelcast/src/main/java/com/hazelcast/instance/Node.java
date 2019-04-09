@@ -50,6 +50,7 @@ import com.hazelcast.internal.cluster.impl.JoinRequest;
 import com.hazelcast.internal.cluster.impl.MulticastJoiner;
 import com.hazelcast.internal.cluster.impl.MulticastService;
 import com.hazelcast.internal.cluster.impl.SplitBrainJoinMessage;
+import com.hazelcast.internal.config.StaticConfigEpochService;
 import com.hazelcast.internal.diagnostics.HealthMonitor;
 import com.hazelcast.internal.dynamicconfig.DynamicConfigurationAwareConfig;
 import com.hazelcast.internal.management.ManagementCenterService;
@@ -136,15 +137,13 @@ public class Node {
 
     public final HazelcastInstanceImpl hazelcastInstance;
 
-    public final DynamicConfigurationAwareConfig config;
-
     public final NodeEngineImpl nodeEngine;
     public final ClientEngine clientEngine;
 
     public final InternalPartitionServiceImpl partitionService;
     public final ClusterServiceImpl clusterService;
     public final MulticastService multicastService;
-    public final DiscoveryService discoveryService;
+    public DiscoveryService discoveryService;
     public final TextCommandService textCommandService;
     public final LoggingServiceImpl loggingService;
 
@@ -165,17 +164,18 @@ public class Node {
 
     private final NodeShutdownHookThread shutdownHookThread;
 
-    private final InternalSerializationService serializationService;
+    private InternalSerializationService serializationService;
 
     private final ClassLoader configClassLoader;
 
     private final NodeExtension nodeExtension;
 
-    private final HazelcastProperties properties;
+    private HazelcastProperties properties;
     private final BuildInfo buildInfo;
     private final HealthMonitor healthMonitor;
 
-    private final Joiner joiner;
+    private Joiner joiner;
+    private final StaticConfigEpochService staticConfigEpochService;
 
     private ManagementCenterService managementCenterService;
 
@@ -193,7 +193,7 @@ public class Node {
         this.properties = new HazelcastProperties(staticConfig);
         DynamicConfigurationAwareConfig config = new DynamicConfigurationAwareConfig(staticConfig, this.properties);
         this.hazelcastInstance = hazelcastInstance;
-        this.config = config;
+        this.staticConfigEpochService = new StaticConfigEpochService(this, config);
         this.configClassLoader = getConfigClassloader(config);
 
         String policy = properties.getString(SHUTDOWNHOOK_POLICY);
@@ -248,11 +248,7 @@ public class Node {
             networkingService = nodeContext.createNetworkingService(this, serverSocketRegistry);
             healthMonitor = new HealthMonitor(this);
             clientEngine = hasClientServerSocket() ? new ClientEngineImpl(this) : new NoOpClientEngine();
-            JoinConfig joinConfig = getActiveMemberNetworkConfig(this.config).getJoin();
-            DiscoveryConfig discoveryConfig = joinConfig.getDiscoveryConfig().getAsReadOnly();
-            List<DiscoveryStrategyConfig> aliasedDiscoveryConfigs =
-                    AliasedDiscoveryConfigUtils.createDiscoveryStrategyConfigs(joinConfig);
-            discoveryService = createDiscoveryService(discoveryConfig, aliasedDiscoveryConfigs, localMember);
+            initDiscoveryService(localMember);
             clusterService = new ClusterServiceImpl(this, localMember);
             partitionService = new InternalPartitionServiceImpl(this);
             textCommandService = nodeExtension.createTextCommandService();
@@ -269,12 +265,28 @@ public class Node {
         }
     }
 
+    private void initDiscoveryService(MemberImpl localMember) {
+        JoinConfig joinConfig = getActiveMemberNetworkConfig(getConfig()).getJoin();
+        DiscoveryConfig discoveryConfig = joinConfig.getDiscoveryConfig().getAsReadOnly();
+        List<DiscoveryStrategyConfig> aliasedDiscoveryConfigs =
+                AliasedDiscoveryConfigUtils.createDiscoveryStrategyConfigs(joinConfig);
+        discoveryService = createDiscoveryService(discoveryConfig, aliasedDiscoveryConfigs, localMember);
+    }
+
+    public void reinit(){
+        nodeExtension.reinit();
+        serializationService = nodeExtension.createSerializationService();
+        properties = new HazelcastProperties(getConfig());
+        initDiscoveryService(clusterService.getLocalMember());
+        joiner = createJoiner();
+    }
+
     private boolean hasClientServerSocket() {
-        if (!config.getAdvancedNetworkConfig().isEnabled()) {
+        if (!getConfig().getAdvancedNetworkConfig().isEnabled()) {
             return true;
         }
 
-        Map<EndpointQualifier, EndpointConfig> endpointConfigs = config.getAdvancedNetworkConfig().getEndpointConfigs();
+        Map<EndpointQualifier, EndpointConfig> endpointConfigs = getConfig().getAdvancedNetworkConfig().getEndpointConfigs();
         EndpointConfig clientEndpointConfig = endpointConfigs.get(CLIENT);
 
         return clientEndpointConfig != null;
@@ -417,11 +429,11 @@ public class Node {
 
     void start() {
         nodeEngine.start();
-        initializeListeners(config);
+        initializeListeners(getConfig());
         hazelcastInstance.lifecycleService.fireLifecycleEvent(LifecycleState.STARTING);
         clusterService.sendLocalMembershipEvent();
         networkingService.start();
-        JoinConfig join = getActiveMemberNetworkConfig(config).getJoin();
+        JoinConfig join = getActiveMemberNetworkConfig(getConfig()).getJoin();
         if (join.getMulticastConfig().isEnabled()) {
             final Thread multicastServiceThread = new Thread(multicastService,
                     createThreadName(hazelcastInstance.getName(), "MulticastThread"));
@@ -443,9 +455,9 @@ public class Node {
         nodeExtension.beforeJoin();
         join();
         int clusterSize = clusterService.getSize();
-        if (getActiveMemberNetworkConfig(config).isPortAutoIncrement()
-                && address.getPort() >= getActiveMemberNetworkConfig(config).getPort() + clusterSize) {
-            logger.warning("Config seed port is " + getActiveMemberNetworkConfig(config).getPort()
+        if (getActiveMemberNetworkConfig(getConfig()).isPortAutoIncrement()
+                && address.getPort() >= getActiveMemberNetworkConfig(getConfig()).getPort() + clusterSize) {
+            logger.warning("Config seed port is " + getActiveMemberNetworkConfig(getConfig()).getPort()
                     + " and cluster size is " + clusterSize + ". Some of the ports seem occupied!");
         }
         try {
@@ -785,7 +797,7 @@ public class Node {
 
     public ConfigCheck createConfigCheck() {
         String joinerType = joiner == null ? "" : joiner.getType();
-        return new ConfigCheck(config, joinerType);
+        return new ConfigCheck(getConfig(), joinerType, staticConfigEpochService.getEpoch());
     }
 
     public void join() {
@@ -822,7 +834,7 @@ public class Node {
     }
 
     Joiner createJoiner() {
-        JoinConfig join = getActiveMemberNetworkConfig(config).getJoin();
+        JoinConfig join = getActiveMemberNetworkConfig(getConfig()).getJoin();
         join.verify();
 
         if (properties.getBoolean(DISCOVERY_SPI_ENABLED) || isAnyAliasedConfigEnabled(join)) {
@@ -879,7 +891,11 @@ public class Node {
     }
 
     public Config getConfig() {
-        return config;
+        return staticConfigEpochService.getConfig();
+    }
+
+    public StaticConfigEpochService getStaticConfigEpochService() {
+        return staticConfigEpochService;
     }
 
     /**
@@ -927,8 +943,8 @@ public class Node {
     }
 
     private void logGroupPasswordInfo() {
-        String password = config.getGroupConfig().getPassword();
-        if (!(config.getSecurityConfig().isEnabled()
+        String password = getConfig().getGroupConfig().getPassword();
+        if (!(getConfig().getSecurityConfig().isEnabled()
                 || isNullOrEmpty(password)
                 || GroupConfig.DEFAULT_GROUP_PASSWORD.equals(password))) {
             logger.info("A non-empty group password is configured for the Hazelcast member."

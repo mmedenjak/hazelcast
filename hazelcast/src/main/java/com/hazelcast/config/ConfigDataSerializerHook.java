@@ -102,8 +102,9 @@ public final class ConfigDataSerializerHook implements DataSerializerHook {
     public static final int AWS_CONFIG = 60;
     public static final int DISCOVERY_CONFIG = 61;
     public static final int DISCOVERY_STRATEGY_CONFIG = 62;
+    public static final int NATIVE_CONFIG = 63;
 
-    private static final int LEN = DISCOVERY_STRATEGY_CONFIG + 1;
+    private static final int LEN = NATIVE_CONFIG + 1;
 
     @Override
     public int getFactoryId() {
@@ -509,6 +510,13 @@ public final class ConfigDataSerializerHook implements DataSerializerHook {
                     @Override
                     public IdentifiedDataSerializable createNew(Integer arg) {
                         return new DiscoveryStrategyConfig();
+                    }
+                };
+        constructors[NATIVE_CONFIG] =
+                new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+                    @Override
+                    public IdentifiedDataSerializable createNew(Integer arg) {
+                        return new NativeMemoryConfig();
                     }
                 };
         return new ArrayDataSerializableFactory(constructors);

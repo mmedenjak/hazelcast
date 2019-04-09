@@ -42,6 +42,8 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
 
     private String groupName;
 
+    private int staticConfigEpoch;
+
     private String joinerType;
 
     private boolean partitionGroupEnabled;
@@ -59,7 +61,7 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
     public ConfigCheck() {
     }
 
-    public ConfigCheck(Config config, String joinerType) {
+    public ConfigCheck(Config config, String joinerType, int epoch) {
         this.joinerType = joinerType;
 
         // Copying all properties relevant for checking
@@ -71,6 +73,8 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
         if (groupConfig != null) {
             this.groupName = groupConfig.getName();
         }
+
+        this.staticConfigEpoch = epoch;
 
         // Partition-group settings
         final PartitionGroupConfig partitionGroupConfig = config.getPartitionGroupConfig();
@@ -98,6 +102,7 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
             return false;
         }
 
+        verifyConfigEpoch(found);
         verifyJoiner(found);
         verifyPartitionGroup(found);
         verifyPartitionCount(found);
@@ -142,6 +147,13 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
         if (partitionGroupEnabled && memberGroupType != found.memberGroupType) {
             throw new ConfigMismatchException("Incompatible partition groups! expected: " + memberGroupType + ", found: "
                     + found.memberGroupType);
+        }
+    }
+
+    private void verifyConfigEpoch(ConfigCheck found) {
+        if (staticConfigEpoch != found.staticConfigEpoch) {
+            throw new ConfigMismatchException("Incompatible config epochs! expected: "
+                    + staticConfigEpoch + ", found: " + found.staticConfigEpoch);
         }
     }
 
@@ -198,6 +210,7 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
             out.writeUTF(entry.getKey());
             out.writeObject(entry.getValue());
         }
+        out.writeInt(staticConfigEpoch);
     }
 
     @Override
@@ -236,5 +249,6 @@ public final class ConfigCheck implements IdentifiedDataSerializable {
             Object value = in.readObject();
             queues.put(key, value);
         }
+        staticConfigEpoch = in.readInt();
     }
 }

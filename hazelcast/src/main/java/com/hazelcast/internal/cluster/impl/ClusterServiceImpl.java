@@ -18,6 +18,7 @@ package com.hazelcast.internal.cluster.impl;
 
 import com.hazelcast.cluster.ClusterState;
 import com.hazelcast.cluster.MemberAttributeOperationType;
+import com.hazelcast.config.Config;
 import com.hazelcast.core.InitialMembershipEvent;
 import com.hazelcast.core.InitialMembershipListener;
 import com.hazelcast.core.Member;
@@ -32,6 +33,7 @@ import com.hazelcast.instance.LifecycleServiceImpl;
 import com.hazelcast.instance.MemberImpl;
 import com.hazelcast.instance.Node;
 import com.hazelcast.internal.cluster.ClusterService;
+import com.hazelcast.internal.cluster.impl.operations.ChangeConfigOp;
 import com.hazelcast.internal.cluster.impl.operations.ExplicitSuspicionOp;
 import com.hazelcast.internal.cluster.impl.operations.OnJoinOp;
 import com.hazelcast.internal.cluster.impl.operations.PromoteLiteMemberOp;
@@ -301,6 +303,12 @@ public class ClusterServiceImpl implements ClusterService, ConnectionListener, M
         node.getJoiner().setTargetAddress(newTargetAddress);
         LifecycleServiceImpl lifecycleService = node.hazelcastInstance.getLifecycleService();
         lifecycleService.runUnderLifecycleLock(new ClusterMergeTask(node));
+    }
+
+    public void upgradeAndMerge(Config newConfig, Address newTargetAddress) {
+        node.getJoiner().setTargetAddress(newTargetAddress);
+        LifecycleServiceImpl lifecycleService = node.hazelcastInstance.getLifecycleService();
+        lifecycleService.runUnderLifecycleLock(new ClusterUpgradeAndMergeTask(newConfig, newTargetAddress, node));
     }
 
     @Override
@@ -618,6 +626,16 @@ public class ClusterServiceImpl implements ClusterService, ConnectionListener, M
     }
 
     @Override
+    public void changeConfig(Config newConfig) {
+        MemberImpl master = getMasterMember();
+        ChangeConfigOp op = new ChangeConfigOp(newConfig);
+
+        InternalCompletableFuture<Boolean> future =
+                nodeEngine.getOperationService().invokeOnTarget(SERVICE_NAME, op, master.getAddress());
+        future.join();
+    }
+
+    @Override
     public Collection<Member> getMembers(MemberSelector selector) {
         return (Collection) new MemberSelectingCollection(membershipManager.getMembers(), selector);
     }
@@ -922,10 +940,10 @@ public class ClusterServiceImpl implements ClusterService, ConnectionListener, M
         long timeoutNanos = node.getProperties().getNanos(GroupProperty.CLUSTER_SHUTDOWN_TIMEOUT_SECONDS);
         long startNanos = System.nanoTime();
         node.getNodeExtension().getInternalHotRestartService()
-                .waitPartitionReplicaSyncOnCluster(timeoutNanos, TimeUnit.NANOSECONDS);
+            .waitPartitionReplicaSyncOnCluster(timeoutNanos, TimeUnit.NANOSECONDS);
         timeoutNanos -= (System.nanoTime() - startNanos);
 
-        if (node.config.getCPSubsystemConfig().getCPMemberCount() == 0) {
+        if (node.getConfig().getCPSubsystemConfig().getCPMemberCount() == 0) {
             shutdownNodesConcurrently(timeoutNanos);
         } else {
             shutdownNodesSerially(timeoutNanos);

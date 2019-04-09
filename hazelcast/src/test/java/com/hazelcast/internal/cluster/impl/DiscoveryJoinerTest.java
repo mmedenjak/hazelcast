@@ -95,7 +95,7 @@ public class DiscoveryJoinerTest {
     @Test
     public void test_DiscoveryJoinerJoin_whenTargetMemberSet() {
         Node node = getNode(hz);
-        node.config.getNetworkConfig().getJoin().getTcpIpConfig().setRequiredMember("127.0.0.1");
+        node.getConfig().getNetworkConfig().getJoin().getTcpIpConfig().setRequiredMember("127.0.0.1");
         DiscoveryJoiner joiner = new DiscoveryJoiner(node, service, true);
         doReturn(discoveryNodes).when(service).discoverNodes();
 
@@ -107,7 +107,7 @@ public class DiscoveryJoinerTest {
     public void test_DiscoveryJoinerJoin_whenTargetMemberHasSameAddressAsNode() throws UnknownHostException {
         Node node = getNode(hz);
         String hostAddress = node.getThisAddress().getInetAddress().getHostAddress();
-        node.config.getNetworkConfig().getJoin().getTcpIpConfig().setRequiredMember(hostAddress);
+        node.getConfig().getNetworkConfig().getJoin().getTcpIpConfig().setRequiredMember(hostAddress);
 
         List<DiscoveryNode> nodes = new ArrayList<DiscoveryNode>();
         nodes.add(new SimpleDiscoveryNode(node.getThisAddress(), node.getThisAddress()));

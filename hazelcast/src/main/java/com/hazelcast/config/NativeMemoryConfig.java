@@ -16,9 +16,17 @@
 
 package com.hazelcast.config;
 
+import com.hazelcast.internal.cluster.Versions;
 import com.hazelcast.memory.MemorySize;
 import com.hazelcast.memory.MemoryUnit;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
+import java.io.IOException;
+
+import static com.hazelcast.internal.serialization.impl.SerializationUtil.readNullableList;
+import static com.hazelcast.internal.serialization.impl.SerializationUtil.writeNullableList;
 import static com.hazelcast.util.Preconditions.checkPositive;
 import static com.hazelcast.util.Preconditions.isNotNull;
 
@@ -33,7 +41,7 @@ import static com.hazelcast.util.Preconditions.isNotNull;
  * store their data (entries, indexes etc.) in native memory region when they are configured with
  * {@link InMemoryFormat#NATIVE}.
  */
-public class NativeMemoryConfig {
+public class NativeMemoryConfig implements IdentifiedDataSerializable {
 
     /**
      * Default minimum block size in bytes
@@ -211,6 +219,31 @@ public class NativeMemoryConfig {
     public NativeMemoryConfig setMetadataSpacePercentage(float metadataSpacePercentage) {
         this.metadataSpacePercentage = metadataSpacePercentage;
         return this;
+    }
+
+    @Override
+    public int getFactoryId() {
+        return ConfigDataSerializerHook.F_ID;
+    }
+
+    @Override
+    public int getId() {
+        return ConfigDataSerializerHook.NATIVE_CONFIG;
+    }
+
+    @Override
+    public void writeData(ObjectDataOutput out) throws IOException {
+        out.writeBoolean(enabled);
+        out.writeLong(size.getValue());
+        out.writeUTF(size.getUnit().toString());
+        out.writeUTF(allocatorType.name());
+    }
+
+    @Override
+    public void readData(ObjectDataInput in) throws IOException {
+        enabled = in.readBoolean();
+        size = new MemorySize(in.readLong(), MemoryUnit.valueOf(in.readUTF()));
+        allocatorType = MemoryAllocatorType.valueOf(in.readUTF());
     }
 
     /**

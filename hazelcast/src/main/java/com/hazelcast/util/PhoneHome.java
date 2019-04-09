@@ -170,7 +170,7 @@ public class PhoneHome {
                 .addParam("jetv", jetBuildInfo == null ? "" : jetBuildInfo.getVersion());
         addClientInfo(hazelcastNode, parameterCreator);
         addOSInfo(parameterCreator);
-        boolean isManagementCenterConfigEnabled = hazelcastNode.config.getManagementCenterConfig().isEnabled();
+        boolean isManagementCenterConfigEnabled = hazelcastNode.getConfig().getManagementCenterConfig().isEnabled();
         if (isManagementCenterConfigEnabled) {
             addManCenterInfo(hazelcastNode, clusterSize, parameterCreator);
         } else {
@@ -249,7 +249,7 @@ public class PhoneHome {
         InputStream inputStream = null;
         InputStreamReader reader = null;
         try {
-            ManagementCenterConfig managementCenterConfig = hazelcastNode.config.getManagementCenterConfig();
+            ManagementCenterConfig managementCenterConfig = hazelcastNode.getConfig().getManagementCenterConfig();
             String manCenterURL = managementCenterConfig.getUrl();
             manCenterURL = manCenterURL.endsWith("/") ? manCenterURL : manCenterURL + '/';
             URL manCenterPhoneHomeURL = new URL(manCenterURL + "phoneHome.do");

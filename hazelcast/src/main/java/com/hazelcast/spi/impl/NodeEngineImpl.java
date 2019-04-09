@@ -23,6 +23,7 @@ import com.hazelcast.instance.MemberImpl;
 import com.hazelcast.instance.Node;
 import com.hazelcast.instance.NodeExtension;
 import com.hazelcast.internal.cluster.ClusterService;
+import com.hazelcast.internal.config.StaticConfigEpochService;
 import com.hazelcast.internal.diagnostics.Diagnostics;
 import com.hazelcast.internal.dynamicconfig.ClusterWideConfigurationService;
 import com.hazelcast.internal.dynamicconfig.DynamicConfigListener;
@@ -263,7 +264,7 @@ public class NodeEngineImpl implements NodeEngine {
 
     @Override
     public SerializationService getSerializationService() {
-        return serializationService;
+        return node.getSerializationService();
     }
 
     @Override

@@ -497,6 +497,11 @@ public class DefaultNodeExtension implements NodeExtension {
         return false;
     }
 
+    @Override
+    public void reinit() {
+
+    }
+
     protected void createAndSetPhoneHome() {
         this.phoneHome = new PhoneHome(node);
     }

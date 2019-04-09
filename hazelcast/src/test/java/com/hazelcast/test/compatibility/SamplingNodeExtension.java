@@ -269,4 +269,9 @@ public class SamplingNodeExtension implements NodeExtension {
     public boolean isClientFailoverSupported() {
         return false;
     }
+
+    @Override
+    public void reinit() {
+
+    }
 }

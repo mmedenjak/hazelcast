@@ -331,4 +331,6 @@ public interface NodeExtension {
      * @return true if client failover feature is supported
      */
     boolean isClientFailoverSupported();
+
+    void reinit();
 }

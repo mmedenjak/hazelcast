@@ -195,5 +195,10 @@ public class CPSubsystemRollingUpgrade_3_11_Test extends HazelcastRaftTestSuppor
         public boolean isNodeVersionCompatibleWith(Version clusterVersion) {
             return true;
         }
+
+        @Override
+        public void reinit() {
+
+        }
     }
 }

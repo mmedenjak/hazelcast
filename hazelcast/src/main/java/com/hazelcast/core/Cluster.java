@@ -17,6 +17,7 @@
 package com.hazelcast.core;
 
 import com.hazelcast.cluster.ClusterState;
+import com.hazelcast.config.Config;
 import com.hazelcast.hotrestart.HotRestartService;
 import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.transaction.TransactionException;
@@ -75,6 +76,8 @@ public interface Cluster {
      * @return current members in the cluster
      */
     Set<Member> getMembers();
+
+    void changeConfig(Config newConfig);
 
     /**
      * Returns this Hazelcast instance member.

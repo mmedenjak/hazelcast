@@ -371,6 +371,11 @@ public class AdvancedClusterStateTest extends HazelcastTestSupport {
                             public boolean isStartCompleted() {
                                 return startupDone.get() && super.isStartCompleted();
                             }
+
+                            @Override
+                            public void reinit() {
+
+                            }
                         };
                     }
                 });

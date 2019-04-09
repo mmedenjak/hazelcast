@@ -53,8 +53,8 @@ public class ConfigCheckTest {
         Config config2 = new Config();
         config2.getGroupConfig().setName("bar");
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner", -1);
 
         assertIsCompatibleFalse(configCheck1, configCheck2);
     }
@@ -69,8 +69,8 @@ public class ConfigCheckTest {
         config2.getGroupConfig().setName("foo");
         config2.getGroupConfig().setPassword("There");
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner", -1);
 
         assertIsCompatibleTrue(configCheck1, configCheck2);
     }
@@ -79,7 +79,7 @@ public class ConfigCheckTest {
     public void testGroupPasswordNotLeak_whenVersionAboveThreeNine() {
         final Config config = new Config();
         config.getNetworkConfig().getJoin().getMulticastConfig()
-                .setEnabled(true).setMulticastTimeoutSeconds(3);
+              .setEnabled(true).setMulticastTimeoutSeconds(3);
         config.getNetworkConfig().getJoin().getTcpIpConfig().setEnabled(false);
 
         final AtomicBoolean leaked = new AtomicBoolean(false);
@@ -87,7 +87,7 @@ public class ConfigCheckTest {
         ObjectDataOutput odo = mock(ObjectDataOutput.class);
 
         try {
-            ConfigCheck configCheck = new ConfigCheck(config, "multicast");
+            ConfigCheck configCheck = new ConfigCheck(config, "multicast", -1);
             configCheck.writeData(odo);
         } catch (IOException e) {
             fail(e.getMessage());
@@ -112,8 +112,8 @@ public class ConfigCheckTest {
         Config config1 = new Config();
         Config config2 = new Config();
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner1");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner2");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner1", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner2", -1);
 
         assertIsCompatibleThrowsConfigMismatchException(configCheck1, configCheck2);
     }
@@ -126,8 +126,8 @@ public class ConfigCheckTest {
         Config config2 = new Config();
         config2.setProperty(GroupProperty.PARTITION_COUNT.getName(), "200");
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner", -1);
 
         assertIsCompatibleThrowsConfigMismatchException(configCheck1, configCheck2);
     }
@@ -140,8 +140,8 @@ public class ConfigCheckTest {
         Config config2 = new Config();
         config2.setProperty(GroupProperty.APPLICATION_VALIDATION_TOKEN.getName(), "bar");
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner", -1);
 
         assertIsCompatibleThrowsConfigMismatchException(configCheck1, configCheck2);
     }
@@ -154,8 +154,8 @@ public class ConfigCheckTest {
         Config config2 = new Config();
         config2.getPartitionGroupConfig().setEnabled(true);
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner", -1);
 
         assertIsCompatibleThrowsConfigMismatchException(configCheck1, configCheck2);
     }
@@ -170,8 +170,8 @@ public class ConfigCheckTest {
         config2.getPartitionGroupConfig().setEnabled(true);
         config2.getPartitionGroupConfig().setGroupType(PartitionGroupConfig.MemberGroupType.PER_MEMBER);
 
-        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner");
-        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner");
+        ConfigCheck configCheck1 = new ConfigCheck(config1, "joiner", -1);
+        ConfigCheck configCheck2 = new ConfigCheck(config2, "joiner", -1);
 
         assertIsCompatibleThrowsConfigMismatchException(configCheck1, configCheck2);
     }

@@ -442,6 +442,8 @@ class MapServiceContextImpl implements MapServiceContext {
     public void reset() {
         removeAllRecordStoresOfAllMaps(false, false);
         mapNearCacheManager.reset();
+        mapContainers.clear();
+        logger.warning("WOOT WOOT clearing containers");
     }
 
     @Override

@@ -159,7 +159,7 @@ public class DynamicConfigurationAwareConfig extends Config {
                 }
             };
 
-    private final Config staticConfig;
+    private Config staticConfig;
     private final ConfigPatternMatcher configPatternMatcher;
     private final boolean isStaticFirst;
     private final DynamicCPSubsystemConfig dynamicCPSubsystemConfig;
@@ -175,6 +175,11 @@ public class DynamicConfigurationAwareConfig extends Config {
         this.isStaticFirst = !properties.getBoolean(SEARCH_DYNAMIC_CONFIG_FIRST);
         this.dynamicSecurityConfig = new DynamicSecurityConfig(staticConfig.getSecurityConfig(), null);
         this.dynamicCPSubsystemConfig = new DynamicCPSubsystemConfig(staticConfig.getCPSubsystemConfig());
+        this.configSearcher = initConfigSearcher();
+    }
+
+    public void setStaticConfig(Config staticConfig) {
+        this.staticConfig = staticConfig;
         this.configSearcher = initConfigSearcher();
     }
 

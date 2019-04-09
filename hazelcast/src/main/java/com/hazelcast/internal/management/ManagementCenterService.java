@@ -150,7 +150,7 @@ public class ManagementCenterService {
     }
 
     private ManagementCenterConfig getManagementCenterConfig() {
-        ManagementCenterConfig config = instance.node.config.getManagementCenterConfig();
+        ManagementCenterConfig config = instance.node.getConfig().getManagementCenterConfig();
         if (config == null) {
             throw new IllegalStateException("ManagementCenterConfig can't be null!");
         }

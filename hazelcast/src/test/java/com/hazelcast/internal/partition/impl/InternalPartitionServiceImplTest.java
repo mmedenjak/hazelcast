@@ -72,6 +72,11 @@ public class InternalPartitionServiceImplTest extends HazelcastTestSupport {
                     public boolean isStartCompleted() {
                         return startupDone.get();
                     }
+
+                    @Override
+                    public void reinit() {
+
+                    }
                 };
             }
         };

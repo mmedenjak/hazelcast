@@ -117,7 +117,7 @@ public class ClusterHeartbeatManager {
         legacyIcmpCheckThresholdMillis = heartbeatIntervalMillis * HEART_BEAT_INTERVAL_FACTOR;
 
         IcmpFailureDetectorConfig icmpFailureDetectorConfig
-                = getActiveMemberNetworkConfig(node.config).getIcmpFailureDetectorConfig();
+                = getActiveMemberNetworkConfig(node.getConfig()).getIcmpFailureDetectorConfig();
 
         this.icmpTtl = icmpFailureDetectorConfig == null
                 ? hazelcastProperties.getInteger(GroupProperty.ICMP_TTL)
@@ -154,7 +154,7 @@ public class ClusterHeartbeatManager {
 
     private PingFailureDetector createIcmpFailureDetectorIfNeeded(HazelcastProperties properties) {
         IcmpFailureDetectorConfig icmpFailureDetectorConfig
-                = getActiveMemberNetworkConfig(node.config).getIcmpFailureDetectorConfig();
+                = getActiveMemberNetworkConfig(node.getConfig()).getIcmpFailureDetectorConfig();
 
         boolean icmpEchoFailFast = icmpFailureDetectorConfig == null
                 ? properties.getBoolean(GroupProperty.ICMP_ECHO_FAIL_FAST)
