@@ -16,11 +16,9 @@
 
 package com.hazelcast.quorum.scheduledexecutor;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.cluster.Member;
-import com.hazelcast.quorum.AbstractQuorumTest;
+import com.hazelcast.config.Config;
 import com.hazelcast.quorum.AbstractQuorumTest2;
-import com.hazelcast.quorum.QuorumException;
 import com.hazelcast.quorum.QuorumType;
 import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import com.hazelcast.scheduledexecutor.IScheduledFuture;
@@ -31,9 +29,7 @@ import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.test.annotation.Repeat;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -220,7 +216,7 @@ public class ScheduledExecutorQuorumWriteTest extends AbstractQuorumTest2 {
     public void scheduleOnMembers_callable_quorum() throws Exception {
         Map<Member, IScheduledFuture<?>> futures = (Map<Member, IScheduledFuture<?>>) exec(0)
                 .scheduleOnMembers(callable(), asList(member(0)),
-                10, TimeUnit.MILLISECONDS);
+                        10, TimeUnit.MILLISECONDS);
         wait(futures);
     }
 
@@ -228,7 +224,7 @@ public class ScheduledExecutorQuorumWriteTest extends AbstractQuorumTest2 {
     public void scheduleOnMembers_callable_noQuorum() throws Exception {
         Map<Member, IScheduledFuture<?>> futures = (Map<Member, IScheduledFuture<?>>) exec(3)
                 .scheduleOnMembers(callable(),
-                asList(member(3)), 10, TimeUnit.MILLISECONDS);
+                        asList(member(3)), 10, TimeUnit.MILLISECONDS);
         wait(futures);
     }
 
