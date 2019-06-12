@@ -25,8 +25,8 @@ import com.hazelcast.scheduledexecutor.IScheduledExecutorService;
 import com.hazelcast.test.HazelcastSerialParametersRunnerFactory;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,17 +37,17 @@ import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 @Category({QuickTest.class, ParallelJVMTest.class})
 public class ClientScheduledExecutorQuorumWriteTest extends ScheduledExecutorQuorumWriteTest {
 
-    private static PartitionedClusterClients clients;
+    private PartitionedClusterClients clients;
 
-    @BeforeClass
-    public static void setUp() {
+    @Before
+    public void setUp() {
         TestHazelcastFactory factory = new TestHazelcastFactory();
         initTestEnvironment(new Config(), factory);
         clients = new PartitionedClusterClients(cluster, factory);
     }
 
-    @AfterClass
-    public static void tearDown() {
+    @After
+    public void tearDown() {
         if (clients != null) {
             clients.terminateAll();
         }
