@@ -55,7 +55,7 @@ import static java.util.Arrays.asList;
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(HazelcastSerialParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
-@Repeat(200)
+@Repeat(400)
 public class ScheduledExecutorQuorumWriteTest extends AbstractQuorumTest2 {
 
     @ClassRule
