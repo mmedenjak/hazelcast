@@ -26,7 +26,8 @@ import com.hazelcast.config.WanPublisherConfig;
 public interface WanReplicationPublisher {
 
     /**
-     * Publish the {@code eventObject} WAN replication event. The event may be dropped if queue capacity has been reached.
+     * Publish the {@code eventObject} WAN replication event. The event may be
+     * dropped if the WAN event container capacity has been reached.
      *
      * @param serviceName the service publishing the event
      * @param eventObject the replication event
@@ -34,7 +35,8 @@ public interface WanReplicationPublisher {
     void publishReplicationEvent(String serviceName, ReplicationEventObject eventObject);
 
     /**
-     * Publish the {@code eventObject} WAN replication event backup. The event may be dropped if queue capacity has been reached.
+     * Publish the {@code eventObject} WAN replication event backup. The event
+     * may be dropped if the WAN event container capacity has been reached.
      *
      * @param serviceName the service publishing the event
      * @param eventObject the replication backup event
@@ -50,10 +52,10 @@ public interface WanReplicationPublisher {
     void publishReplicationEvent(WanReplicationEvent wanReplicationEvent);
 
     /**
-     * Checks the size of the WAN replication queue and throws an
+     * Checks the size of the WAN event container and throws an
      * exception if it has been reached or crossed.
      *
-     * @throws WANReplicationQueueFullException if queue capacity has been reached and
+     * @throws WANReplicationQueueFullException if event container capacity has been reached and
      *                                          {@link WanPublisherConfig#getQueueFullBehavior()} is
      *                                          set to {@link WANQueueFullBehavior#THROW_EXCEPTION}
      */
