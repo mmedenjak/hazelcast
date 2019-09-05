@@ -53,7 +53,7 @@ public abstract class Invalidator {
         this.partitionService = nodeEngine.getPartitionService();
         this.eventService = nodeEngine.getEventService();
         this.partitionCount = nodeEngine.getPartitionService().getPartitionCount();
-        this.metaDataGenerator = new MetaDataGenerator(partitionCount);
+        this.metaDataGenerator = new MetaDataGenerator(partitionCount, logger);
     }
 
     protected abstract void invalidateInternal(Invalidation invalidation, int orderKey);

@@ -16,6 +16,7 @@
 
 package com.hazelcast.internal.nearcache.impl.invalidation;
 
+import com.hazelcast.logging.ILogger;
 import com.hazelcast.util.ConstructorFunction;
 
 import java.util.UUID;
@@ -51,14 +52,18 @@ public class MetaDataGenerator {
             = new ConstructorFunction<Integer, UUID>() {
         @Override
         public UUID createNew(Integer partitionId) {
-            return newUnsecureUUID();
+            UUID uuid = newUnsecureUUID();
+            logger.warning("WOOT WOOT setting UUID 3 " + uuid + ", partitionId " + partitionId);
+            return uuid;
         }
     };
+    private final ILogger logger;
 
-    public MetaDataGenerator(int partitionCount) {
+    public MetaDataGenerator(int partitionCount, ILogger logger) {
         assert partitionCount > 0;
 
         this.partitionCount = partitionCount;
+        this.logger = logger;
     }
 
     public long currentSequence(String name, int partitionId) {
@@ -90,7 +95,8 @@ public class MetaDataGenerator {
     }
 
     public void setUuid(int partitionId, UUID uuid) {
-        uuids.put(partitionId, uuid);
+        UUID previous = uuids.put(partitionId, uuid);
+        logger.warning("WOOT WOOT put UUID " + uuid + ", previous: " + previous + ", partitionId= " + partitionId);
     }
 
     public void removeUuidAndSequence(final int partitionId) {
@@ -108,7 +114,9 @@ public class MetaDataGenerator {
     }
 
     public void regenerateUuid(int partitionId) {
-        uuids.put(partitionId, uuidConstructor.createNew(partitionId));
+        UUID aNew = uuidConstructor.createNew(partitionId);
+        UUID previous = uuids.put(partitionId, aNew);
+        logger.warning("WOOT WOOT put UUID 2 " + aNew + ", previous: " + previous + ", partitionId= " + partitionId);
     }
 
     public void resetSequence(String name, int partitionId) {
