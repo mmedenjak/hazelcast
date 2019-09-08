@@ -53,7 +53,7 @@ public class MetaDataGenerator {
         @Override
         public UUID createNew(Integer partitionId) {
             UUID uuid = newUnsecureUUID();
-            logger.warning("WOOT WOOT setting UUID 3 " + uuid + ", partitionId " + partitionId);
+            logger.warning("WOOT WOOT setting UUID 3 " + uuid + ", partitionId=" + partitionId);
             return uuid;
         }
     };
@@ -96,7 +96,7 @@ public class MetaDataGenerator {
 
     public void setUuid(int partitionId, UUID uuid) {
         UUID previous = uuids.put(partitionId, uuid);
-        logger.warning("WOOT WOOT put UUID " + uuid + ", previous: " + previous + ", partitionId= " + partitionId);
+        logger.warning("WOOT WOOT put UUID " + uuid + ", previous: " + previous + ", partitionId=" + partitionId);
     }
 
     public void removeUuidAndSequence(final int partitionId) {
@@ -116,7 +116,7 @@ public class MetaDataGenerator {
     public void regenerateUuid(int partitionId) {
         UUID aNew = uuidConstructor.createNew(partitionId);
         UUID previous = uuids.put(partitionId, aNew);
-        logger.warning("WOOT WOOT put UUID 2 " + aNew + ", previous: " + previous + ", partitionId= " + partitionId);
+        logger.warning("WOOT WOOT put UUID 2 " + aNew + ", previous: " + previous + ", partitionId=" + partitionId);
     }
 
     public void resetSequence(String name, int partitionId) {

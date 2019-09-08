@@ -20,10 +20,11 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.MapConfig;
 import com.hazelcast.config.NearCacheConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.map.IMap;
 import com.hazelcast.internal.nearcache.impl.invalidation.Invalidator;
 import com.hazelcast.internal.nearcache.impl.invalidation.MetaDataGenerator;
 import com.hazelcast.internal.partition.InternalPartitionService;
+import com.hazelcast.logging.ILogger;
+import com.hazelcast.map.IMap;
 import com.hazelcast.map.impl.MapService;
 import com.hazelcast.map.impl.MapServiceContext;
 import com.hazelcast.map.impl.nearcache.MapNearCacheManager;
@@ -47,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.hazelcast.config.InMemoryFormat.BINARY;
 import static com.hazelcast.internal.nearcache.NearCacheTestUtils.getBaseConfig;
+import static com.hazelcast.logging.Logger.getLogger;
 import static com.hazelcast.map.impl.MapService.SERVICE_NAME;
 import static com.hazelcast.util.MapUtil.createHashMap;
 import static java.lang.String.format;
@@ -60,11 +62,13 @@ public class MemberMapInvalidationMetaDataMigrationTest extends HazelcastTestSup
     private static final String MAP_NAME = "MapInvalidationMetaDataMigrationTest";
 
     private TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory();
+    private final ILogger logger = getLogger(MemberMapInvalidationMetaDataMigrationTest.class);
     private Config config;
 
     @Before
     public void setUp() {
         config = getConfig(MAP_NAME);
+
     }
 
     @After
@@ -221,6 +225,7 @@ public class MemberMapInvalidationMetaDataMigrationTest extends HazelcastTestSup
         Map<Integer, UUID> destination3 = getPartitionToUuidMap(instance3);
 
         InternalPartitionService partitionService2 = getNodeEngineImpl(instance2).getPartitionService();
+        logger.warning("WOOT WOOT " + destination2 + " " + destination3);
         Map<Integer, UUID> merged = mergeOwnedPartitionUuids(partitionService2, destination2, destination3);
         assertPartitionUUIDsEqual(source, merged);
     }
@@ -303,15 +308,25 @@ public class MemberMapInvalidationMetaDataMigrationTest extends HazelcastTestSup
         return invalidator.getMetaDataGenerator();
     }
 
-    private static Map<Integer, UUID> mergeOwnedPartitionUuids(InternalPartitionService localPartitionService,
-                                                               Map<Integer, UUID> localUUIDs, Map<Integer, UUID> remoteUUIDs) {
+    private Map<Integer, UUID> mergeOwnedPartitionUuids(InternalPartitionService localPartitionService,
+                                                        Map<Integer, UUID> localUUIDs, Map<Integer, UUID> remoteUUIDs) {
         int partitionCount = localPartitionService.getPartitionCount();
         Map<Integer, UUID> merged = createHashMap(partitionCount);
         for (int i = 0; i < partitionCount; i++) {
-            if (localPartitionService.getPartition(i).isLocal()) {
-                merged.put(i, localUUIDs.get(i));
+            boolean isLocal = localPartitionService.getPartition(i).isLocal();
+            logger.warning("WOOT WOOT partitionId=" + i + " " + isLocal);
+            if (isLocal) {
+                UUID newUuid = localUUIDs.get(i);
+                UUID previous = merged.put(i, newUuid);
+                if (previous != null) {
+                    logger.warning("WOOT WOOT overwritten 1 " + previous + " with " + newUuid + ", partitionId=" + i);
+                }
             } else {
-                merged.put(i, remoteUUIDs.get(i));
+                UUID newUuid = remoteUUIDs.get(i);
+                UUID previous = merged.put(i, newUuid);
+                if (previous != null) {
+                    logger.warning("WOOT WOOT overwritten 2 " + previous + " with " + newUuid + ", partitionId=" + i);
+                }
             }
         }
         return merged;
