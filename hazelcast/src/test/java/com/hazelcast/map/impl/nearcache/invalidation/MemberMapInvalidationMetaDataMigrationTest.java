@@ -225,8 +225,8 @@ public class MemberMapInvalidationMetaDataMigrationTest extends HazelcastTestSup
         Map<Integer, UUID> destination3 = getPartitionToUuidMap(instance3);
 
         InternalPartitionService partitionService2 = getNodeEngineImpl(instance2).getPartitionService();
-        logger.warning("WOOT WOOT " + destination2 + " " + destination3);
         Map<Integer, UUID> merged = mergeOwnedPartitionUuids(partitionService2, destination2, destination3);
+        logger.warning("WOOT WOOT UUIDs " + destination2 + " " + destination3 + " " + merged);
         assertPartitionUUIDsEqual(source, merged);
     }
 
