@@ -116,7 +116,7 @@ public class MetaDataGenerator {
     public void regenerateUuid(int partitionId) {
         UUID aNew = uuidConstructor.createNew(partitionId);
         UUID previous = uuids.put(partitionId, aNew);
-        logger.warning("WOOT WOOT put UUID 2 " + aNew + ", previous: " + previous + ", partitionId=" + partitionId);
+        logger.warning("WOOT WOOT put UUID 2 " + aNew + ", previous: " + previous + ", partitionId=" + partitionId, new Exception());
     }
 
     public void resetSequence(String name, int partitionId) {
