@@ -61,7 +61,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 @UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelTest.class})
-@Repeat(100)
+@Repeat(500)
 public class SingleValueBitmapIndexTest extends HazelcastTestSupport {
 
     private static final int BATCH_SIZE = 1000;
