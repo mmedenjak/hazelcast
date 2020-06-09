@@ -20,6 +20,7 @@ import com.hazelcast.config.MetricsConfig;
 import com.hazelcast.internal.metrics.MetricsPublisher;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.metrics.collectors.MetricsCollector;
+import com.hazelcast.internal.metrics.jfr.FlightRecorderPublisher;
 import com.hazelcast.internal.metrics.jmx.JmxPublisher;
 import com.hazelcast.internal.metrics.managementcenter.ConcurrentArrayRingbuffer;
 import com.hazelcast.internal.metrics.managementcenter.ConcurrentArrayRingbuffer.RingbufferSlice;
@@ -100,6 +101,9 @@ public class MetricsService implements ManagedService, LiveOperationsTracker {
             if (config.getJmxConfig().isEnabled()) {
                 publishers.add(createJmxPublisher());
             }
+
+            // just hack in the JFR publisher
+            publishers.add(new FlightRecorderPublisher());
 
             if (!publishers.isEmpty()) {
                 scheduleMetricsCollectorIfNeeded();
