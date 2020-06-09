@@ -62,10 +62,16 @@ public class FlightRecorderPublisher implements MetricsPublisher {
             ArrayList<ValueDescriptor> fields = new ArrayList<>(1);
             fields.add(new ValueDescriptor(String.class, "prefix", singletonList(new AnnotationElement(Label.class, "Prefix"))));
             fields.add(new ValueDescriptor(String.class, "metric", singletonList(new AnnotationElement(Label.class, "Metric"))));
-            fields.add(new ValueDescriptor(String.class, "discriminator",
-                    singletonList(new AnnotationElement(Label.class, "Discriminator"))));
+            String discriminator = descriptor.discriminator() != null ? descriptor.discriminator() : "Discriminator";
+            fields.add(new ValueDescriptor(String.class, discriminator,
+                    singletonList(new AnnotationElement(Label.class, discriminator))));
             fields.add(new ValueDescriptor(String.class, "unit", singletonList(new AnnotationElement(Label.class, "Unit"))));
             fields.add(new ValueDescriptor(valueClass, "value", singletonList(new AnnotationElement(Label.class, "Value"))));
+
+            for (int i = 0; i < descriptor.tagCount(); i++) {
+                String tag = descriptor.tag(i);
+                fields.add(new ValueDescriptor(String.class, tag, singletonList(new AnnotationElement(Label.class, tag))));
+            }
 
             List<AnnotationElement> eventAnnotations = new ArrayList<>();
             eventAnnotations.add(new AnnotationElement(Name.class, prefix));
@@ -82,9 +88,11 @@ public class FlightRecorderPublisher implements MetricsPublisher {
     private void fillMetadata(MetricDescriptor descriptor, Event event) {
         event.set(0, descriptor.prefix());
         event.set(1, descriptor.metric());
-        event.set(2, descriptor.discriminator() != null ?
-                descriptor.discriminator() + ":" + descriptor.discriminatorValue() : null);
+        event.set(2, descriptor.discriminatorValue());
         event.set(3, descriptor.unit() != null ? descriptor.unit().toString() : null);
+        //        for (int i = 0; i < descriptor.tagCount(); i++) {
+        //            event.set(5 + i, descriptor.tagValue(i));
+        //        }
     }
 
     @Override

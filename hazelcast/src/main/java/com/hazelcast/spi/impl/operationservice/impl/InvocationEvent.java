@@ -18,9 +18,11 @@ package com.hazelcast.spi.impl.operationservice.impl;
 
 import jdk.jfr.Category;
 import jdk.jfr.Event;
+import jdk.jfr.Label;
 import jdk.jfr.Name;
 import jdk.jfr.StackTrace;
 
+@Label("Invocation event")
 @Category({"Hazelcast", "Invocation"})
 @StackTrace(false)
 class InvocationEvent extends Event {

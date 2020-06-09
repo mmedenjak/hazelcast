@@ -103,7 +103,7 @@ public class MetricsService implements ManagedService, LiveOperationsTracker {
                 publishers.add(createJmxPublisher());
             }
 
-            if (JfrSupport.isJfrEnabled()) {
+            if (JfrSupport.isJfrAvailable()) {
                 publishers.add(new FlightRecorderPublisher());
             }
 

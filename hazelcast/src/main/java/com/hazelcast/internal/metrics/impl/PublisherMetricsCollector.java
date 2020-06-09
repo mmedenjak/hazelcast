@@ -61,6 +61,7 @@ public class PublisherMetricsCollector implements MetricsCollector {
             try {
                 publisher.publishLong(descriptor, value);
             } catch (Exception e) {
+                e.printStackTrace();
                 logError(descriptor, value, publisher, e);
             }
         }
