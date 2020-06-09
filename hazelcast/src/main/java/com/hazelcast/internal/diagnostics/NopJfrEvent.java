@@ -19,6 +19,8 @@ package com.hazelcast.internal.diagnostics;
 import java.util.function.Consumer;
 
 class NopJfrEvent<T> implements JfrEvent<T> {
+    static final NopJfrEvent INSTANCE = new NopJfrEvent();
+
     @Override
     public void begin() {
     }

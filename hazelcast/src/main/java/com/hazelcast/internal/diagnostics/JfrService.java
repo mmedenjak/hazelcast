@@ -34,7 +34,7 @@ public class JfrService implements JfrEventProvider {
     @Override
     public <T extends Event> JfrEvent<T> provide(JfrEventFactory<T> eventFactory) {
         if (!enabled) {
-            return (NopJfrEvent<T>) new NopJfrEvent();
+            return NopJfrEvent.INSTANCE;
         }
 
         return new RealJfrEvent<>(eventFactory.create());
