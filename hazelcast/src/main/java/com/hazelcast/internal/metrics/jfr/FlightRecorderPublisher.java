@@ -39,9 +39,10 @@ public class FlightRecorderPublisher implements MetricsPublisher {
     private void fillMetadata(MetricDescriptor descriptor, AbstractMetricEvent event) {
         event.prefix = descriptor.prefix();
         event.metric = descriptor.metric();
-        event.discriminator = descriptor.discriminator() + ":" + descriptor.discriminatorValue();
-        event.unit = descriptor.unit();
-        descriptor.readTags(event::tag);
+        event.discriminator = descriptor.discriminator() != null ?
+                descriptor.discriminator() + ":" + descriptor.discriminatorValue() : null;
+        event.unit = descriptor.unit().toString();
+        //        descriptor.readTags(event::tag);
     }
 
     @Override

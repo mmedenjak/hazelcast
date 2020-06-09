@@ -102,8 +102,9 @@ public class MetricsService implements ManagedService, LiveOperationsTracker {
                 publishers.add(createJmxPublisher());
             }
 
-            // just hack in the JFR publisher
-            publishers.add(new FlightRecorderPublisher());
+            if (nodeEngine.getJfrService().isEnabled()) {
+                publishers.add(new FlightRecorderPublisher());
+            }
 
             if (!publishers.isEmpty()) {
                 scheduleMetricsCollectorIfNeeded();

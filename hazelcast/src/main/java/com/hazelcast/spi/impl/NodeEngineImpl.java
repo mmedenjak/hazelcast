@@ -25,6 +25,7 @@ import com.hazelcast.instance.impl.Node;
 import com.hazelcast.instance.impl.NodeExtension;
 import com.hazelcast.internal.cluster.ClusterService;
 import com.hazelcast.internal.diagnostics.Diagnostics;
+import com.hazelcast.internal.diagnostics.JfrService;
 import com.hazelcast.internal.dynamicconfig.ClusterWideConfigurationService;
 import com.hazelcast.internal.dynamicconfig.DynamicConfigListener;
 import com.hazelcast.internal.management.ManagementCenterService;
@@ -122,6 +123,7 @@ public class NodeEngineImpl implements NodeEngine {
     private final Diagnostics diagnostics;
     private final SplitBrainMergePolicyProvider splitBrainMergePolicyProvider;
     private final ConcurrencyDetection concurrencyDetection;
+    private final JfrService jfrService;
 
     @SuppressWarnings("checkstyle:executablestatementcount")
     public NodeEngineImpl(Node node) {
@@ -164,6 +166,7 @@ public class NodeEngineImpl implements NodeEngine {
             serviceManager.registerService(OperationParker.SERVICE_NAME, operationParker);
             serviceManager.registerService(UserCodeDeploymentService.SERVICE_NAME, userCodeDeploymentService);
             serviceManager.registerService(ClusterWideConfigurationService.SERVICE_NAME, configurationService);
+            this.jfrService = new JfrService(node);
         } catch (Throwable e) {
             try {
                 shutdown(true);
@@ -411,6 +414,11 @@ public class NodeEngineImpl implements NodeEngine {
     @Override
     public <S> Collection<S> getServices(Class<S> serviceClass) {
         return serviceManager.getServices(serviceClass);
+    }
+
+    @Override
+    public JfrService getJfrService() {
+        return jfrService;
     }
 
     public Collection<ServiceInfo> getServiceInfos(Class serviceClass) {

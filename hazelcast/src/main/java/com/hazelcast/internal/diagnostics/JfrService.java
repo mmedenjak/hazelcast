@@ -14,28 +14,29 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.metrics.jfr;
+package com.hazelcast.internal.diagnostics;
 
-import jdk.jfr.Category;
+import com.hazelcast.instance.impl.Node;
 import jdk.jfr.Event;
-import jdk.jfr.Name;
-import jdk.jfr.StackTrace;
+import jdk.jfr.FlightRecorder;
 
-@Category({"Hazelcast", "Metrics"})
-@StackTrace(false)
-public abstract class AbstractMetricEvent extends Event {
-    @Name("discriminator")
-    String discriminator;
+public class JfrService implements JfrEventProvider {
+    private final boolean enabled;
 
-    @Name("prefix")
-    String prefix;
+    public JfrService(Node node) {
+        this.enabled = FlightRecorder.isAvailable() && FlightRecorder.isInitialized();
+    }
 
-    @Name("metric")
-    String metric;
+    public boolean isEnabled() {
+        return enabled;
+    }
 
-    @Name("unit")
-    String unit;
+    @Override
+    public <T extends Event> JfrEvent<T> provide(JfrEventFactory<T> eventFactory) {
+        if (!enabled) {
+            return (NopJfrEvent<T>) new NopJfrEvent();
+        }
 
-    @Name("tags")
-    String tags;
+        return new RealJfrEvent<>(eventFactory.create());
+    }
 }

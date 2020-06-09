@@ -14,28 +14,10 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.metrics.jfr;
+package com.hazelcast.internal.diagnostics;
 
-import jdk.jfr.Category;
 import jdk.jfr.Event;
-import jdk.jfr.Name;
-import jdk.jfr.StackTrace;
 
-@Category({"Hazelcast", "Metrics"})
-@StackTrace(false)
-public abstract class AbstractMetricEvent extends Event {
-    @Name("discriminator")
-    String discriminator;
-
-    @Name("prefix")
-    String prefix;
-
-    @Name("metric")
-    String metric;
-
-    @Name("unit")
-    String unit;
-
-    @Name("tags")
-    String tags;
+public interface JfrEventProvider {
+    <T extends Event> JfrEvent<T> provide(JfrEventFactory<T> eventFactory);
 }

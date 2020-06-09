@@ -14,28 +14,38 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.metrics.jfr;
+package com.hazelcast.internal.diagnostics;
 
-import jdk.jfr.Category;
-import jdk.jfr.Event;
-import jdk.jfr.Name;
-import jdk.jfr.StackTrace;
+import java.util.function.Consumer;
 
-@Category({"Hazelcast", "Metrics"})
-@StackTrace(false)
-public abstract class AbstractMetricEvent extends Event {
-    @Name("discriminator")
-    String discriminator;
+class NopJfrEvent<T> implements JfrEvent<T> {
+    @Override
+    public void begin() {
+    }
 
-    @Name("prefix")
-    String prefix;
+    @Override
+    public void end() {
+    }
 
-    @Name("metric")
-    String metric;
+    @Override
+    public void commit() {
+    }
 
-    @Name("unit")
-    String unit;
+    @Override
+    public boolean isEnabled() {
+        return false;
+    }
 
-    @Name("tags")
-    String tags;
+    @Override
+    public boolean shouldCommit() {
+        return false;
+    }
+
+    @Override
+    public void set(int index, Object value) {
+    }
+
+    @Override
+    public void mutate(Consumer<T> action) {
+    }
 }
