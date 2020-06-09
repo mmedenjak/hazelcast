@@ -1,4 +1,4 @@
-package com.hazelcast.internal.metrics.jfr;/*
+/*
  * Copyright (c) 2008-2020, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,11 @@ package com.hazelcast.internal.metrics.jfr;/*
  * limitations under the License.
  */
 
+package com.hazelcast.internal.metrics.jfr;
+
 import jdk.jfr.Name;
 
-class MetricLongEvent extends AbstractMetricEvent {
+public class MetricDoubleEvent extends AbstractMetricEvent {
     @Name("value")
-    long value;
+    double value;
 }

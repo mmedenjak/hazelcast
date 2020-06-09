@@ -23,19 +23,25 @@ public class FlightRecorderPublisher implements MetricsPublisher {
     @Override
     public void publishLong(MetricDescriptor descriptor, long value) {
         MetricLongEvent event = new MetricLongEvent();
-        //        event.begin();
-        event.prefix = descriptor.prefix();
-        event.metric = descriptor.metric();
-        event.discriminator = descriptor.discriminator() + ":" + descriptor.discriminatorValue();
-        event.unit = descriptor.unit();
+        fillMetadata(descriptor, event);
         event.value = value;
-        descriptor.readTags(event::tag);
         event.commit();
     }
 
     @Override
     public void publishDouble(MetricDescriptor descriptor, double value) {
+        MetricDoubleEvent event = new MetricDoubleEvent();
+        fillMetadata(descriptor, event);
+        event.value = value;
+        event.commit();
+    }
 
+    private void fillMetadata(MetricDescriptor descriptor, AbstractMetricEvent event) {
+        event.prefix = descriptor.prefix();
+        event.metric = descriptor.metric();
+        event.discriminator = descriptor.discriminator() + ":" + descriptor.discriminatorValue();
+        event.unit = descriptor.unit();
+        descriptor.readTags(event::tag);
     }
 
     @Override

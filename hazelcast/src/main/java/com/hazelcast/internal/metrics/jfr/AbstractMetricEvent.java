@@ -28,7 +28,7 @@ import static com.hazelcast.internal.util.MapUtil.createHashMap;
 
 @Category({"Hazelcast", "Metrics"})
 @StackTrace(false)
-public class MetricEvent extends Event {
+public abstract class AbstractMetricEvent extends Event {
     @Name("discriminator")
     String discriminator;
 
