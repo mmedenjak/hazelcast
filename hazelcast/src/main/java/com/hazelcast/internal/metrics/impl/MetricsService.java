@@ -17,6 +17,7 @@
 package com.hazelcast.internal.metrics.impl;
 
 import com.hazelcast.config.MetricsConfig;
+import com.hazelcast.internal.diagnostics.JfrSupport;
 import com.hazelcast.internal.metrics.MetricsPublisher;
 import com.hazelcast.internal.metrics.MetricsRegistry;
 import com.hazelcast.internal.metrics.collectors.MetricsCollector;
@@ -102,7 +103,7 @@ public class MetricsService implements ManagedService, LiveOperationsTracker {
                 publishers.add(createJmxPublisher());
             }
 
-            if (nodeEngine.getJfrService().isEnabled()) {
+            if (JfrSupport.isJfrEnabled()) {
                 publishers.add(new FlightRecorderPublisher());
             }
 

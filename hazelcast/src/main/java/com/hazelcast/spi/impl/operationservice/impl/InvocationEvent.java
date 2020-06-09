@@ -14,10 +14,22 @@
  * limitations under the License.
  */
 
-package com.hazelcast.internal.diagnostics;
+package com.hazelcast.spi.impl.operationservice.impl;
 
+import jdk.jfr.Category;
 import jdk.jfr.Event;
+import jdk.jfr.Name;
+import jdk.jfr.StackTrace;
 
-public interface JfrEventProvider {
-    <T extends Event> JfrEvent<T> provide(JfrEventFactory<T> eventFactory);
+@Category({"Hazelcast", "Invocation"})
+@StackTrace(false)
+class InvocationEvent extends Event {
+    @Name("opClass")
+    String opClass;
+
+    @Name("remote")
+    boolean remote;
+
+    @Name("targetAddress")
+    String targetAddress;
 }

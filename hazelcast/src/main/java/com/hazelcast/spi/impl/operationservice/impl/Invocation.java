@@ -26,13 +26,14 @@ import com.hazelcast.instance.impl.Node;
 import com.hazelcast.instance.impl.NodeState;
 import com.hazelcast.internal.cluster.ClusterClock;
 import com.hazelcast.internal.cluster.ClusterService;
+import com.hazelcast.internal.diagnostics.JfrSupport;
 import com.hazelcast.internal.nio.Connection;
-import com.hazelcast.internal.server.ServerConnectionManager;
-import com.hazelcast.internal.server.Server;
 import com.hazelcast.internal.nio.Packet;
-import com.hazelcast.internal.server.ServerConnection;
 import com.hazelcast.internal.partition.InternalPartitionService;
 import com.hazelcast.internal.serialization.InternalSerializationService;
+import com.hazelcast.internal.server.Server;
+import com.hazelcast.internal.server.ServerConnection;
+import com.hazelcast.internal.server.ServerConnectionManager;
 import com.hazelcast.internal.util.Clock;
 import com.hazelcast.internal.util.counters.MwCounter;
 import com.hazelcast.internal.util.executor.ManagedExecutorService;
@@ -195,6 +196,7 @@ public abstract class Invocation<T> extends BaseInvocation implements OperationR
      */
     private final Runnable taskDoneCallback;
 
+    private final InvocationEvent invocationEvent;
 
     Invocation(Context context,
                Operation op,
@@ -204,6 +206,14 @@ public abstract class Invocation<T> extends BaseInvocation implements OperationR
                long callTimeoutMillis,
                boolean deserialize,
                ServerConnectionManager connectionManager) {
+        if (JfrSupport.isJfrEnabled()) {
+            this.invocationEvent = new InvocationEvent();
+            this.invocationEvent.begin();
+            this.invocationEvent.opClass = op.getClass().getName();
+        } else {
+            this.invocationEvent = null;
+        }
+
         this.context = context;
         this.op = op;
         this.taskDoneCallback = taskDoneCallback;
@@ -576,6 +586,11 @@ public abstract class Invocation<T> extends BaseInvocation implements OperationR
             return;
         }
 
+        if (invocationEvent != null) {
+            invocationEvent.targetAddress = targetAddress.toString();
+            invocationEvent.remote = remote;
+        }
+
         if (remote) {
             doInvokeRemote();
         } else {
@@ -662,6 +677,10 @@ public abstract class Invocation<T> extends BaseInvocation implements OperationR
         future.complete(value);
         if (context.invocationRegistry.deregister(this) && taskDoneCallback != null) {
             context.asyncExecutor.execute(taskDoneCallback);
+        }
+
+        if (invocationEvent != null) {
+            invocationEvent.commit();
         }
     }
 

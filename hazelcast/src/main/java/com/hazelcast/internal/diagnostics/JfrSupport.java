@@ -16,27 +16,14 @@
 
 package com.hazelcast.internal.diagnostics;
 
-import com.hazelcast.instance.impl.Node;
-import jdk.jfr.Event;
 import jdk.jfr.FlightRecorder;
 
-public class JfrService implements JfrEventProvider {
-    private final boolean enabled;
+public final class JfrSupport {
 
-    public JfrService(Node node) {
-        this.enabled = FlightRecorder.isAvailable() && FlightRecorder.isInitialized();
+    public static boolean isJfrEnabled() {
+        return FlightRecorder.isAvailable() && FlightRecorder.isInitialized();
     }
 
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    @Override
-    public <T extends Event> JfrEvent<T> provide(JfrEventFactory<T> eventFactory) {
-        if (!enabled) {
-            return NopJfrEvent.INSTANCE;
-        }
-
-        return new RealJfrEvent<>(eventFactory.create());
+    private JfrSupport() {
     }
 }

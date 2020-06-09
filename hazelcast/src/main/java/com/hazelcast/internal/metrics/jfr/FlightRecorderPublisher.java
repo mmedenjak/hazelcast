@@ -16,33 +16,75 @@
 
 package com.hazelcast.internal.metrics.jfr;
 
+import com.hazelcast.function.FunctionEx;
 import com.hazelcast.internal.metrics.MetricDescriptor;
 import com.hazelcast.internal.metrics.MetricsPublisher;
+import jdk.jfr.AnnotationElement;
+import jdk.jfr.Category;
+import jdk.jfr.Event;
+import jdk.jfr.EventFactory;
+import jdk.jfr.Label;
+import jdk.jfr.Name;
+import jdk.jfr.StackTrace;
+import jdk.jfr.ValueDescriptor;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static java.util.Collections.singletonList;
 
 public class FlightRecorderPublisher implements MetricsPublisher {
+    private final Map<String, Event> metricEvents = new HashMap<>();
+
     @Override
     public void publishLong(MetricDescriptor descriptor, long value) {
-        MetricLongEvent event = new MetricLongEvent();
+        Event event = eventFor(descriptor, long.class);
         fillMetadata(descriptor, event);
-        event.value = value;
+        event.set(4, value);
+        event.end();
         event.commit();
     }
 
     @Override
     public void publishDouble(MetricDescriptor descriptor, double value) {
-        MetricDoubleEvent event = new MetricDoubleEvent();
+        Event event = eventFor(descriptor, double.class);
         fillMetadata(descriptor, event);
-        event.value = value;
+        event.set(4, value);
+        event.end();
         event.commit();
     }
 
-    private void fillMetadata(MetricDescriptor descriptor, AbstractMetricEvent event) {
-        event.prefix = descriptor.prefix();
-        event.metric = descriptor.metric();
-        event.discriminator = descriptor.discriminator() != null ?
-                descriptor.discriminator() + ":" + descriptor.discriminatorValue() : null;
-        event.unit = descriptor.unit().toString();
-        //        descriptor.readTags(event::tag);
+    private Event eventFor(MetricDescriptor descriptor, Class valueClass) {
+        return metricEvents.computeIfAbsent(descriptor.prefix(), (FunctionEx<String, Event>) prefix -> {
+            prefix = prefix != null ? prefix : "Generic";
+            ArrayList<ValueDescriptor> fields = new ArrayList<>(1);
+            fields.add(new ValueDescriptor(String.class, "prefix", singletonList(new AnnotationElement(Label.class, "Prefix"))));
+            fields.add(new ValueDescriptor(String.class, "metric", singletonList(new AnnotationElement(Label.class, "Metric"))));
+            fields.add(new ValueDescriptor(String.class, "discriminator",
+                    singletonList(new AnnotationElement(Label.class, "Discriminator"))));
+            fields.add(new ValueDescriptor(String.class, "unit", singletonList(new AnnotationElement(Label.class, "Unit"))));
+            fields.add(new ValueDescriptor(valueClass, "value", singletonList(new AnnotationElement(Label.class, "Value"))));
+
+            List<AnnotationElement> eventAnnotations = new ArrayList<>();
+            eventAnnotations.add(new AnnotationElement(Name.class, prefix));
+            eventAnnotations.add(new AnnotationElement(Label.class, prefix));
+            eventAnnotations.add(new AnnotationElement(Category.class, new String[]{"Hazelcast", "Metrics"}));
+            eventAnnotations.add(new AnnotationElement(StackTrace.class, false));
+
+            EventFactory factory = EventFactory.create(eventAnnotations, fields);
+
+            return factory.newEvent();
+        });
+    }
+
+    private void fillMetadata(MetricDescriptor descriptor, Event event) {
+        event.set(0, descriptor.prefix());
+        event.set(1, descriptor.metric());
+        event.set(2, descriptor.discriminator() != null ?
+                descriptor.discriminator() + ":" + descriptor.discriminatorValue() : null);
+        event.set(3, descriptor.unit() != null ? descriptor.unit().toString() : null);
     }
 
     @Override

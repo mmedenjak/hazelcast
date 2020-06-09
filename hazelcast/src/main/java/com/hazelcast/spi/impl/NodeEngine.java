@@ -22,7 +22,6 @@ import com.hazelcast.cluster.Member;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.cluster.ClusterService;
-import com.hazelcast.internal.diagnostics.JfrService;
 import com.hazelcast.internal.partition.IPartitionService;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.serialization.SerializationService;
@@ -304,6 +303,4 @@ public interface NodeEngine {
      * <b>Note:</b> CoreServices will be placed at the beginning of the list.
      */
     <S> Collection<S> getServices(Class<S> serviceClass);
-
-    JfrService getJfrService();
 }
