@@ -51,6 +51,9 @@ import static com.hazelcast.cache.CacheTestSupport.getCacheService;
 import static com.hazelcast.cache.HazelcastCachingProvider.propertiesByInstanceItself;
 import static com.hazelcast.cache.CacheTestSupport.createServerCachingProvider;
 import static com.hazelcast.config.CacheConfigAccessor.getTenantControl;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -59,11 +62,12 @@ import static org.junit.Assert.assertNotNull;
 @Category(QuickTest.class)
 public class CacheTenantControlTest extends HazelcastTestSupport {
 
-    private static AtomicInteger saveCurrentCount = new AtomicInteger();
+    private static final AtomicInteger saveCurrentCount = new AtomicInteger();
     static AtomicInteger setTenantCount = new AtomicInteger();
-    private static AtomicInteger closeTenantCount = new AtomicInteger();
-    private static AtomicInteger unregisterTenantCount = new AtomicInteger();
-    private static AtomicReference<DestroyEventContext> destroyEventContext = new AtomicReference<DestroyEventContext>(null);
+    private static final AtomicInteger closeTenantCount = new AtomicInteger();
+    private static final AtomicInteger registerTenantCount = new AtomicInteger();
+    private static final AtomicInteger unregisterTenantCount = new AtomicInteger();
+    static final AtomicReference<DestroyEventContext> destroyEventContext = new AtomicReference<DestroyEventContext>(null);
 
     @Parameter
     public boolean hasTenantControl;
@@ -92,6 +96,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         saveCurrentCount.set(0);
         setTenantCount.set(0);
         closeTenantCount.set(0);
+        registerTenantCount.set(0);
         unregisterTenantCount.set(0);
     }
 
@@ -141,8 +146,9 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         // expecting tenant context is created & closed 5 times:
         // 2 times on creation of record store (wrapping initialization of eviction policy)
         // + 3 times on before/afterRun of put, get & getAndPut operations
-        assertEquals(5, setTenantCount.get());
-        assertEquals(5, closeTenantCount.get());
+        assertEquals(4, setTenantCount.get());
+        assertEquals(4, closeTenantCount.get());
+        assertEquals(1, registerTenantCount.get());
         assertEquals(1, unregisterTenantCount.get());
     }
 
@@ -174,7 +180,6 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
     }
 
     public static class CountingTenantControl implements TenantControl {
-
         @Override
         public Closeable setTenant(boolean createRequestScope) {
             new Exception().printStackTrace();
@@ -188,8 +193,26 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         }
 
         @Override
+        public void register() {
+            registerTenantCount.incrementAndGet();
+        }
+
+        @Override
         public void unregister() {
             unregisterTenantCount.incrementAndGet();
+        }
+
+        @Override
+        public boolean isClassesAlwaysAvailable() {
+            return false;
+        }
+
+        @Override
+        public void writeData(ObjectDataOutput out) throws IOException {
+        }
+
+        @Override
+        public void readData(ObjectDataInput in) throws IOException {
         }
     }
 
@@ -201,5 +224,4 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
             return new CountingTenantControl();
         }
     }
-
 }

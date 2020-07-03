@@ -394,6 +394,7 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
                 if (cacheConfig.isManagementEnabled()) {
                     setManagementEnabled(cacheConfig, cacheConfig.getNameWithPrefix(), true);
                 }
+                getTenantControl(cacheConfig).register();
                 logger.info("Added cache config: " + cacheConfig);
                 additionalCacheConfigSetup(config, false);
                 // now it is safe for others to obtain the new cache config
@@ -532,6 +533,12 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
         }
         CacheConfigAccessor.setTenantControl(cacheConfig, tenantControlFactory.saveCurrentTenant(
                 new CacheDestroyEventContext(cacheConfig.getName())));
+    }
+
+    public void reSerializeCacheConfig(CacheConfig cacheConfig) {
+        CompletableFuture<CacheConfig> future = new CompletableFuture<>();
+        future.complete(PreJoinCacheConfig.of(cacheConfig).asCacheConfig());
+        configs.replace(cacheConfig.getNameWithPrefix(), future);
     }
 
     @Override

@@ -23,6 +23,7 @@ import com.hazelcast.spi.impl.SpiDataSerializerHook;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 
 import java.io.Closeable;
+import java.io.IOException;
 
 /**
  * Default no-op implementation of TenantControl
@@ -35,7 +36,24 @@ public final class NoopTenantControl implements TenantControl, IdentifiedDataSer
     }
 
     @Override
+    public void register() {
+    }
+
+    @Override
     public void unregister() {
+    }
+
+    @Override
+    public boolean isClassesAlwaysAvailable() {
+        return true;
+    }
+
+    @Override
+    public void writeData(ObjectDataOutput out) throws IOException {
+    }
+
+    @Override
+    public void readData(ObjectDataInput in) throws IOException {
     }
 
     private static final class NoopCloseable implements Closeable {
@@ -65,15 +83,5 @@ public final class NoopTenantControl implements TenantControl, IdentifiedDataSer
     @Override
     public int getClassId() {
         return SpiDataSerializerHook.NOOP_TENANT_CONTROL;
-    }
-
-    @Override
-    public void writeData(ObjectDataOutput out) {
-
-    }
-
-    @Override
-    public void readData(ObjectDataInput in) {
-
     }
 }
