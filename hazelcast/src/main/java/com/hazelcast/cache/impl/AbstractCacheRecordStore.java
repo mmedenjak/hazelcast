@@ -192,9 +192,12 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
         }
         injectDependencies(evictionPolicyEvaluator.getEvictionPolicyComparator());
         TenantControl tenantControl = CacheConfigAccessor.getTenantControl(cacheConfig);
-        cacheLoader = new TenantContextual<>(this::initCacheLoader, () -> cacheConfig.getCacheLoaderFactory() != null, tenantControl);
-        cacheWriter = new TenantContextual<>(this::initCacheWriter, () -> cacheConfig.getCacheWriterFactory() != null, tenantControl);
-        defaultExpiryPolicy = new TenantContextual<>(this::initDefaultExpiryPolicy, this::defaultExpiryPolicyExists, tenantControl);
+        cacheLoader = new TenantContextual<>(this::initCacheLoader,
+                () -> cacheConfig.getCacheLoaderFactory() != null, tenantControl);
+        cacheWriter = new TenantContextual<>(this::initCacheWriter,
+                () -> cacheConfig.getCacheWriterFactory() != null, tenantControl);
+        defaultExpiryPolicy = new TenantContextual<>(this::initDefaultExpiryPolicy,
+                this::defaultExpiryPolicyExists, tenantControl);
         init();
     }
 

@@ -29,8 +29,6 @@ import com.hazelcast.spi.tenantcontrol.TenantControl;
 import javax.cache.configuration.CacheEntryListenerConfiguration;
 import java.io.IOException;
 
-import com.hazelcast.internal.serialization.InternalSerializationService;
-
 /**
  * This subclass of {@link CacheConfig} is used to communicate cache configurations in pre-join cache operations when cluster
  * version is at least 3.9. The key difference against {@link CacheConfig} is that the key/value class names are used in its
@@ -61,7 +59,8 @@ public class PreJoinCacheConfig<K, V> extends CacheConfig<K, V> {
         this(cacheConfig, resolved, null);
     }
 
-    public PreJoinCacheConfig(CacheConfig cacheConfig, boolean resolved, InternalSerializationService backupSerializationService) {
+    public PreJoinCacheConfig(CacheConfig cacheConfig, boolean resolved,
+            SerializationService backupSerializationService) {
         cacheConfig.copy(this, resolved, backupSerializationService);
     }
 
@@ -163,7 +162,7 @@ public class PreJoinCacheConfig<K, V> extends CacheConfig<K, V> {
         return of(cacheConfig, null);
     }
 
-    public static PreJoinCacheConfig of(CacheConfig cacheConfig, InternalSerializationService serializationService) {
+    public static PreJoinCacheConfig of(CacheConfig cacheConfig, SerializationService serializationService) {
         if (cacheConfig instanceof PreJoinCacheConfig) {
             return (PreJoinCacheConfig) cacheConfig;
         } else {

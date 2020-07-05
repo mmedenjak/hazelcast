@@ -668,7 +668,7 @@ public class CacheProxy<K, V> extends CacheProxySupport<K, V>
     }
 
     public void reSerializeCacheConfig() {
-        cacheConfig = PreJoinCacheConfig.of(cacheConfig, (InternalSerializationService)getNodeEngine()
+        cacheConfig = PreJoinCacheConfig.of(cacheConfig, (InternalSerializationService) getNodeEngine()
                 .getSerializationService()).asCacheConfig();
         CacheConfigAccessor.getTenantControl(cacheConfig).tenantUnavailable();
     }

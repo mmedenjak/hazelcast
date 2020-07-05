@@ -108,7 +108,6 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
                                                       ClusterStateListener {
 
     public static final String TENANT_CONTROL_FACTORY = "com.hazelcast.spi.tenantcontrol.TenantControlFactory";
-    private TenantControlFactory tenantControlFactory;
 
     /**
      * Map from full prefixed cache name to {@link CacheConfig}
@@ -154,6 +153,7 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
     protected CacheSplitBrainHandlerService splitBrainHandlerService;
     protected CacheClearExpiredRecordsTask clearExpiredRecordsTask;
     protected ExpirationManager expirationManager;
+    protected TenantControlFactory tenantControlFactory;
 
     @Override
     public final void init(NodeEngine nodeEngine, Properties properties) {
@@ -550,7 +550,7 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
     public void reSerializeCacheConfig(CacheConfig cacheConfig) {
         CompletableFuture<CacheConfig> future = new CompletableFuture<>();
         CacheConfig serializedCacheConfig = PreJoinCacheConfig.of(cacheConfig,
-                (InternalSerializationService)nodeEngine.getSerializationService()).asCacheConfig();
+                nodeEngine.getSerializationService()).asCacheConfig();
         getTenantControl(serializedCacheConfig).tenantUnavailable();
         future.complete(serializedCacheConfig);
         configs.replace(cacheConfig.getNameWithPrefix(), future);
