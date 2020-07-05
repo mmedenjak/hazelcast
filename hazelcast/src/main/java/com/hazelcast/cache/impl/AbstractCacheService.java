@@ -96,6 +96,7 @@ import static com.hazelcast.internal.util.ConcurrencyUtil.CALLER_RUNS;
 import static com.hazelcast.internal.util.ExceptionUtil.rethrow;
 import static com.hazelcast.internal.util.FutureUtil.RETHROW_EVERYTHING;
 import static com.hazelcast.internal.util.MapUtil.createHashMap;
+import com.hazelcast.internal.serialization.InternalSerializationService;
 import static com.hazelcast.spi.tenantcontrol.TenantControl.NOOP_TENANT_CONTROL;
 import static com.hazelcast.spi.tenantcontrol.TenantControlFactory.NOOP_TENANT_CONTROL_FACTORY;
 import static java.util.Collections.newSetFromMap;
@@ -107,6 +108,7 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
                                                       ClusterStateListener {
 
     public static final String TENANT_CONTROL_FACTORY = "com.hazelcast.spi.tenantcontrol.TenantControlFactory";
+    private TenantControlFactory tenantControlFactory;
 
     /**
      * Map from full prefixed cache name to {@link CacheConfig}
@@ -168,6 +170,7 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
         this.logger = nodeEngine.getLogger(getClass());
         this.eventJournal = new RingbufferCacheEventJournalImpl(nodeEngine);
         this.mergePolicyProvider = nodeEngine.getSplitBrainMergePolicyProvider();
+        this.tenantControlFactory = initTenantControlFactory();
 
         boolean dsMetricsEnabled = nodeEngine.getProperties().getBoolean(ClusterProperty.METRICS_DATASTRUCTURES);
         postInit(nodeEngine, properties, dsMetricsEnabled);
@@ -225,6 +228,22 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
         for (String objectName : configs.keySet()) {
             sendInvalidationEvent(objectName, null, SOURCE_NOT_AVAILABLE);
         }
+    }
+
+    private TenantControlFactory initTenantControlFactory() {
+        TenantControlFactory factory = null;
+        try {
+            factory = ServiceLoader.load(TenantControlFactory.class,
+                    TENANT_CONTROL_FACTORY, nodeEngine.getConfigClassLoader());
+        } catch (Exception e) {
+            if (logger.isFinestEnabled()) {
+                logger.finest("Could not load service provider for TenantControl", e);
+            }
+        }
+        if (factory == null) {
+            factory = NOOP_TENANT_CONTROL_FACTORY;
+        }
+        return factory;
     }
 
     @Override
@@ -519,25 +538,21 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
         }
         // associate cache config with the current thread's tenant
         // and add hook so when the tenant is destroyed, so is the cache config
-        TenantControlFactory tenantControlFactory = null;
-        try {
-            tenantControlFactory = ServiceLoader.load(TenantControlFactory.class,
-                    TENANT_CONTROL_FACTORY, nodeEngine.getConfigClassLoader());
-        } catch (Exception e) {
-            if (logger.isFinestEnabled()) {
-                logger.finest("Could not load service provider for TenantControl", e);
-            }
-        }
-        if (tenantControlFactory == null) {
-            tenantControlFactory = NOOP_TENANT_CONTROL_FACTORY;
-        }
-        CacheConfigAccessor.setTenantControl(cacheConfig, tenantControlFactory.saveCurrentTenant(
+        CacheConfigAccessor.setTenantControl(cacheConfig, getTenantControlFactory().saveCurrentTenant(
                 new CacheDestroyEventContext(cacheConfig.getName())));
+    }
+
+    @Override
+    public TenantControlFactory getTenantControlFactory() {
+        return tenantControlFactory;
     }
 
     public void reSerializeCacheConfig(CacheConfig cacheConfig) {
         CompletableFuture<CacheConfig> future = new CompletableFuture<>();
-        future.complete(PreJoinCacheConfig.of(cacheConfig).asCacheConfig());
+        CacheConfig serializedCacheConfig = PreJoinCacheConfig.of(cacheConfig,
+                (InternalSerializationService)nodeEngine.getSerializationService()).asCacheConfig();
+        getTenantControl(serializedCacheConfig).tenantUnavailable();
+        future.complete(serializedCacheConfig);
         configs.replace(cacheConfig.getNameWithPrefix(), future);
     }
 

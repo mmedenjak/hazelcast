@@ -92,7 +92,7 @@ abstract class CacheProxySupport<K, V>
     private static final int TIMEOUT = 10;
 
     protected final ILogger logger;
-    protected final CacheConfig<K, V> cacheConfig;
+    protected CacheConfig<K, V> cacheConfig;
     protected final String name;
     protected final String nameWithPrefix;
     protected final ICacheService cacheService;

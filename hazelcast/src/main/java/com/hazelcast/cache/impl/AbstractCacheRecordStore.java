@@ -103,7 +103,7 @@ import static com.hazelcast.internal.util.MapUtil.createHashMap;
 import static com.hazelcast.internal.util.SetUtil.createHashSet;
 import static com.hazelcast.internal.util.ThreadUtil.assertRunningOnPartitionThread;
 import static com.hazelcast.spi.impl.merge.MergingValueFactory.createMergingEntry;
-import java.io.IOException;
+import com.hazelcast.spi.tenantcontrol.TenantControl;
 import static java.util.Collections.emptySet;
 
 @SuppressWarnings({"checkstyle:methodcount", "checkstyle:classfanoutcomplexity"})
@@ -141,11 +141,11 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     protected boolean eventsEnabled = true;
     protected boolean eventsBatchingEnabled;
     protected CRM records;
-    protected CacheLoader cacheLoader;
-    protected CacheWriter cacheWriter;
+    protected TenantContextual<CacheLoader> cacheLoader;
+    protected TenantContextual<CacheWriter> cacheWriter;
     protected CacheContext cacheContext;
     protected CacheStatisticsImpl statistics;
-    protected ExpiryPolicy defaultExpiryPolicy;
+    protected final TenantContextual<ExpiryPolicy> defaultExpiryPolicy;
     protected Iterator<Map.Entry<Data, R>> expirationIterator;
     protected InvalidationQueue<ExpiredKey> expiredKeys = new InvalidationQueue<ExpiredKey>();
     protected boolean hasEntryWithExpiration;
@@ -164,64 +164,70 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             throw new CacheNotExistsException("Cache " + cacheNameWithPrefix + " is already destroyed or not created yet, on "
                     + nodeEngine.getLocalMember());
         }
-        Closeable tenantContext = CacheConfigAccessor.getTenantControl(cacheConfig).setTenant(true);
-        try {
-            this.eventJournalConfig = cacheConfig.getEventJournalConfig();
-            this.evictionConfig = cacheConfig.getEvictionConfig();
-            if (evictionConfig == null) {
-                throw new IllegalStateException("Eviction config cannot be null!");
-            }
-            this.wanReplicationEnabled = cacheService.isWanReplicationEnabled(cacheNameWithPrefix);
-            this.disablePerEntryInvalidationEvents = cacheConfig.isDisablePerEntryInvalidationEvents();
-            initializeStatisticsAndFactories(cacheNameWithPrefix);
-
-            EvictionPolicyComparator evictionPolicyComparator = createEvictionPolicyComparator(evictionConfig);
-            evictionPolicyComparator = injectDependencies(evictionPolicyComparator);
-            this.evictionPolicyEvaluator = new EvictionPolicyEvaluator<>(evictionPolicyComparator);
-            this.cacheContext = cacheService.getOrCreateCacheContext(cacheNameWithPrefix);
-            this.records = createRecordCacheMap();
-            this.evictionChecker = createCacheEvictionChecker(evictionConfig.getSize(), evictionConfig.getMaxSizePolicy());
-            this.evictionStrategy = createEvictionStrategy(evictionConfig);
-            this.objectNamespace = CacheService.getObjectNamespace(cacheNameWithPrefix);
-            this.persistWanReplicatedData = canPersistWanReplicatedData(cacheConfig, nodeEngine);
-            this.cacheRecordFactory = new CacheRecordFactory(cacheConfig.getInMemoryFormat(), ss);
-            this.valueComparator = getValueComparatorOf(cacheConfig.getInMemoryFormat());
-            this.clearExpiredRecordsTask = cacheService.getExpirationManager().getTask();
-
-            registerResourceIfItIsClosable(cacheWriter);
-            registerResourceIfItIsClosable(cacheLoader);
-            registerResourceIfItIsClosable(defaultExpiryPolicy);
-            init();
-        } finally {
-            try {
-                tenantContext.close();
-            } catch (IOException ex) {
-                ExceptionUtil.rethrow(ex);
-            }
+        this.eventJournalConfig = cacheConfig.getEventJournalConfig();
+        this.evictionConfig = cacheConfig.getEvictionConfig();
+        if (evictionConfig == null) {
+            throw new IllegalStateException("Eviction config cannot be null!");
         }
-    }
+        this.wanReplicationEnabled = cacheService.isWanReplicationEnabled(cacheNameWithPrefix);
+        this.disablePerEntryInvalidationEvents = cacheConfig.isDisablePerEntryInvalidationEvents();
 
-    private void initializeStatisticsAndFactories(String cacheNameWithPrefix) {
+        EvictionPolicyComparator evictionPolicyComparator = createEvictionPolicyComparator(evictionConfig);
+        evictionPolicyComparator = injectDependencies(evictionPolicyComparator);
+        this.evictionPolicyEvaluator = new EvictionPolicyEvaluator<>(evictionPolicyComparator);
+        this.cacheContext = cacheService.getOrCreateCacheContext(cacheNameWithPrefix);
+        this.records = createRecordCacheMap();
+        this.evictionChecker = createCacheEvictionChecker(evictionConfig.getSize(), evictionConfig.getMaxSizePolicy());
+        this.evictionStrategy = createEvictionStrategy(evictionConfig);
+        this.objectNamespace = CacheService.getObjectNamespace(cacheNameWithPrefix);
+        this.persistWanReplicatedData = canPersistWanReplicatedData(cacheConfig, nodeEngine);
+        this.cacheRecordFactory = new CacheRecordFactory(cacheConfig.getInMemoryFormat(), ss);
+        this.valueComparator = getValueComparatorOf(cacheConfig.getInMemoryFormat());
+        this.clearExpiredRecordsTask = cacheService.getExpirationManager().getTask();
+
+        init();
+
         if (cacheConfig.isStatisticsEnabled()) {
             statistics = cacheService.createCacheStatIfAbsent(cacheNameWithPrefix);
         }
-        if (cacheConfig.getCacheLoaderFactory() != null) {
-            Factory<CacheLoader> cacheLoaderFactory = cacheConfig.getCacheLoaderFactory();
-            cacheLoaderFactory = injectDependencies(cacheLoaderFactory);
-            cacheLoader = cacheLoaderFactory.create();
-            cacheLoader = injectDependencies(cacheLoader);
-        }
-        if (cacheConfig.getCacheWriterFactory() != null) {
-            Factory<CacheWriter> cacheWriterFactory = cacheConfig.getCacheWriterFactory();
-            cacheWriterFactory = injectDependencies(cacheWriterFactory);
-            cacheWriter = cacheWriterFactory.create();
-            cacheWriter = injectDependencies(cacheWriter);
-        }
+        injectDependencies(evictionPolicyEvaluator.getEvictionPolicyComparator());
+        TenantControl tenantControl = CacheConfigAccessor.getTenantControl(cacheConfig);
+        cacheLoader = new TenantContextual<>(this::initCacheLoader, () -> cacheConfig.getCacheLoaderFactory() != null, tenantControl);
+        cacheWriter = new TenantContextual<>(this::initCacheWriter, () -> cacheConfig.getCacheWriterFactory() != null, tenantControl);
+        defaultExpiryPolicy = new TenantContextual<>(this::initDefaultExpiryPolicy, this::defaultExpiryPolicyExists, tenantControl);
+        init();
+    }
+
+    private CacheLoader initCacheLoader() {
+        Factory<CacheLoader> cacheLoaderFactory = cacheConfig.getCacheLoaderFactory();
+        injectDependencies(cacheLoaderFactory);
+        CacheLoader loader = cacheLoaderFactory.create();
+        injectDependencies(loader);
+        registerResourceIfItIsClosable(loader);
+        return loader;
+    }
+
+    private CacheWriter initCacheWriter() {
+        Factory<CacheWriter> cacheWriterFactory = cacheConfig.getCacheWriterFactory();
+        injectDependencies(cacheWriterFactory);
+        CacheWriter writer = cacheWriterFactory.create();
+        injectDependencies(writer);
+        registerResourceIfItIsClosable(writer);
+        return writer;
+    }
+
+    private ExpiryPolicy initDefaultExpiryPolicy() {
+        Factory<ExpiryPolicy> expiryPolicyFactory = cacheConfig.getExpiryPolicyFactory();
+        injectDependencies(expiryPolicyFactory);
+        ExpiryPolicy expiryPolicy = expiryPolicyFactory.create();
+        injectDependencies(expiryPolicy);
+        registerResourceIfItIsClosable(defaultExpiryPolicy);
+        return expiryPolicy;
+    }
+
+    private Boolean defaultExpiryPolicyExists() {
         if (cacheConfig.getExpiryPolicyFactory() != null) {
-            Factory<ExpiryPolicy> expiryPolicyFactory = cacheConfig.getExpiryPolicyFactory();
-            expiryPolicyFactory = injectDependencies(expiryPolicyFactory);
-            defaultExpiryPolicy = expiryPolicyFactory.create();
-            defaultExpiryPolicy = injectDependencies(defaultExpiryPolicy);
+            return true;
         } else {
             throw new IllegalStateException("Expiry policy factory cannot be null!");
         }
@@ -266,13 +272,8 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             return;
         }
 
-        if (cacheLoader != null) {
-            cacheLoader = new LatencyTrackingCacheLoader(cacheLoader, plugin, cacheConfig.getName());
-        }
-
-        if (cacheWriter != null) {
-            cacheWriter = new LatencyTrackingCacheWriter(cacheWriter, plugin, cacheConfig.getName());
-        }
+        cacheLoader = cacheLoader.delegate(new LatencyTrackingCacheLoader(cacheLoader, plugin, cacheConfig.getName()));
+        cacheWriter = cacheWriter.delegate(new LatencyTrackingCacheWriter(cacheWriter, plugin, cacheConfig.getName()));
     }
 
     private boolean isPrimary() {
@@ -462,7 +463,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             return (ExpiryPolicy) toValue(record.getExpiryPolicy());
         }
 
-        return defaultExpiryPolicy;
+        return defaultExpiryPolicy.get();
     }
 
     protected boolean evictIfExpired(Data key, R record, long now) {
@@ -997,7 +998,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
         }
         Duration expiryDuration;
         try {
-            expiryDuration = defaultExpiryPolicy.getExpiryForCreation();
+            expiryDuration = defaultExpiryPolicy.get().getExpiryForCreation();
         } catch (Exception e) {
             expiryDuration = Duration.ETERNAL;
         }
@@ -1009,10 +1010,10 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     public Object readThroughCache(Data key) throws CacheLoaderException {
-        if (isReadThrough() && cacheLoader != null) {
+        if (isReadThrough() && cacheLoader.exists()) {
             try {
                 Object o = dataToValue(key);
-                return cacheLoader.load(o);
+                return cacheLoader.get().load(o);
             } catch (Exception e) {
                 if (!(e instanceof CacheLoaderException)) {
                     throw new CacheLoaderException("Exception in CacheLoader during load", e);
@@ -1025,11 +1026,11 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     public void writeThroughCache(Data key, Object value) throws CacheWriterException {
-        if (isWriteThrough() && cacheWriter != null) {
+        if (isWriteThrough() && cacheWriter.exists()) {
             try {
                 Object objKey = dataToValue(key);
                 Object objValue = toValue(value);
-                cacheWriter.write(new CacheEntry<Object, Object>(objKey, objValue));
+                cacheWriter.get().write(new CacheEntry<Object, Object>(objKey, objValue));
             } catch (Exception e) {
                 if (!(e instanceof CacheWriterException)) {
                     throw new CacheWriterException("Exception in CacheWriter during write", e);
@@ -1045,10 +1046,10 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     protected void deleteCacheEntry(Data key, CallerProvenance provenance) {
-        if (persistenceEnabledFor(provenance) && isWriteThrough() && cacheWriter != null) {
+        if (persistenceEnabledFor(provenance) && isWriteThrough() && cacheWriter.exists()) {
             try {
                 Object objKey = dataToValue(key);
-                cacheWriter.delete(objKey);
+                cacheWriter.get().delete(objKey);
             } catch (Exception e) {
                 if (!(e instanceof CacheWriterException)) {
                     throw new CacheWriterException("Exception in CacheWriter during delete", e);
@@ -1061,7 +1062,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
 
     @SuppressFBWarnings("WMI_WRONG_MAP_ITERATOR")
     protected void deleteAllCacheEntry(Set<Data> keys) {
-        if (isWriteThrough() && cacheWriter != null && keys != null && !keys.isEmpty()) {
+        if (isWriteThrough() && cacheWriter.exists() && keys != null && !keys.isEmpty()) {
             Map<Object, Data> keysToDelete = createHashMap(keys.size());
             for (Data key : keys) {
                 Object localKeyObj = dataToValue(key);
@@ -1069,7 +1070,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             }
             Set<Object> keysObject = keysToDelete.keySet();
             try {
-                cacheWriter.deleteAll(keysObject);
+                cacheWriter.get().deleteAll(keysObject);
             } catch (Exception e) {
                 if (!(e instanceof CacheWriterException)) {
                     throw new CacheWriterException("Exception in CacheWriter during deleteAll", e);
@@ -1086,7 +1087,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     protected Map<Data, Object> loadAllCacheEntry(Set<Data> keys) {
-        if (cacheLoader != null) {
+        if (cacheLoader.exists()) {
             Map<Object, Data> keysToLoad = createHashMap(keys.size());
             for (Data key : keys) {
                 Object localKeyObj = dataToValue(key);
@@ -1094,7 +1095,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             }
             Map<Object, Object> loaded;
             try {
-                loaded = cacheLoader.loadAll(keysToLoad.keySet());
+                loaded = cacheLoader.get().loadAll(keysToLoad.keySet());
             } catch (Throwable e) {
                 if (!(e instanceof CacheLoaderException)) {
                     throw new CacheLoaderException("Exception in CacheLoader during loadAll", e);
@@ -1590,7 +1591,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
                     deleteCacheEntry(key);
                     removed = deleteRecord(key, completionId, source, origin);
                 } else {
-                    long expiryTime = onRecordAccess(key, record, defaultExpiryPolicy, now);
+                    long expiryTime = onRecordAccess(key, record, defaultExpiryPolicy.get(), now);
                     processExpiredEntry(key, record, expiryTime, now, source, origin);
                 }
             }

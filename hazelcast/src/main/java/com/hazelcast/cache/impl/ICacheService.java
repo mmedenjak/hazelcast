@@ -31,6 +31,7 @@ import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.spi.impl.NodeEngine;
 import com.hazelcast.spi.impl.eventservice.EventFilter;
 import com.hazelcast.spi.impl.eventservice.EventPublishingService;
+import com.hazelcast.spi.tenantcontrol.TenantControlFactory;
 
 import java.util.Collection;
 import java.util.UUID;
@@ -172,4 +173,5 @@ public interface ICacheService
     <K, V> void createCacheConfigOnAllMembers(PreJoinCacheConfig<K, V> cacheConfig);
 
     <K, V> void setTenantControl(CacheConfig<K, V> cacheConfig);
+    TenantControlFactory getTenantControlFactory();
 }
