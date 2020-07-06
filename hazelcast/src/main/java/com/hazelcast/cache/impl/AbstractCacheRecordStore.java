@@ -357,11 +357,8 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     protected EvictionPolicyComparator createEvictionPolicyComparator(EvictionConfig evictionConfig) {
         checkCacheEvictionConfig(evictionConfig);
 
-        Closeable tenantContext = getTenantControl(cacheConfig).setTenant(false);
-        try {
+        try (TenantControl.Closeable tenantContext = getTenantControl(cacheConfig).setTenant(false)) {
             return EvictionPolicyEvaluatorProvider.getEvictionPolicyComparator(evictionConfig, nodeEngine.getConfigClassLoader());
-        } finally {
-            closeResource(tenantContext);
         }
     }
 
