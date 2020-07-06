@@ -18,22 +18,20 @@ package com.hazelcast.cache;
 
 import static com.hazelcast.cache.CacheTenantControlTest.destroyEventContext;
 import static com.hazelcast.cache.CacheTenantControlTest.setTenantCount;
+import static com.hazelcast.cache.CacheTestSupport.createServerCachingProvider;
+import static com.hazelcast.cache.CacheTestSupport.getCacheService;
 import static com.hazelcast.cache.HazelcastCacheManager.CACHE_MANAGER_PREFIX;
-import com.hazelcast.cache.impl.CacheService;
-import com.hazelcast.cache.impl.HazelcastServerCachingProvider;
+import com.hazelcast.cache.impl.ICacheService;
 import com.hazelcast.config.CacheConfig;
 import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.spi.impl.NodeEngineImpl;
+import com.hazelcast.internal.util.AdditionalServiceClassLoader;
+import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
-import static com.hazelcast.test.HazelcastTestSupport.getNodeEngineImpl;
 import static com.hazelcast.test.HazelcastTestSupport.randomName;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
-import com.hazelcast.test.annotation.ParallelTest;
 import com.hazelcast.test.annotation.QuickTest;
-import com.hazelcast.util.AdditionalServiceClassLoader;
-import com.hazelcast.util.ExceptionUtil;
 import java.io.Serializable;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -52,7 +50,7 @@ import org.junit.runner.RunWith;
  * @author lprimak
  */
 @RunWith(HazelcastParallelClassRunner.class)
-@Category({QuickTest.class, ParallelTest.class})
+@Category(QuickTest.class)
 public class CacheTenantUnavailableTest extends HazelcastTestSupport {
     private Config config;
     private String cacheName;
@@ -76,16 +74,15 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         HazelcastInstance hz1 = factory.newHazelcastInstance(config);
         CacheConfig cacheConfig = new CacheConfig();
         cacheConfig.setTypes(KeyType.class, ValueType.class);
-        Cache cache1 = HazelcastServerCachingProvider.createCachingProvider(hz1).getCacheManager().createCache(cacheName, cacheConfig);
+        Cache cache1 = createServerCachingProvider(hz1).getCacheManager().createCache(cacheName, cacheConfig);
         cache1.put(new KeyType(), new ValueType());
         assertInstanceOf(ValueType.class, cache1.get(new KeyType()));
 
         HazelcastInstance hz2 = factory.newHazelcastInstance(config);
-        NodeEngineImpl nodeEngineImpl = getNodeEngineImpl(hz2);
-        CacheService cacheService = nodeEngineImpl.getService(CacheService.SERVICE_NAME);
+        ICacheService cacheService = getCacheService(hz2);
         disallowClassNames.add(KeyType.class.getName());
         hz1.shutdown(); // force migration
-        CacheManager cacheManager = HazelcastServerCachingProvider.createCachingProvider(hz2).getCacheManager();
+        CacheManager cacheManager = createServerCachingProvider(hz2).getCacheManager();
         Cache cache2 = cacheManager.getCache(cacheName);
         disallowClassNames.clear();
         assertInstanceOf(ValueType.class, cache2.get(new KeyType()));

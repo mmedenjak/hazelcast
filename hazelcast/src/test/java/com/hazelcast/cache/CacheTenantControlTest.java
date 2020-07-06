@@ -40,7 +40,6 @@ import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import javax.cache.spi.CachingProvider;
-import java.io.Closeable;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;

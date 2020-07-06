@@ -32,7 +32,6 @@ import com.hazelcast.spi.impl.tenantcontrol.NoopTenantControlFactory;
  * </ul>
  */
 @Beta
-@FunctionalInterface
 public interface TenantControlFactory {
 
     /**
