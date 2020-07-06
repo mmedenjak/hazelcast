@@ -43,7 +43,6 @@ import javax.cache.expiry.EternalExpiryPolicy;
 import javax.cache.expiry.ModifiedExpiryPolicy;
 import javax.cache.expiry.TouchedExpiryPolicy;
 import javax.cache.integration.CacheWriter;
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +56,7 @@ import static com.hazelcast.internal.util.Preconditions.checkAsyncBackupCount;
 import static com.hazelcast.internal.util.Preconditions.checkBackupCount;
 import static com.hazelcast.internal.util.Preconditions.checkNotNull;
 import static com.hazelcast.internal.util.Preconditions.isNotNull;
+import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
 import static com.hazelcast.spi.tenantcontrol.TenantControl.NOOP_TENANT_CONTROL;
 
 /**
@@ -557,8 +557,7 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
         // set the thread-context and class loading context for this cache's tenant application
         // This way user customizations (loader factories, listeners) and keyType/valueType
         // can be CDI / EJB / JPA objects
-        Closeable tenantContext = tenantControl.setTenant(false);
-        try {
+        try (Closeable tenantContext = tenantControl.setTenant(false)) {
             evictionConfig = in.readObject();
             wanReplicationRef = in.readObject();
 
@@ -580,8 +579,6 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
             if (listNotEmpty) {
                 readListenerConfigurations(in);
             }
-        } finally {
-            tenantContext.close();
         }
 
         mergePolicyConfig = in.readObject();
