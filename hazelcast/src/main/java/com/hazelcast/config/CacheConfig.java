@@ -727,7 +727,8 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
             target.setValueClassName(getValueClassName());
         }
 
-        final SerializationService useSerializationService = serializationService != null? serializationService : backupSerializationService;
+        final SerializationService useSerializationService =
+                serializationService != null ? serializationService : backupSerializationService;
 
         target.cacheLoaderFactory = cacheLoaderFactory.shallowCopy(resolved, useSerializationService);
         target.cacheWriterFactory = cacheWriterFactory.shallowCopy(resolved, useSerializationService);
