@@ -147,8 +147,8 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         // expecting tenant context is created & closed 5 times:
         // 2 times on creation of record store (wrapping initialization of eviction policy)
         // + 3 times on before/afterRun of put, get & getAndPut operations
-        assertEquals(4, setTenantCount.get());
-        assertEquals(4, closeTenantCount.get());
+        assertEquals(5, setTenantCount.get());
+        assertEquals(5, closeTenantCount.get());
         assertEquals(1, registerTenantCount.get());
         assertEquals(1, unregisterTenantCount.get());
     }
