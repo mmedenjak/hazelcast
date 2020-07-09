@@ -32,6 +32,9 @@ import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.util.AdditionalServiceClassLoader;
 import com.hazelcast.internal.util.ExceptionUtil;
+import com.hazelcast.partition.MigrationListener;
+import com.hazelcast.partition.MigrationState;
+import com.hazelcast.partition.ReplicaMigrationEvent;
 import com.hazelcast.test.HazelcastSerialClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
 import static com.hazelcast.test.HazelcastTestSupport.randomName;
@@ -43,6 +46,7 @@ import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 import javax.cache.Cache;
 import javax.cache.CacheManager;
 import org.junit.Assert;
@@ -59,35 +63,41 @@ import org.junit.runner.RunWith;
 @RunWith(HazelcastSerialClassRunner.class)
 @Category(QuickTest.class)
 public class CacheTenantUnavailableTest extends HazelcastTestSupport {
-    private Config config;
     private String cacheName;
     private static final Set<String> disallowClassNames = new HashSet<>();
+    private static final CountDownLatch latch = new CountDownLatch(1);
+    private static boolean classLoadingFailed;
 
     @Before
     public void setup() {
         cacheName = randomName();
-        config = new Config();
-        ClassLoader configClassLoader = new AdditionalServiceClassLoader(new URL[0],
-                new SimulateNonExistantClassLoader());
-        config.setClassLoader(configClassLoader);
-        config.getCacheConfig("*");
+        classLoadingFailed = false;
         setTenantCount.set(0);
         disallowClassNames.clear();
         classesAlwaysAvailable = false;
         tenantAvailable = true;
     }
 
+    private Config newConfig() {
+        Config config = new Config();
+        ClassLoader configClassLoader = new AdditionalServiceClassLoader(new URL[0],
+                new SimulateNonExistantClassLoader());
+        config.setClassLoader(configClassLoader);
+        config.getCacheConfig("*");
+        return config;
+    }
+
     @Test
     public void testCacheWithTypesWithoutClassLoader() {
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
-        HazelcastInstance hz1 = factory.newHazelcastInstance(config);
+        HazelcastInstance hz1 = factory.newHazelcastInstance(newConfig());
         CacheConfig cacheConfig = new CacheConfig();
         cacheConfig.setTypes(KeyType.class, ValueType.class);
         Cache cache1 = createServerCachingProvider(hz1).getCacheManager().createCache(cacheName, cacheConfig);
         cache1.put(new KeyType(), new ValueType());
         assertInstanceOf(ValueType.class, cache1.get(new KeyType()));
 
-        HazelcastInstance hz2 = factory.newHazelcastInstance(config);
+        HazelcastInstance hz2 = factory.newHazelcastInstance(newConfig());
         ICacheService cacheService = getCacheService(hz2);
         disallowClassNames.add(KeyType.class.getName());
         hz1.shutdown(); // force migration
@@ -103,18 +113,17 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         cacheService.setTenantControl(cacheConfig);
         Cache cache3 = cacheManager.getCache(cacheName);
         assertInstanceOf(ValueType.class, cache3.get(new KeyType()));
+        Assert.assertFalse("Class Loading Failed", classLoadingFailed);
     }
 
     @Test
-    public void testMigrationWithUnavailableClasses() {
-        tenantAvailable = false;
+    public void testMigrationWithUnavailableClasses() throws InterruptedException {
         classesAlwaysAvailable = true;
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
-        HazelcastInstance hz1 = factory.newHazelcastInstance(config);
+        HazelcastInstance hz1 = factory.newHazelcastInstance(newConfig());
         CacheConfig cacheConfig = new CacheConfig();
         cacheConfig.setTypes(String.class, ValueType.class);
         cacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
-//        config.setProperty(ClusterProperty.PARTITION_COUNT.getName(), "2");
 
         CacheProxy<String, ValueType> cache1 = (CacheProxy<String, ValueType>) createServerCachingProvider(hz1)
                 .getCacheManager().createCache(cacheName, cacheConfig);
@@ -122,16 +131,26 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         putValuesToPartition(hz1, cache1, value, 0, 1);
         putValuesToPartition(hz1, cache1, value, 1, 1);
 
+        tenantAvailable = false;
+        disallowClassNames.add(ValueType.class.getName());
+//        hz1.getCluster().changeClusterState(ClusterState.NO_MIGRATION);
         // force migration
-        HazelcastInstance hz2 = factory.newHazelcastInstance(config);
+        HazelcastInstance hz2 = factory.newHazelcastInstance(newConfig());
+        hz1.getPartitionService().addMigrationListener(new MigrationListenerImpl());
+//        hz2.getCluster().changeClusterState(ClusterState.ACTIVE);
         CacheManager cacheManager = createServerCachingProvider(hz2).getCacheManager();
         Cache cache2 = cacheManager.getCache(cacheName);
+        latch.await();
+        tenantAvailable = true;
+        disallowClassNames.clear();
+        System.out.println("interator starting");
         Iterator it2 = cache2.iterator();
         Assert.assertNotNull("Iterator should not be empty", it2.hasNext());
         while (it2.hasNext()) {
             Cache.Entry<String, ValueType> entry = (Cache.Entry<String, ValueType>) it2.next();
             assertInstanceOf(ValueType.class, entry.getValue());
         }
+        Assert.assertFalse("Class Loading Failed", classLoadingFailed);
     }
 
     public static class SimulateNonExistantClassLoader extends URLClassLoader {
@@ -142,6 +161,7 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         @Override
         protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
             if (disallowClassNames.contains(name)) {
+                classLoadingFailed = true;
                 ExceptionUtil.sneakyThrow(new IllegalStateException(String.format("Unavailable Class %s", name)));
             }
             return super.loadClass(name, resolve);
@@ -152,5 +172,28 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
     }
 
     public static class ValueType implements Serializable {
+    }
+
+    private static class MigrationListenerImpl implements MigrationListener {
+        @Override
+        public void migrationStarted(MigrationState state) {
+            System.out.println("Started");
+        }
+
+        @Override
+        public void migrationFinished(MigrationState state) {
+            System.out.println("Finished");
+            latch.countDown();
+        }
+
+        @Override
+        public void replicaMigrationCompleted(ReplicaMigrationEvent event) {
+            System.out.println("Completed");
+        }
+
+        @Override
+        public void replicaMigrationFailed(ReplicaMigrationEvent event) {
+            System.out.println("Failed");
+        }
     }
 }

@@ -186,7 +186,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
     public static class CountingTenantControl implements TenantControl {
         @Override
         public Closeable setTenant(boolean createRequestScope) {
-            new Exception().printStackTrace();
+//            new Exception().printStackTrace();
             if (createRequestScope && !isAvailable()) {
                 throw new IllegalStateException("Tenant Not Available & Request scope requested");
             }
