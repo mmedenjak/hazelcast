@@ -68,6 +68,8 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
     private static final AtomicInteger unregisterTenantCount = new AtomicInteger();
     private static final AtomicInteger clearedTenantCount = new AtomicInteger();
     static final AtomicReference<DestroyEventContext> destroyEventContext = new AtomicReference<DestroyEventContext>(null);
+    static boolean classesAlwaysAvailable;
+    static boolean tenantAvailable;
 
     @Parameter
     public boolean hasTenantControl;
@@ -99,6 +101,8 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         registerTenantCount.set(0);
         unregisterTenantCount.set(0);
         clearedTenantCount.set(0);
+        classesAlwaysAvailable = false;
+        tenantAvailable = true;
     }
 
     @Test
@@ -183,6 +187,9 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         @Override
         public Closeable setTenant(boolean createRequestScope) {
             new Exception().printStackTrace();
+            if (createRequestScope && !isAvailable()) {
+                throw new IllegalStateException("Tenant Not Available & Request scope requested");
+            }
             setTenantCount.incrementAndGet();
             return new Closeable() {
                 @Override
@@ -217,7 +224,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
 
         @Override
         public boolean isAvailable() {
-            return true;
+            return tenantAvailable;
         }
     }
 
@@ -231,7 +238,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
 
         @Override
         public boolean isClassesAlwaysAvailable() {
-            return false;
+            return classesAlwaysAvailable;
         }
     }
 }
