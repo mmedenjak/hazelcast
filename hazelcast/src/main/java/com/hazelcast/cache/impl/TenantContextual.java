@@ -49,8 +49,8 @@ public class TenantContextual<T> {
     public T get() {
         boolean localInitialized = this.initialized;
         if (!localInitialized) {
+            lock.lock();
             try {
-                lock.lock();
                 if (!initialized) {
                     if (exists()) {
                         try (Closeable tenantContext = tenantControl.setTenant(true)) {
