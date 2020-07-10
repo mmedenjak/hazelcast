@@ -184,8 +184,6 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
         this.valueComparator = getValueComparatorOf(cacheConfig.getInMemoryFormat());
         this.clearExpiredRecordsTask = cacheService.getExpirationManager().getTask();
 
-        init();
-
         if (cacheConfig.isStatisticsEnabled()) {
             statistics = cacheService.createCacheStatIfAbsent(cacheNameWithPrefix);
         }
