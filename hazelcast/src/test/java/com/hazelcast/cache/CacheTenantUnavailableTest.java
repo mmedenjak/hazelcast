@@ -133,17 +133,15 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
 
         tenantAvailable = false;
         disallowClassNames.add(ValueType.class.getName());
-//        hz1.getCluster().changeClusterState(ClusterState.NO_MIGRATION);
         // force migration
-        HazelcastInstance hz2 = factory.newHazelcastInstance(newConfig());
+        HazelcastInstance hz2 = factory.newHazelcastInstance(newConfig().setLiteMember(true));
         hz1.getPartitionService().addMigrationListener(new MigrationListenerImpl());
-//        hz2.getCluster().changeClusterState(ClusterState.ACTIVE);
         CacheManager cacheManager = createServerCachingProvider(hz2).getCacheManager();
         Cache cache2 = cacheManager.getCache(cacheName);
-        latch.await();
         tenantAvailable = true;
         disallowClassNames.clear();
-        System.out.println("interator starting");
+        hz2.getCluster().promoteLocalLiteMember();
+        latch.await(); // await migration
         Iterator it2 = cache2.iterator();
         Assert.assertNotNull("Iterator should not be empty", it2.hasNext());
         while (it2.hasNext()) {
@@ -177,23 +175,19 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
     private static class MigrationListenerImpl implements MigrationListener {
         @Override
         public void migrationStarted(MigrationState state) {
-            System.out.println("Started");
         }
 
         @Override
         public void migrationFinished(MigrationState state) {
-            System.out.println("Finished");
             latch.countDown();
         }
 
         @Override
         public void replicaMigrationCompleted(ReplicaMigrationEvent event) {
-            System.out.println("Completed");
         }
 
         @Override
         public void replicaMigrationFailed(ReplicaMigrationEvent event) {
-            System.out.println("Failed");
         }
     }
 }
