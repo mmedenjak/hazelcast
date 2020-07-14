@@ -191,7 +191,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
     }
 
     @Override
-    public void run(Operation op) {
+    public boolean run(Operation op) {
         executedOperationsCounter.inc();
 
         boolean publishCurrentTask = publishCurrentTask();
@@ -204,16 +204,19 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
             checkNodeState(op);
 
             if (timeout(op)) {
-                return;
+                return false;
             }
 
             ensureNoPartitionProblems(op);
 
             ensureNoSplitBrain(op);
 
-            op.beforeRun();
-
-            call(op);
+            if (op.ready()) {
+                op.beforeRun();
+                call(op);
+            } else {
+                return true;
+            }
         } catch (Throwable e) {
             handleOperationError(op, e);
         } finally {
@@ -221,6 +224,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
                 currentTask = null;
             }
         }
+        return false;
     }
 
     private void call(Operation op) throws Exception {
@@ -394,7 +398,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
     }
 
     @Override
-    public void run(Packet packet) throws Exception {
+    public boolean run(Packet packet) throws Exception {
         boolean publishCurrentTask = publishCurrentTask();
 
         if (publishCurrentTask) {
@@ -413,13 +417,17 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
             setOperationResponseHandler(op);
 
             if (!ensureValidMember(op)) {
-                return;
+                return false;
             }
 
             if (publishCurrentTask) {
                 currentTask = null;
             }
-            run(op);
+            if (op.ready()) {
+                run(op);
+            } else {
+                return true;
+            }
         } catch (Throwable throwable) {
             // If exception happens we need to extract the callId from the bytes directly!
             long callId = extractOperationCallId(packet);
@@ -432,6 +440,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
                 currentTask = null;
             }
         }
+        return false;
     }
 
     /**

@@ -803,4 +803,8 @@ public abstract class Operation implements DataSerializable {
         sb.append('}');
         return sb.toString();
     }
+
+    public boolean ready() {
+        return true;
+    }
 }

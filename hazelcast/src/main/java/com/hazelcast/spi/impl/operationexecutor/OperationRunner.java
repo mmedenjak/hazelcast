@@ -49,11 +49,11 @@ public abstract class OperationRunner {
 
     public abstract long executedOperationsCount();
 
-    public abstract void run(Packet packet) throws Exception;
+    public abstract boolean run(Packet packet) throws Exception;
 
     public abstract void run(Runnable task);
 
-    public abstract void run(Operation task);
+    public abstract boolean run(Operation task);
 
     /**
      * Returns the current task that is executing. This value could be null

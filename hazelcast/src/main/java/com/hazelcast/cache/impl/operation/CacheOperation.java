@@ -104,6 +104,15 @@ public abstract class CacheOperation extends AbstractNamedOperation
     }
 
     @Override
+    public boolean ready() {
+        cacheService = getService();
+        if (!cacheService.getTenantControlFactory().isClassesAlwaysAvailable()) {
+            return getTenantControl(cacheService.getCacheConfig(name)).isAvailable();
+        }
+        return true;
+    }
+
+    @Override
     public void afterRun() throws Exception {
         if (tenantContext != null) {
             tenantContext.close();
