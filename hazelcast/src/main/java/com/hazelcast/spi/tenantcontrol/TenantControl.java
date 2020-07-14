@@ -77,9 +77,9 @@ public interface TenantControl extends DataSerializable {
     boolean isAvailable();
 
     /**
-     * tenant is no longer available, clear the tenant control of stale classes / class loaders
+     * clean up the thread to avoid potential class loader leaks
      */
-    void tenantUnavailable();
+    void clearThreadContext();
 
     /**
      * same to Java's Closeable interface, except close() method does not throw IOException

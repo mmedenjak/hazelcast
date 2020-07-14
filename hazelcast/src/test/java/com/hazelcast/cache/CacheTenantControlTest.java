@@ -66,7 +66,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
     private static final AtomicInteger closeTenantCount = new AtomicInteger();
     private static final AtomicInteger registerTenantCount = new AtomicInteger();
     private static final AtomicInteger unregisterTenantCount = new AtomicInteger();
-    private static final AtomicInteger clearedTenantCount = new AtomicInteger();
+    private static final AtomicInteger clearedThreadInfoCount = new AtomicInteger();
     static final AtomicReference<DestroyEventContext> destroyEventContext = new AtomicReference<DestroyEventContext>(null);
     static boolean classesAlwaysAvailable;
     static boolean tenantAvailable;
@@ -100,7 +100,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         closeTenantCount.set(0);
         registerTenantCount.set(0);
         unregisterTenantCount.set(0);
-        clearedTenantCount.set(0);
+        clearedThreadInfoCount.set(0);
         classesAlwaysAvailable = false;
         tenantAvailable = true;
     }
@@ -155,6 +155,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         assertEquals(5, closeTenantCount.get());
         assertEquals(1, registerTenantCount.get());
         assertEquals(1, unregisterTenantCount.get());
+        assertEquals(3, clearedThreadInfoCount.get());
     }
 
     @Test
@@ -218,13 +219,13 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         }
 
         @Override
-        public void tenantUnavailable() {
-            clearedTenantCount.incrementAndGet();
+        public boolean isAvailable() {
+            return tenantAvailable;
         }
 
         @Override
-        public boolean isAvailable() {
-            return tenantAvailable;
+        public void clearThreadContext() {
+            clearedThreadInfoCount.incrementAndGet();
         }
     }
 

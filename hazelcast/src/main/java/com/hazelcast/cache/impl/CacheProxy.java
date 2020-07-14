@@ -70,7 +70,6 @@ import static com.hazelcast.internal.util.MapUtil.toIntSize;
 import static com.hazelcast.internal.util.Preconditions.checkNotNull;
 import static com.hazelcast.internal.util.SetUtil.createHashSet;
 import static java.util.Collections.emptyMap;
-import com.hazelcast.config.CacheConfigAccessor;
 
 /**
  * <h1>ICache implementation</h1>
@@ -669,6 +668,5 @@ public class CacheProxy<K, V> extends CacheProxySupport<K, V>
     public void reSerializeCacheConfig() {
         cacheConfig = PreJoinCacheConfig.of(cacheConfig, getNodeEngine()
                 .getSerializationService()).asCacheConfig();
-        CacheConfigAccessor.getTenantControl(cacheConfig).tenantUnavailable();
     }
 }

@@ -22,7 +22,6 @@ import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.impl.SpiDataSerializerHook;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 
-import java.io.Closeable;
 import java.io.IOException;
 
 /**
@@ -52,7 +51,7 @@ public final class NoopTenantControl implements TenantControl, IdentifiedDataSer
     }
 
     @Override
-    public void tenantUnavailable() {
+    public void clearThreadContext() {
     }
 
     @Override

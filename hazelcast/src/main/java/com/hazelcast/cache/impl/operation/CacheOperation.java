@@ -40,6 +40,7 @@ import com.hazelcast.internal.util.ExceptionUtil;
 import static com.hazelcast.cache.impl.CacheEntryViews.createDefaultEntryView;
 import static com.hazelcast.config.CacheConfigAccessor.getTenantControl;
 import static com.hazelcast.internal.util.ToHeapDataConverter.toHeapData;
+import com.hazelcast.spi.tenantcontrol.TenantControl;
 import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
 
 /**
@@ -85,7 +86,9 @@ public abstract class CacheOperation extends AbstractNamedOperation
                 cacheConfig = cacheService.getCacheConfig(name);
             }
             if (cacheConfig != null) {
-                tenantContext = getTenantControl(cacheConfig).setTenant(true);
+                TenantControl tenantControl = getTenantControl(cacheConfig);
+                tenantControl.clearThreadContext();
+                tenantContext = tenantControl.setTenant(true);
             }
         } catch (CacheNotExistsException e) {
             dispose();
