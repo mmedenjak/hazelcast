@@ -806,12 +806,7 @@ public abstract class Operation implements DataSerializable {
      * @return true if ready
      */
     public boolean isOperationReady() {
-        TenantControlFactory tenantControlFactory = getNodeEngine().getTenantControlFactory();
-        if (tenantControlFactory.isClassesAlwaysAvailable()) {
-            return true;
-        } else {
-            return tenantControl.isAvailable();
-        }
+        return tenantControl.isAvailable();
     }
 
     public void pushThreadContext() {
