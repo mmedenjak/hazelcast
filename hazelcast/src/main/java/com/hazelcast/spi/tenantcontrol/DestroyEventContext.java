@@ -31,16 +31,4 @@ public interface DestroyEventContext {
      * @param instance to use to decouple the Hazelcast object from tenant
      */
     void tenantUnavailable(HazelcastInstance instance);
-
-    /**
-     *
-     * @return the name of the distributed object
-     */
-    String getDistributedObjectName();
-
-    /**
-     *
-     * @return the service name
-     */
-    String getServiceName();
 }

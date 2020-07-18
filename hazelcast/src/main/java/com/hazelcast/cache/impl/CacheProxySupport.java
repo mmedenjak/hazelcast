@@ -68,9 +68,12 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static com.hazelcast.cache.impl.CacheProxyUtil.validateNotNull;
 import static com.hazelcast.cache.impl.operation.MutableOperation.IGNORE_COMPLETION;
+import com.hazelcast.cache.impl.tenantcontrol.CacheDestroyEventContext;
 import static com.hazelcast.internal.util.ExceptionUtil.rethrow;
 import static com.hazelcast.internal.util.ExceptionUtil.rethrowAllowedTypeFirst;
 import static com.hazelcast.internal.util.SetUtil.createHashSet;
+import com.hazelcast.spi.tenantcontrol.TenantControl;
+import java.util.Optional;
 
 /**
  * Abstract {@link com.hazelcast.cache.ICache} implementation which provides shared internal implementations
@@ -163,6 +166,11 @@ abstract class CacheProxySupport<K, V>
     @Override
     public void close() {
         close0(false);
+    }
+
+    @Override
+    public void tenantCreated(TenantControl tenantControl) {
+        tenantControl.objectCreated(Optional.of(new CacheDestroyEventContext(cacheConfig.getName())));
     }
 
     @Override

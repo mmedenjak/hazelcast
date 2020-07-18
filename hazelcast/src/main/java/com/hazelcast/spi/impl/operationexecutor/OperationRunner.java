@@ -146,8 +146,13 @@ public abstract class OperationRunner {
      * @throws Exception when one of the operation phases fails with an exception
      */
     public static void runDirect(Operation operation) throws Exception {
-        operation.beforeRun();
-        operation.call();
-        operation.afterRun();
+        try {
+            operation.pushThreadContext();
+            operation.beforeRun();
+            operation.call();
+            operation.afterRun();
+        } finally {
+            operation.popThreadContext();
+        }
     }
 }

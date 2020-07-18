@@ -18,19 +18,16 @@ package com.hazelcast.cache;
 
 import static com.hazelcast.cache.CachePartitionIteratorMigrationTest.putValuesToPartition;
 import static com.hazelcast.cache.CacheTenantControlTest.destroyEventContext;
-import static com.hazelcast.cache.CacheTenantControlTest.setTenantCount;
 import static com.hazelcast.cache.CacheTenantControlTest.classesAlwaysAvailable;
-import static com.hazelcast.cache.CacheTenantControlTest.tenantAvailable;
+import static com.hazelcast.cache.CacheTenantControlTest.initState;
+import static com.hazelcast.cache.CacheTenantControlTest.newConfig;
 import static com.hazelcast.cache.CacheTestSupport.createServerCachingProvider;
 import static com.hazelcast.cache.CacheTestSupport.getCacheService;
 import static com.hazelcast.cache.HazelcastCacheManager.CACHE_MANAGER_PREFIX;
 import com.hazelcast.cache.impl.CacheProxy;
 import com.hazelcast.cache.impl.ICacheService;
 import com.hazelcast.config.CacheConfig;
-import com.hazelcast.config.Config;
-import com.hazelcast.config.InMemoryFormat;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.internal.util.AdditionalServiceClassLoader;
 import com.hazelcast.internal.util.ExceptionUtil;
 import com.hazelcast.partition.MigrationListener;
 import com.hazelcast.partition.MigrationState;
@@ -72,19 +69,8 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
     public void setup() {
         cacheName = randomName();
         classLoadingFailed = false;
-        setTenantCount.set(0);
-        disallowClassNames.clear();
+        initState();
         classesAlwaysAvailable = false;
-        tenantAvailable = true;
-    }
-
-    private Config newConfig() {
-        Config config = new Config();
-        ClassLoader configClassLoader = new AdditionalServiceClassLoader(new URL[0],
-                new SimulateNonExistantClassLoader());
-        config.setClassLoader(configClassLoader);
-        config.getCacheConfig("*");
-        return config;
     }
 
     @Test
@@ -110,7 +96,6 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         disallowClassNames.add(KeyType.class.getName());
 
         cacheConfig = cacheService.getCacheConfig(CACHE_MANAGER_PREFIX + cacheName);
-        cacheService.setTenantControl(cacheConfig);
         Cache cache3 = cacheManager.getCache(cacheName);
         assertInstanceOf(ValueType.class, cache3.get(new KeyType()));
         Assert.assertFalse("Class Loading Failed", classLoadingFailed);
@@ -118,12 +103,11 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
 
     @Test
     public void testMigrationWithUnavailableClasses() throws InterruptedException {
-        classesAlwaysAvailable = true;
+        classesAlwaysAvailable = false;
         TestHazelcastInstanceFactory factory = createHazelcastInstanceFactory(2);
         HazelcastInstance hz1 = factory.newHazelcastInstance(newConfig());
         CacheConfig cacheConfig = new CacheConfig();
         cacheConfig.setTypes(String.class, ValueType.class);
-        cacheConfig.setInMemoryFormat(InMemoryFormat.OBJECT);
 
         CacheProxy<String, ValueType> cache1 = (CacheProxy<String, ValueType>) createServerCachingProvider(hz1)
                 .getCacheManager().createCache(cacheName, cacheConfig);
@@ -131,17 +115,15 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         putValuesToPartition(hz1, cache1, value, 0, 1);
         putValuesToPartition(hz1, cache1, value, 1, 1);
 
-        tenantAvailable = false;
         disallowClassNames.add(ValueType.class.getName());
-        // force migration
         HazelcastInstance hz2 = factory.newHazelcastInstance(newConfig().setLiteMember(true));
         hz1.getPartitionService().addMigrationListener(new MigrationListenerImpl());
         CacheManager cacheManager = createServerCachingProvider(hz2).getCacheManager();
         Cache cache2 = cacheManager.getCache(cacheName);
-        tenantAvailable = true;
-        disallowClassNames.clear();
+        // force migration
         hz2.getCluster().promoteLocalLiteMember();
         latch.await(); // await migration
+        disallowClassNames.clear();
         Iterator it2 = cache2.iterator();
         Assert.assertNotNull("Iterator should not be empty", it2.hasNext());
         while (it2.hasNext()) {

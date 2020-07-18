@@ -94,8 +94,6 @@ import static com.hazelcast.cache.impl.CacheEventContextUtil.createCacheUpdatedE
 import static com.hazelcast.cache.impl.operation.MutableOperation.IGNORE_COMPLETION;
 import static com.hazelcast.cache.impl.record.CacheRecord.TIME_NOT_AVAILABLE;
 import static com.hazelcast.cache.impl.record.CacheRecordFactory.isExpiredAt;
-import com.hazelcast.config.CacheConfigAccessor;
-import static com.hazelcast.config.CacheConfigAccessor.getTenantControl;
 import static com.hazelcast.internal.config.ConfigValidator.checkCacheEvictionConfig;
 import static com.hazelcast.internal.util.EmptyStatement.ignore;
 import static com.hazelcast.internal.util.MapUtil.createHashMap;
@@ -188,7 +186,8 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
             statistics = cacheService.createCacheStatIfAbsent(cacheNameWithPrefix);
         }
         injectDependencies(evictionPolicyEvaluator.getEvictionPolicyComparator());
-        TenantControl tenantControl = CacheConfigAccessor.getTenantControl(cacheConfig);
+        TenantControl tenantControl = nodeEngine.getProxyService()
+                .getTenantControl(ICacheService.SERVICE_NAME, cacheNameWithPrefix);
         cacheLoader = new TenantContextual<>(this::initCacheLoader,
                 () -> cacheConfig.getCacheLoaderFactory() != null, tenantControl);
         cacheWriter = new TenantContextual<>(this::initCacheWriter,
@@ -354,9 +353,7 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     protected EvictionPolicyComparator createEvictionPolicyComparator(EvictionConfig evictionConfig) {
         checkCacheEvictionConfig(evictionConfig);
 
-        try (TenantControl.Closeable tenantContext = getTenantControl(cacheConfig).setTenant(false)) {
-            return EvictionPolicyEvaluatorProvider.getEvictionPolicyComparator(evictionConfig, nodeEngine.getConfigClassLoader());
-        }
+        return EvictionPolicyEvaluatorProvider.getEvictionPolicyComparator(evictionConfig, nodeEngine.getConfigClassLoader());
     }
 
     protected SamplingEvictionStrategy<Data, R, CRM> createEvictionStrategy(EvictionConfig cacheEvictionConfig) {

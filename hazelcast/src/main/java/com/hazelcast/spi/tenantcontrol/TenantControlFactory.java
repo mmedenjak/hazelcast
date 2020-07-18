@@ -33,7 +33,6 @@ import com.hazelcast.spi.impl.tenantcontrol.NoopTenantControlFactory;
  */
 @Beta
 public interface TenantControlFactory {
-
     /**
      * Default tenant control factory. Always produces {@link TenantControl#NOOP_TENANT_CONTROL}
      */
@@ -46,13 +45,9 @@ public interface TenantControlFactory {
      * Further operations from other threads will use the returned context
      * for this particular Hazelcast object to re-establish the invocation context
      *
-     * @param event hook to destroy any Hazelcast object when the tenant is destroyed,
-     * This is used, for example, to delete all associated caches from the application when
-     * it gets undeployed, so there are no ClassCastExceptions afterwards
-     *
      * @return new TenantControl instance with the saved state of the current tenant
      */
-    TenantControl saveCurrentTenant(DestroyEventContext event);
+    TenantControl saveCurrentTenant();
 
     /**
      * If not, CacheConfigs are always sent over the wire as PreJoin ops

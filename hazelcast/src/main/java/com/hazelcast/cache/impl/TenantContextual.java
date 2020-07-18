@@ -16,6 +16,7 @@
 
 package com.hazelcast.cache.impl;
 
+import com.hazelcast.spi.annotation.PrivateApi;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
 import java.util.concurrent.locks.Lock;
@@ -28,6 +29,7 @@ import java.util.function.Supplier;
  * @author lprimak
  * @param <T> object type
  */
+@PrivateApi
 public class TenantContextual<T> {
     private T contextual;
     private volatile boolean initialized;
@@ -53,7 +55,7 @@ public class TenantContextual<T> {
             try {
                 if (!initialized) {
                     if (exists()) {
-                        try (Closeable tenantContext = tenantControl.setTenant(true)) {
+                        try (Closeable tenantContext = tenantControl.setTenant()) {
                             contextual = initFunction.get();
                         }
                     }

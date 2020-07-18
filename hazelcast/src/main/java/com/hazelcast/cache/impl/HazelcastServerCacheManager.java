@@ -148,7 +148,6 @@ public class HazelcastServerCacheManager extends AbstractHazelcastCacheManager {
 
     @Override
     protected <K, V> void createCacheConfig(String cacheName, CacheConfig<K, V> config) {
-        cacheService.setTenantControl(config);
         cacheService.createCacheConfigOnAllMembers(PreJoinCacheConfig.of(config));
     }
 

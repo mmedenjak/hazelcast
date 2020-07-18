@@ -20,9 +20,11 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.impl.SpiDataSerializerHook;
+import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Default no-op implementation of TenantControl
@@ -30,16 +32,16 @@ import java.io.IOException;
 public final class NoopTenantControl implements TenantControl, IdentifiedDataSerializable {
 
     @Override
-    public Closeable setTenant(boolean createRequestScope) {
+    public Closeable setTenant() {
         return NoopCloseable.INSTANCE;
     }
 
     @Override
-    public void register() {
+    public void objectCreated(Optional<DestroyEventContext> destroyEventContext) {
     }
 
     @Override
-    public void unregister() {
+    public void objectDestroyed() {
     }
 
     @Override

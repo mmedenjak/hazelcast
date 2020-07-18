@@ -19,6 +19,7 @@ package com.hazelcast.spi.tenantcontrol;
 import com.hazelcast.nio.serialization.DataSerializable;
 import com.hazelcast.spi.annotation.Beta;
 import com.hazelcast.spi.impl.tenantcontrol.NoopTenantControl;
+import java.util.Optional;
 
 /**
  * Hooks for multi-tenancy for application servers
@@ -40,23 +41,18 @@ public interface TenantControl extends DataSerializable {
     /**
      * Establish this tenant's thread-local context
      * Particular TenantControl implementation will control the details of how
-     * createRequestScope parameter is handled, but in general,
-     * if createRequestScope = false, only ClassLoader is set up,
-     * if createRequestScope = true, in addition to ClassLoader,
-     * other things like invocation, EJB/JPA/CDI context should be set up as well
      *
-     * In other words, if only app class needs to be resolved, set createRequestScope to false
-     * If actually calling into user's code, set createRequestScope to true
-     *
-     * @param createRequestScope whether to create CDI request scope for this context
      * @return handle to be able to close the tenant's scope.
      */
-    Closeable setTenant(boolean createRequestScope);
+    Closeable setTenant();
 
     /**
      * To be called when Hazelcast object is created
+     * @param destroyEventContext hook to decouple any Hazelcast object when the tenant is destroyed,
+     * This is used, for example, to delete all associated caches from the application when
+     * it gets undeployed, so there are no ClassCastExceptions afterwards
      */
-    void register();
+    void objectCreated(Optional<DestroyEventContext> destroyEventContext);
 
     /**
      * To be called when the Hazelcast object attached to this tenant is destroyed.
@@ -67,7 +63,7 @@ public interface TenantControl extends DataSerializable {
      * Hazelcast object from the tenant
      * This is so the TenantControl itself can be garbage collected
      */
-    void unregister();
+    void objectDestroyed();
 
     /**
      * Checks if tenant app is loaded at the current time and classes are available

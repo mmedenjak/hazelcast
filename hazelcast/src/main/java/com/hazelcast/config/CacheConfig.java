@@ -26,7 +26,6 @@ import com.hazelcast.internal.nio.ClassLoaderUtil;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.impl.SerializationServiceSupport;
-import com.hazelcast.spi.tenantcontrol.TenantControl;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.cache.configuration.CacheEntryListenerConfiguration;
@@ -56,8 +55,6 @@ import static com.hazelcast.internal.util.Preconditions.checkAsyncBackupCount;
 import static com.hazelcast.internal.util.Preconditions.checkBackupCount;
 import static com.hazelcast.internal.util.Preconditions.checkNotNull;
 import static com.hazelcast.internal.util.Preconditions.isNotNull;
-import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
-import static com.hazelcast.spi.tenantcontrol.TenantControl.NOOP_TENANT_CONTROL;
 
 /**
  * Contains all the configuration for the {@link com.hazelcast.cache.ICache}.
@@ -88,8 +85,6 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
      * Full-flush invalidation means the invalidation of events for all entries when clear is called.
      */
     private boolean disablePerEntryInvalidationEvents;
-
-    private TenantControl tenantControl = NOOP_TENANT_CONTROL;
 
     public CacheConfig() {
     }
@@ -554,31 +549,26 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
 
         String resultInMemoryFormat = in.readUTF();
         inMemoryFormat = InMemoryFormat.valueOf(resultInMemoryFormat);
-        // set the thread-context and class loading context for this cache's tenant application
-        // This way user customizations (loader factories, listeners) and keyType/valueType
-        // can be CDI / EJB / JPA objects
-        try (Closeable tenantContext = tenantControl.setTenant(false)) {
-            evictionConfig = in.readObject();
-            wanReplicationRef = in.readObject();
+        evictionConfig = in.readObject();
+        wanReplicationRef = in.readObject();
 
-            readKeyValueTypes(in);
-            readTenant(in);
-            readFactories(in);
+        readKeyValueTypes(in);
+        readTenant(in);
+        readFactories(in);
 
-            isReadThrough = in.readBoolean();
-            isWriteThrough = in.readBoolean();
-            isStoreByValue = in.readBoolean();
-            isManagementEnabled = in.readBoolean();
-            isStatisticsEnabled = in.readBoolean();
-            hotRestartConfig = in.readObject();
-            eventJournalConfig = in.readObject();
+        isReadThrough = in.readBoolean();
+        isWriteThrough = in.readBoolean();
+        isStoreByValue = in.readBoolean();
+        isManagementEnabled = in.readBoolean();
+        isStatisticsEnabled = in.readBoolean();
+        hotRestartConfig = in.readObject();
+        eventJournalConfig = in.readObject();
 
-            splitBrainProtectionName = in.readUTF();
+        splitBrainProtectionName = in.readUTF();
 
-            final boolean listNotEmpty = in.readBoolean();
-            if (listNotEmpty) {
-                readListenerConfigurations(in);
-            }
+        final boolean listNotEmpty = in.readBoolean();
+        if (listNotEmpty) {
+            readListenerConfigurations(in);
         }
 
         mergePolicyConfig = in.readObject();
@@ -646,14 +636,6 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
                 + '}';
     }
 
-    TenantControl getTenantControl() {
-        return tenantControl;
-    }
-
-    void setTenantControl(TenantControl tenantControl) {
-        this.tenantControl = tenantControl;
-    }
-
     protected void writeTenant(ObjectDataOutput out) throws IOException {
     }
 
@@ -711,7 +693,6 @@ public class CacheConfig<K, V> extends AbstractCacheConfig<K, V> {
      * @return the target config
      */
     public <T extends CacheConfig<K, V>> T copy(T target, boolean resolved, SerializationService backupSerializationService) {
-        target.setTenantControl(getTenantControl());
         target.setAsyncBackupCount(getAsyncBackupCount());
         target.setBackupCount(getBackupCount());
         target.setDisablePerEntryInvalidationEvents(isDisablePerEntryInvalidationEvents());

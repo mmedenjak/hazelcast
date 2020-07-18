@@ -23,7 +23,6 @@ import com.hazelcast.cache.impl.ICacheRecordStore;
 import com.hazelcast.cache.impl.ICacheService;
 import com.hazelcast.cache.impl.event.CacheWanEventPublisher;
 import com.hazelcast.cache.impl.record.CacheRecord;
-import com.hazelcast.config.CacheConfig;
 import com.hazelcast.logging.ILogger;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
@@ -38,10 +37,7 @@ import com.hazelcast.internal.serialization.SerializationService;
 import com.hazelcast.internal.util.ExceptionUtil;
 
 import static com.hazelcast.cache.impl.CacheEntryViews.createDefaultEntryView;
-import static com.hazelcast.config.CacheConfigAccessor.getTenantControl;
 import static com.hazelcast.internal.util.ToHeapDataConverter.toHeapData;
-import com.hazelcast.spi.tenantcontrol.TenantControl;
-import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
 
 /**
  * Base Cache Operation. Cache operations are named operations. Key based operations are subclasses of this base
@@ -54,7 +50,6 @@ public abstract class CacheOperation extends AbstractNamedOperation
     protected transient ICacheService cacheService;
     protected transient ICacheRecordStore recordStore;
     protected transient CacheWanEventPublisher wanEventPublisher;
-    protected transient Closeable tenantContext;
 
     protected CacheOperation() {
     }
@@ -78,18 +73,6 @@ public abstract class CacheOperation extends AbstractNamedOperation
         cacheService = getService();
         try {
             recordStore = getOrCreateStoreIfAllowed();
-            // establish tenant application's thread-local context for this cache operation
-            CacheConfig<?, ?> cacheConfig;
-            if (recordStore != null) {
-                cacheConfig = recordStore.getConfig();
-            } else {
-                cacheConfig = cacheService.getCacheConfig(name);
-            }
-            if (cacheConfig != null) {
-                TenantControl tenantControl = getTenantControl(cacheConfig);
-                tenantControl.clearThreadContext();
-                tenantContext = tenantControl.setTenant(true);
-            }
         } catch (CacheNotExistsException e) {
             dispose();
             rethrowOrSwallowIfBackup(e);
@@ -104,22 +87,6 @@ public abstract class CacheOperation extends AbstractNamedOperation
         }
 
         beforeRunInternal();
-    }
-
-    @Override
-    public boolean ready() {
-        cacheService = getService();
-        if (!cacheService.getTenantControlFactory().isClassesAlwaysAvailable()) {
-            return getTenantControl(cacheService.getCacheConfig(name)).isAvailable();
-        }
-        return true;
-    }
-
-    @Override
-    public void afterRun() throws Exception {
-        if (tenantContext != null) {
-            tenantContext.close();
-        }
     }
 
     /**

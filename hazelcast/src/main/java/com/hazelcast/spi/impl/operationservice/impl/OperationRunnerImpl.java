@@ -211,7 +211,8 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
 
             ensureNoSplitBrain(op);
 
-            if (op.ready()) {
+            if (op.isOperationReady()) {
+                op.pushThreadContext();
                 op.beforeRun();
                 call(op);
             } else {
@@ -223,6 +224,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
             if (publishCurrentTask) {
                 currentTask = null;
             }
+            op.popThreadContext();
         }
         return false;
     }
@@ -407,9 +409,10 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
 
         ServerConnection connection = packet.getConn();
         Address caller = connection.getRemoteAddress();
+        Operation op = null;
         try {
             Object object = nodeEngine.toObject(packet);
-            Operation op = (Operation) object;
+            op = (Operation) object;
             op.setNodeEngine(nodeEngine);
             setCallerAddress(op, caller);
             setConnection(op, connection);
@@ -423,11 +426,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
             if (publishCurrentTask) {
                 currentTask = null;
             }
-            if (op.ready()) {
-                run(op);
-            } else {
-                return true;
-            }
+            return run(op);
         } catch (Throwable throwable) {
             // If exception happens we need to extract the callId from the bytes directly!
             long callId = extractOperationCallId(packet);
@@ -436,11 +435,13 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
             logOperationDeserializationException(throwable, callId);
             throw ExceptionUtil.rethrow(throwable);
         } finally {
+            if (op != null) {
+                op.clearThreadContext();
+            }
             if (publishCurrentTask) {
                 currentTask = null;
             }
         }
-        return false;
     }
 
     /**

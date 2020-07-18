@@ -24,6 +24,8 @@ import com.hazelcast.transaction.TransactionalMap;
 import com.hazelcast.transaction.TransactionalMultiMap;
 import com.hazelcast.transaction.TransactionalQueue;
 import com.hazelcast.multimap.MultiMap;
+import com.hazelcast.spi.tenantcontrol.TenantControl;
+import java.util.Optional;
 
 /**
  * Base interface for all distributed objects.
@@ -74,4 +76,21 @@ public interface DistributedObject {
      * Clears and releases all resources for this object.
      */
     void destroy();
+
+    /**
+     * Overridden by subclasses tell the tenant that an object was created,
+     * and to optionally add destroy event context for tenant control
+     * @param tenantControl
+     */
+    default void tenantCreated(TenantControl tenantControl) {
+        tenantControl.objectCreated(Optional.empty());
+    }
+
+    /**
+     * Overridden by subclasses to tell tenant that an object was destroyed
+     * @param tenantControl
+     */
+    default void tenantDestroyed(TenantControl tenantControl) {
+        tenantControl.objectDestroyed();
+    }
 }

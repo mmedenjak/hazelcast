@@ -164,7 +164,11 @@ public abstract class OperationThread extends HazelcastManagedThread implements 
 
     private SwCounter process(Operation operation) {
         currentRunner = operationRunner(operation.getPartitionId());
-        return currentRunner.run(operation) ? null : completedOperationCount;
+        try {
+            return currentRunner.run(operation) ? null : completedOperationCount;
+        } finally {
+            operation.clearThreadContext();
+        }
     }
 
     private SwCounter process(Packet packet) throws Exception {

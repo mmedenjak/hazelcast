@@ -41,9 +41,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import static com.hazelcast.config.CacheConfigAccessor.getTenantControl;
 import static com.hazelcast.internal.util.MapUtil.createHashMap;
-import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
 
 /**
  * Replication operation is the data migration operation of {@link com.hazelcast.cache.impl.CacheRecordStore}.
@@ -83,15 +81,14 @@ public class CacheReplicationOperation extends Operation implements IdentifiedDa
 
             CacheConfig cacheConfig = recordStore.getConfig();
             if (cacheConfig.getTotalBackupCount() >= replicaIndex) {
-                try (Closeable tenantContext = getTenantControl(cacheConfig).setTenant(false)) {
-                    storeRecordsToReplicate(recordStore);
-                }
+                storeRecordsToReplicate(recordStore);
             }
         }
 
         configs.addAll(segment.getCacheConfigs());
         nearCacheStateHolder.prepare(segment, namespaces);
-        classesAlwaysAvailable = segment.getCacheService().getTenantControlFactory().isClassesAlwaysAvailable();
+        classesAlwaysAvailable = segment.getCacheService().getNodeEngine()
+                .getTenantControlFactory().isClassesAlwaysAvailable();
     }
 
     protected void storeRecordsToReplicate(ICacheRecordStore recordStore) {

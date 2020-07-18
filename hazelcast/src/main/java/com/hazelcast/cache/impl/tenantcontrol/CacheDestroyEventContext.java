@@ -16,24 +16,15 @@
 
 package com.hazelcast.cache.impl.tenantcontrol;
 
-import com.hazelcast.cache.impl.CacheDataSerializerHook;
 import com.hazelcast.cache.impl.CacheProxy;
 import com.hazelcast.cache.impl.CacheService;
 import com.hazelcast.config.CacheConfig;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
-import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
-import java.io.IOException;
 
 
-public class CacheDestroyEventContext implements DestroyEventContext, IdentifiedDataSerializable {
-
-    private String cacheName;
-
-    public CacheDestroyEventContext() {
-    }
+public class CacheDestroyEventContext implements DestroyEventContext {
+    private final String cacheName;
 
     public CacheDestroyEventContext(String cacheName) {
         this.cacheName = cacheName;
@@ -41,42 +32,10 @@ public class CacheDestroyEventContext implements DestroyEventContext, Identified
 
     @Override
     public void tenantUnavailable(HazelcastInstance instance) {
-        CacheProxy cache = (CacheProxy) instance.getCacheManager().getCache(getDistributedObjectName());
+        CacheProxy cache = (CacheProxy) instance.getCacheManager().getCache(cacheName);
         cache.reSerializeCacheConfig();
         CacheService cacheService = (CacheService) cache.getService();
         CacheConfig cacheConfig = cacheService.getCacheConfig(cache.getPrefixedName());
         cacheService.reSerializeCacheConfig(cacheConfig);
-    }
-
-    @Override
-    public int getFactoryId() {
-        return CacheDataSerializerHook.F_ID;
-    }
-
-    @Override
-    public int getClassId() {
-        return CacheDataSerializerHook.CACHE_DESTROY_EVENT_CONTEXT;
-    }
-
-    @Override
-    public void writeData(ObjectDataOutput out)
-            throws IOException {
-        out.writeUTF(cacheName);
-    }
-
-    @Override
-    public void readData(ObjectDataInput in)
-            throws IOException {
-        cacheName = in.readUTF();
-    }
-
-    @Override
-    public String getDistributedObjectName() {
-        return cacheName;
-    }
-
-    @Override
-    public String getServiceName() {
-        return CacheService.SERVICE_NAME;
     }
 }
