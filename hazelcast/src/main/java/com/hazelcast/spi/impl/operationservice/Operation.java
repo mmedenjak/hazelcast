@@ -47,7 +47,6 @@ import static com.hazelcast.spi.impl.operationservice.ExceptionAction.RETRY_INVO
 import static com.hazelcast.spi.impl.operationservice.ExceptionAction.THROW_EXCEPTION;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
-import com.hazelcast.spi.tenantcontrol.TenantControlFactory;
 
 /**
  * An operation could be compared to a {@link Runnable}. It contains logic that
@@ -791,9 +790,15 @@ public abstract class Operation implements DataSerializable {
     }
 
     public void setTenantControlIfNotAlready() {
-        if (this.tenantControl == TenantControl.NOOP_TENANT_CONTROL) {
-            this.tenantControl = nodeEngine.getTenantControlFactory().saveCurrentTenant();
-            setFlag(true, BITMASK_TENANT_CONTROL_SET);
+        if (tenantControl == TenantControl.NOOP_TENANT_CONTROL) {
+            tenantControl = nodeEngine.getTenantControlFactory().saveCurrentTenant();
+            if (tenantControl == null) {
+                getLogger().warning(String.format("TenantControl factory return null: %s - %s)",
+                        this.toString(), nodeEngine.getTenantControlFactory().toString()));
+                tenantControl = TenantControl.NOOP_TENANT_CONTROL;
+            } else {
+                setFlag(true, BITMASK_TENANT_CONTROL_SET);
+            }
         }
     }
 
