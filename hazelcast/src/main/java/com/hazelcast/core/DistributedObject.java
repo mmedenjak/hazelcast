@@ -24,7 +24,7 @@ import com.hazelcast.transaction.TransactionalMap;
 import com.hazelcast.transaction.TransactionalMultiMap;
 import com.hazelcast.transaction.TransactionalQueue;
 import com.hazelcast.multimap.MultiMap;
-import com.hazelcast.spi.tenantcontrol.TenantControl;
+import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
 import java.util.Optional;
 
 /**
@@ -78,19 +78,14 @@ public interface DistributedObject {
     void destroy();
 
     /**
-     * Overridden by subclasses tell the tenant that an object was created,
-     * and to optionally add destroy event context for tenant control
-     * @param tenantControl
+     * If a particular distributed object needs to clear any classes
+     * that are cached, possibly from the destroyed tenant, needs to be cleared
+     * to avoid class loader leaks and ClassNotFound exceptions
+     * when the tenant is destroyed
+     *
+     * @return destroy context
      */
-    default void tenantCreated(TenantControl tenantControl) {
-        tenantControl.objectCreated(Optional.empty());
-    }
-
-    /**
-     * Overridden by subclasses to tell tenant that an object was destroyed
-     * @param tenantControl
-     */
-    default void tenantDestroyed(TenantControl tenantControl) {
-        tenantControl.objectDestroyed();
+    default Optional<DestroyEventContext> getDestroyContextForTenant() {
+        return Optional.empty();
     }
 }

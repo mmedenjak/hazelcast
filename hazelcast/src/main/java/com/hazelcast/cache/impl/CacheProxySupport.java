@@ -71,7 +71,7 @@ import static com.hazelcast.cache.impl.operation.MutableOperation.IGNORE_COMPLET
 import static com.hazelcast.internal.util.ExceptionUtil.rethrow;
 import static com.hazelcast.internal.util.ExceptionUtil.rethrowAllowedTypeFirst;
 import static com.hazelcast.internal.util.SetUtil.createHashSet;
-import com.hazelcast.spi.tenantcontrol.TenantControl;
+import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
 import java.util.Optional;
 
 /**
@@ -168,11 +168,11 @@ abstract class CacheProxySupport<K, V>
     }
 
     @Override
-    public void tenantCreated(TenantControl tenantControl) {
-        tenantControl.objectCreated(Optional.of(() -> {
+    public Optional<DestroyEventContext> getDestroyContextForTenant() {
+        return Optional.of(() -> {
             reSerializeCacheConfig();
             ((CacheService)cacheService).reSerializeCacheConfig(cacheConfig);
-        }));
+        });
     }
 
     abstract void reSerializeCacheConfig();
