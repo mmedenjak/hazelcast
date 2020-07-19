@@ -188,7 +188,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         cache.get(1);
         cache.getAndPut(1, 2);
 
-        destroyEventContext.get().tenantUnavailable(hz);
+        destroyEventContext.get().tenantUnavailable();
 
         assertInstanceOf(CountingTenantControl.class, getTenantControl(hz, cache));
     }

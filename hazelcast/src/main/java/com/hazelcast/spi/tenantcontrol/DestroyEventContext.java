@@ -16,19 +16,17 @@
 
 package com.hazelcast.spi.tenantcontrol;
 
-import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.spi.annotation.Beta;
 
 /**
  * Hook to decouple Hazelcast object from the tenant
  */
 @Beta
+@FunctionalInterface
 public interface DestroyEventContext {
 
     /**
      * Called to decouple Hazelcast object from the tenant
-     *
-     * @param instance to use to decouple the Hazelcast object from tenant
      */
-    void tenantUnavailable(HazelcastInstance instance);
+    void tenantUnavailable();
 }

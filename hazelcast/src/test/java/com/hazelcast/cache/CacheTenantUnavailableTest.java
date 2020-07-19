@@ -92,7 +92,7 @@ public class CacheTenantUnavailableTest extends HazelcastTestSupport {
         disallowClassNames.clear();
         assertInstanceOf(ValueType.class, cache2.get(new KeyType()));
 
-        destroyEventContext.get().tenantUnavailable(hz2);
+        destroyEventContext.get().tenantUnavailable();
         disallowClassNames.add(KeyType.class.getName());
 
         cacheConfig = cacheService.getCacheConfig(CACHE_MANAGER_PREFIX + cacheName);

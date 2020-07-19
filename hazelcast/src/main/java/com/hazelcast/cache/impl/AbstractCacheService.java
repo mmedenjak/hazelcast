@@ -408,9 +408,6 @@ public abstract class AbstractCacheService implements ICacheService, PreJoinAwar
         CompletableFuture<CacheConfig> cacheConfigFuture = configs.remove(cacheNameWithPrefix);
         CacheConfig cacheConfig = null;
         if (cacheConfigFuture != null) {
-            // decouple this cache from the tenant
-            // the tenant will unregister it's event listeners so the tenant itself
-            // can be garbage collected
             cacheConfig = cacheConfigFuture.join();
             logger.info("Removed cache config: " + cacheConfig);
         }
