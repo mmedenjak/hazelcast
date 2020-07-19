@@ -171,7 +171,7 @@ abstract class CacheProxySupport<K, V>
     public Optional<DestroyEventContext> getDestroyContextForTenant() {
         return Optional.of(() -> {
             reSerializeCacheConfig();
-            ((CacheService)cacheService).reSerializeCacheConfig(cacheConfig);
+            ((CacheService) cacheService).reSerializeCacheConfig(cacheConfig);
         });
     }
 
