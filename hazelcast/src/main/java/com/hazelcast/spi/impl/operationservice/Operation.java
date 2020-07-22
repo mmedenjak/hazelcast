@@ -811,7 +811,7 @@ public abstract class Operation implements DataSerializable {
      * @return true if ready
      */
     public boolean isOperationReady() {
-        return tenantControl.isAvailable();
+        return tenantControl.isAvailable(this);
     }
 
     public void pushThreadContext() {

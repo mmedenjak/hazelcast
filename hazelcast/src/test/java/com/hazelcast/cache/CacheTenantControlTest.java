@@ -55,6 +55,7 @@ import com.hazelcast.map.IMap;
 import com.hazelcast.map.listener.EntryAddedListener;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.properties.ClusterProperty;
 import java.io.IOException;
 import java.util.Optional;
@@ -222,7 +223,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         @Override
         public Closeable setTenant() {
 //            new Exception().printStackTrace();
-            if (!isAvailable()) {
+            if (!isAvailable(null)) {
                 throw new IllegalStateException("Tenant Not Available");
             }
             setTenantCount.incrementAndGet();
@@ -249,7 +250,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         }
 
         @Override
-        public boolean isAvailable() {
+        public boolean isAvailable(Operation op) {
             return true;
         }
 

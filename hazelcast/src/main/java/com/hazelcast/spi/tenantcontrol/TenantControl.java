@@ -18,6 +18,7 @@ package com.hazelcast.spi.tenantcontrol;
 
 import com.hazelcast.nio.serialization.DataSerializable;
 import com.hazelcast.spi.annotation.Beta;
+import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.tenantcontrol.NoopTenantControl;
 import java.util.Optional;
 
@@ -68,9 +69,10 @@ public interface TenantControl extends DataSerializable {
     /**
      * Checks if tenant app is loaded at the current time and classes are available
      *
+     * @param op passed so the tenant can filter on who is calling
      * @return true if tenant is loaded and classes are available
      */
-    boolean isAvailable();
+    boolean isAvailable(Operation op);
 
     /**
      * clean up the thread to avoid potential class loader leaks

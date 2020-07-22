@@ -24,7 +24,6 @@ import com.hazelcast.spi.annotation.Beta;
 @Beta
 @FunctionalInterface
 public interface DestroyEventContext {
-
     /**
      * Called to decouple Hazelcast object from the tenant
      */
