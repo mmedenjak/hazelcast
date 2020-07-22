@@ -77,6 +77,10 @@ public class TenantContextual<T> {
         return existsFunction.get();
     }
 
+    public TenantControl getTenantControl() {
+        return tenantControl;
+    }
+
     /**
      * method to return delegate having same contextual and creation methods
      * as the current class

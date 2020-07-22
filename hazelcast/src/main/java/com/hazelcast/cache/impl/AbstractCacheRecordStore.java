@@ -1004,10 +1004,12 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     public Object readThroughCache(Data key) throws CacheLoaderException {
-        if (isReadThrough() && cacheLoader.exists()) {
-            try {
-                Object o = dataToValue(key);
-                return cacheLoader.get().load(o);
+        if (isReadThrough()) {
+            try (TenantControl.Closeable ctx = cacheLoader.getTenantControl().setTenant()) {
+                if (cacheLoader.exists()) {
+                    Object o = dataToValue(key);
+                    return cacheLoader.get().load(o);
+                }
             } catch (Exception e) {
                 if (!(e instanceof CacheLoaderException)) {
                     throw new CacheLoaderException("Exception in CacheLoader during load", e);
@@ -1020,11 +1022,13 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     public void writeThroughCache(Data key, Object value) throws CacheWriterException {
-        if (isWriteThrough() && cacheWriter.exists()) {
-            try {
-                Object objKey = dataToValue(key);
-                Object objValue = toValue(value);
-                cacheWriter.get().write(new CacheEntry<Object, Object>(objKey, objValue));
+        if (isWriteThrough()) {
+            try (TenantControl.Closeable ctx = cacheWriter.getTenantControl().setTenant()) {
+                if (cacheWriter.exists()) {
+                    Object objKey = dataToValue(key);
+                    Object objValue = toValue(value);
+                    cacheWriter.get().write(new CacheEntry<Object, Object>(objKey, objValue));
+                }
             } catch (Exception e) {
                 if (!(e instanceof CacheWriterException)) {
                     throw new CacheWriterException("Exception in CacheWriter during write", e);
@@ -1040,10 +1044,12 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
     }
 
     protected void deleteCacheEntry(Data key, CallerProvenance provenance) {
-        if (persistenceEnabledFor(provenance) && isWriteThrough() && cacheWriter.exists()) {
-            try {
-                Object objKey = dataToValue(key);
-                cacheWriter.get().delete(objKey);
+        if (persistenceEnabledFor(provenance) && isWriteThrough()) {
+            try (TenantControl.Closeable ctx = cacheWriter.getTenantControl().setTenant()) {
+                if (cacheWriter.exists()) {
+                    Object objKey = dataToValue(key);
+                    cacheWriter.get().delete(objKey);
+                }
             } catch (Exception e) {
                 if (!(e instanceof CacheWriterException)) {
                     throw new CacheWriterException("Exception in CacheWriter during delete", e);
@@ -1056,57 +1062,63 @@ public abstract class AbstractCacheRecordStore<R extends CacheRecord, CRM extend
 
     @SuppressFBWarnings("WMI_WRONG_MAP_ITERATOR")
     protected void deleteAllCacheEntry(Set<Data> keys) {
-        if (isWriteThrough() && cacheWriter.exists() && keys != null && !keys.isEmpty()) {
-            Map<Object, Data> keysToDelete = createHashMap(keys.size());
-            for (Data key : keys) {
-                Object localKeyObj = dataToValue(key);
-                keysToDelete.put(localKeyObj, key);
-            }
-            Set<Object> keysObject = keysToDelete.keySet();
-            try {
-                cacheWriter.get().deleteAll(keysObject);
-            } catch (Exception e) {
-                if (!(e instanceof CacheWriterException)) {
-                    throw new CacheWriterException("Exception in CacheWriter during deleteAll", e);
-                } else {
-                    throw (CacheWriterException) e;
-                }
-            } finally {
-                for (Object undeletedKey : keysObject) {
-                    Data undeletedKeyData = keysToDelete.get(undeletedKey);
-                    keys.remove(undeletedKeyData);
+        if (isWriteThrough() && keys != null && !keys.isEmpty()) {
+            try (TenantControl.Closeable ctx = cacheWriter.getTenantControl().setTenant()) {
+                if (cacheWriter.exists()) {
+                    Map<Object, Data> keysToDelete = createHashMap(keys.size());
+                    for (Data key : keys) {
+                        Object localKeyObj = dataToValue(key);
+                        keysToDelete.put(localKeyObj, key);
+                    }
+                    Set<Object> keysObject = keysToDelete.keySet();
+                    try {
+                        cacheWriter.get().deleteAll(keysObject);
+                    } catch (Exception e) {
+                        if (!(e instanceof CacheWriterException)) {
+                            throw new CacheWriterException("Exception in CacheWriter during deleteAll", e);
+                        } else {
+                            throw (CacheWriterException) e;
+                        }
+                    } finally {
+                        for (Object undeletedKey : keysObject) {
+                            Data undeletedKeyData = keysToDelete.get(undeletedKey);
+                            keys.remove(undeletedKeyData);
+                        }
+                    }
                 }
             }
         }
     }
 
     protected Map<Data, Object> loadAllCacheEntry(Set<Data> keys) {
-        if (cacheLoader.exists()) {
-            Map<Object, Data> keysToLoad = createHashMap(keys.size());
-            for (Data key : keys) {
-                Object localKeyObj = dataToValue(key);
-                keysToLoad.put(localKeyObj, key);
-            }
-            Map<Object, Object> loaded;
-            try {
-                loaded = cacheLoader.get().loadAll(keysToLoad.keySet());
-            } catch (Throwable e) {
-                if (!(e instanceof CacheLoaderException)) {
-                    throw new CacheLoaderException("Exception in CacheLoader during loadAll", e);
-                } else {
-                    throw (CacheLoaderException) e;
+        try (TenantControl.Closeable ctx = cacheLoader.getTenantControl().setTenant()) {
+            if (cacheLoader.exists()) {
+                Map<Object, Data> keysToLoad = createHashMap(keys.size());
+                for (Data key : keys) {
+                    Object localKeyObj = dataToValue(key);
+                    keysToLoad.put(localKeyObj, key);
                 }
+                Map<Object, Object> loaded;
+                try {
+                    loaded = cacheLoader.get().loadAll(keysToLoad.keySet());
+                } catch (Throwable e) {
+                    if (!(e instanceof CacheLoaderException)) {
+                        throw new CacheLoaderException("Exception in CacheLoader during loadAll", e);
+                    } else {
+                        throw (CacheLoaderException) e;
+                    }
+                }
+                Map<Data, Object> result = createHashMap(keysToLoad.size());
+                for (Map.Entry<Object, Data> entry : keysToLoad.entrySet()) {
+                    Object keyObj = entry.getKey();
+                    Object valueObject = loaded.get(keyObj);
+                    Data keyData = entry.getValue();
+                    result.put(keyData, valueObject);
+                }
+                return result;
             }
-            Map<Data, Object> result = createHashMap(keysToLoad.size());
-            for (Map.Entry<Object, Data> entry : keysToLoad.entrySet()) {
-                Object keyObj = entry.getKey();
-                Object valueObject = loaded.get(keyObj);
-                Data keyData = entry.getValue();
-                result.put(keyData, valueObject);
-            }
-            return result;
+            return null;
         }
-        return null;
     }
 
     @Override
