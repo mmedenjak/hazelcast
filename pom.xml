@@ -116,7 +116,7 @@
         <snakeyaml.engine.version>1.0</snakeyaml.engine.version>
 
         <h2.version>1.3.160</h2.version>
-        <atomikos.version>3.9.3</atomikos.version>
+        <atomikos.version>5.0.8</atomikos.version>
 
         <!-- The path to relocated external dependencies. -->
         <relocation.root>com.hazelcast</relocation.root>
