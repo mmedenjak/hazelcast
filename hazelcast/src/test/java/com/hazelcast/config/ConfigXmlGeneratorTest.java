@@ -245,6 +245,14 @@ public class ConfigXmlGeneratorTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void testNetworkAutoDetectionJoinConfig() {
+        Config cfg = new Config();
+        cfg.getNetworkConfig().getJoin().getAutoDetectionConfig().setEnabled(false);
+        Config actualConfig = getNewConfigViaXMLGenerator(cfg);
+        assertFalse(actualConfig.getNetworkConfig().getJoin().getAutoDetectionConfig().isEnabled());
+    }
+
+    @Test
     public void testNetworkMulticastJoinConfig() {
         Config cfg = new Config();
 
@@ -1872,6 +1880,14 @@ public class ConfigXmlGeneratorTest extends HazelcastTestSupport {
     }
 
     @Test
+    public void testAdvancedNetworkAutoDetectionJoinConfig() {
+        Config cfg = new Config();
+        cfg.getAdvancedNetworkConfig().setEnabled(true).getJoin().getAutoDetectionConfig().setEnabled(false);
+        Config actualConfig = getNewConfigViaXMLGenerator(cfg);
+        assertFalse(actualConfig.getAdvancedNetworkConfig().getJoin().getAutoDetectionConfig().isEnabled());
+    }
+
+    @Test
     public void testAdvancedNetworkMulticastJoinConfig() {
         Config cfg = new Config();
         cfg.getAdvancedNetworkConfig().setEnabled(true);
@@ -1992,6 +2008,20 @@ public class ConfigXmlGeneratorTest extends HazelcastTestSupport {
                 .getAdvancedNetworkConfig().getEndpointConfigs().get(expected.getQualifier());
 
         checkEndpointConfigCompatible(expected, actual);
+    }
+
+    @Test
+    public void testAuditlogConfig() {
+        Config config = new Config();
+
+        config.getAuditlogConfig()
+              .setEnabled(true)
+              .setFactoryClassName("com.acme.AuditlogToSyslog")
+              .setProperty("host", "syslogserver.acme.com")
+              .setProperty("port", "514");
+        AuditlogConfig generatedConfig = getNewConfigViaXMLGenerator(config).getAuditlogConfig();
+        assertTrue(generatedConfig + " should be compatible with " + config.getAuditlogConfig(),
+                new ConfigCompatibilityChecker.AuditlogConfigChecker().check(config.getAuditlogConfig(), generatedConfig));
     }
 
     @Test

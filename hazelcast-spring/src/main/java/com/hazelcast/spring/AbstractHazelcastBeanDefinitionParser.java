@@ -18,6 +18,7 @@ package com.hazelcast.spring;
 
 import com.hazelcast.config.AbstractXmlConfigHelper;
 import com.hazelcast.config.AliasedDiscoveryConfig;
+import com.hazelcast.config.AutoDetectionConfig;
 import com.hazelcast.config.ClassFilter;
 import com.hazelcast.config.DiscoveryConfig;
 import com.hazelcast.config.DiscoveryStrategyConfig;
@@ -98,7 +99,10 @@ public abstract class AbstractHazelcastBeanDefinitionParser extends AbstractBean
                 }
 
                 if (parserContext.isNested()) {
-                    builder.setScope(parserContext.getContainingBeanDefinition().getScope());
+                    BeanDefinition containingBeanDefinition = parserContext.getContainingBeanDefinition();
+                    if (containingBeanDefinition != null) {
+                        builder.setScope(containingBeanDefinition.getScope());
+                    }
                 } else {
                     Node scopeNode = attributes.getNamedItem("scope");
                     if (scopeNode != null) {
@@ -525,6 +529,12 @@ public abstract class AbstractHazelcastBeanDefinitionParser extends AbstractBean
             }
             discoveryConfigBuilder.addPropertyValue("discoveryStrategyConfigs", discoveryStrategyConfigs);
             joinConfigBuilder.addPropertyValue("discoveryConfig", discoveryConfigBuilder.getBeanDefinition());
+        }
+
+        protected void handleAutoDetection(Node node, BeanDefinitionBuilder joinConfigBuilder) {
+            BeanDefinitionBuilder autoDetectionConfigBuilder = createBeanBuilder(AutoDetectionConfig.class);
+            autoDetectionConfigBuilder.addPropertyValue("enabled", getBooleanValue(getAttribute(node, "enabled")));
+            joinConfigBuilder.addPropertyValue("autoDetectionConfig", autoDetectionConfigBuilder.getBeanDefinition());
         }
 
         protected void handleIndex(ManagedList<BeanDefinition> indexes, Node indexNode) {

@@ -613,6 +613,8 @@ hazelcast:
       - 34500
     reuse-address: false
     join:
+      auto-detection:
+        enabled: false
       multicast:
         enabled: false
         multicast-group: 224.2.2.3
@@ -3334,6 +3336,14 @@ hazelcast:
     jmx:
       enabled: false
     collection-frequency-seconds: 10
+
+  auditlog:
+    enabled: false
+    factory-class-name: com.acme.AuditlogToSyslogFactory
+    properties:
+      host: syslogserver.acme.com
+      port: 514
+      type: tcp
 
   #
   # ===== HAZELCAST INSTANCE TRACKING CONFIGURATION =====

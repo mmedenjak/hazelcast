@@ -18,6 +18,8 @@ package com.hazelcast.internal.config;
 
 import com.hazelcast.config.AliasedDiscoveryConfig;
 import com.hazelcast.config.AttributeConfig;
+import com.hazelcast.config.AuditlogConfig;
+import com.hazelcast.config.AutoDetectionConfig;
 import com.hazelcast.config.CRDTReplicationConfig;
 import com.hazelcast.config.CacheDeserializedValues;
 import com.hazelcast.config.CachePartitionLostListenerConfig;
@@ -161,6 +163,7 @@ import static com.hazelcast.config.security.LdapRoleMappingMode.getRoleMappingMo
 import static com.hazelcast.config.security.LdapSearchScope.getSearchScope;
 import static com.hazelcast.internal.config.AliasedDiscoveryConfigUtils.getConfigByTag;
 import static com.hazelcast.internal.config.ConfigSections.ADVANCED_NETWORK;
+import static com.hazelcast.internal.config.ConfigSections.AUDITLOG;
 import static com.hazelcast.internal.config.ConfigSections.CACHE;
 import static com.hazelcast.internal.config.ConfigSections.CARDINALITY_ESTIMATOR;
 import static com.hazelcast.internal.config.ConfigSections.CLUSTER_NAME;
@@ -336,6 +339,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
             handleAdvancedNetwork(node);
         } else if (CP_SUBSYSTEM.isEqual(nodeName)) {
             handleCPSubsystem(node);
+        } else if (AUDITLOG.isEqual(nodeName)) {
+            config.setAuditlogConfig(fillFactoryWithPropertiesConfig(node, new AuditlogConfig()));
         } else if (METRICS.isEqual(nodeName)) {
             handleMetrics(node);
         } else if (INSTANCE_TRACKING.isEqual(nodeName)) {
@@ -1262,6 +1267,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 handleAliasedDiscoveryStrategy(joinConfig, child, name);
             } else if ("discovery-strategies".equals(name)) {
                 handleDiscoveryStrategies(joinConfig.getDiscoveryConfig(), child);
+            } else if ("auto-detection".equals(name)) {
+                handleAutoDetection(child, advancedNetworkConfig);
             }
         }
         joinConfig.verify();
@@ -1386,6 +1393,19 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 multicastConfig.setMulticastTimeToLive(parseInt(value));
             } else if ("trusted-interfaces".equals(cleanNodeName(n))) {
                 handleTrustedInterfaces(multicastConfig, n);
+            }
+        }
+    }
+
+    private void handleAutoDetection(Node node, boolean advancedNetworkConfig) {
+        JoinConfig join = joinConfig(advancedNetworkConfig);
+        AutoDetectionConfig autoDetectionConfig = join.getAutoDetectionConfig();
+        NamedNodeMap attributes = node.getAttributes();
+        for (int a = 0; a < attributes.getLength(); a++) {
+            Node att = attributes.item(a);
+            String value = getTextContent(att).trim();
+            if ("enabled".equals(lowerCaseInternal(att.getNodeName()))) {
+                autoDetectionConfig.setEnabled(getBooleanValue(value));
             }
         }
     }
