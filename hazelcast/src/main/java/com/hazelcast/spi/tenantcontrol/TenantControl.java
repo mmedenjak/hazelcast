@@ -53,7 +53,7 @@ public interface TenantControl extends DataSerializable {
      * This is used, for example, to delete all associated caches from the application when
      * it gets undeployed, so there are no ClassCastExceptions afterwards
      */
-    void objectCreated(Optional<DestroyEventContext> destroyEventContext);
+    void distributedObjectCreated(Optional<DestroyEventContext> destroyEventContext);
 
     /**
      * To be called when the Hazelcast object attached to this tenant is destroyed.
@@ -64,7 +64,7 @@ public interface TenantControl extends DataSerializable {
      * Hazelcast object from the tenant
      * This is so the TenantControl itself can be garbage collected
      */
-    void objectDestroyed();
+    void distributedObjectDestroyed();
 
     /**
      * Checks if tenant app is loaded at the current time and classes are available

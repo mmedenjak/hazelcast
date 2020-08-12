@@ -50,7 +50,12 @@ public interface TenantControlFactory {
     TenantControl saveCurrentTenant();
 
     /**
-     * If not, CacheConfigs are always sent over the wire as PreJoin ops
+     * If the method returns false (classes are not always available),
+     * all objects, e.g. CacheConfigs are always sent over the wire
+     * in a form that does not require classes to be loaded / available.
+     * Objects will be sent using class names instead of class types,
+     * and sending byte arrays instead of serialized objects.
+     * This is so de-serialization does not fail with ClassNotFoundException
      *
      * @return true is the associated applications are always loaded and running
      */

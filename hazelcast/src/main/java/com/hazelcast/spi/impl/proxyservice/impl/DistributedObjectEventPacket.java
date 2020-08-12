@@ -26,9 +26,11 @@ import java.io.IOException;
 import java.util.UUID;
 
 import static com.hazelcast.core.DistributedObjectEvent.EventType;
+import com.hazelcast.internal.cluster.Versions;
+import com.hazelcast.nio.serialization.impl.Versioned;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 
-public final class DistributedObjectEventPacket implements IdentifiedDataSerializable {
+public final class DistributedObjectEventPacket implements IdentifiedDataSerializable, Versioned {
 
     private EventType eventType;
     private String serviceName;
@@ -74,7 +76,9 @@ public final class DistributedObjectEventPacket implements IdentifiedDataSeriali
         out.writeUTF(serviceName);
         out.writeUTF(name);
         UUIDSerializationUtil.writeUUID(out, source);
-        out.writeObject(tenantControl);
+        if (out.getVersion().isGreaterOrEqual(Versions.V4_1)) {
+            out.writeObject(tenantControl);
+        }
     }
 
     @Override
@@ -83,7 +87,8 @@ public final class DistributedObjectEventPacket implements IdentifiedDataSeriali
         serviceName = in.readUTF();
         name = in.readUTF();
         source = UUIDSerializationUtil.readUUID(in);
-        tenantControl = in.readObject();
+        tenantControl = in.getVersion()
+                .isGreaterOrEqual(Versions.V4_1) ? in.readObject() : TenantControl.NOOP_TENANT_CONTROL;
     }
 
     @Override

@@ -38,11 +38,11 @@ public final class NoopTenantControl implements TenantControl, IdentifiedDataSer
     }
 
     @Override
-    public void objectCreated(Optional<DestroyEventContext> destroyEventContext) {
+    public void distributedObjectCreated(Optional<DestroyEventContext> destroyEventContext) {
     }
 
     @Override
-    public void objectDestroyed() {
+    public void distributedObjectDestroyed() {
     }
 
     @Override

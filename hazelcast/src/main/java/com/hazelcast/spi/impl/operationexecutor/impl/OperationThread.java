@@ -133,6 +133,12 @@ public abstract class OperationThread extends HazelcastManagedThread implements 
     private void process(Object task) {
         try {
             SwCounter counter;
+            // process() will return it's appropriate counter to be incremented
+            // if process() returns null instead, which means that task's tenant
+            // is not available, the task will be put in the back of the queue
+            // this, however, conflates the meaning of SwCounter return value
+            // design choice needed to be made, otherwise there would be a lot of
+            // code duplication. Wishing Java had tuples (although they bring their own problems)
             if (task.getClass() == Packet.class) {
                 counter = process((Packet) task);
             } else if (task instanceof Operation) {

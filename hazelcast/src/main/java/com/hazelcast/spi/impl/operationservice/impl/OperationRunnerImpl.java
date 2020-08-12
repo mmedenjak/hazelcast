@@ -211,7 +211,7 @@ class OperationRunnerImpl extends OperationRunner implements StaticMetricsProvid
 
             ensureNoSplitBrain(op);
 
-            if (op.isOperationReady()) {
+            if (op.isTenantAvailable()) {
                 op.pushThreadContext();
                 op.beforeRun();
                 call(op);

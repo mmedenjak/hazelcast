@@ -18,6 +18,7 @@ package com.hazelcast.spi.impl.operationservice;
 
 import com.hazelcast.cluster.Address;
 import com.hazelcast.internal.cluster.ClusterClock;
+import com.hazelcast.internal.cluster.Versions;
 import com.hazelcast.internal.server.ServerConnection;
 import com.hazelcast.internal.partition.InternalPartition;
 import com.hazelcast.internal.util.UUIDSerializationUtil;
@@ -790,7 +791,9 @@ public abstract class Operation implements DataSerializable {
     }
 
     public void setTenantControlIfNotAlready() {
-        if (tenantControl == TenantControl.NOOP_TENANT_CONTROL) {
+        if (tenantControl == TenantControl.NOOP_TENANT_CONTROL
+                && nodeEngine.getClusterService().getClusterVersion()
+                        .isGreaterOrEqual(Versions.V4_1)) {
             tenantControl = nodeEngine.getTenantControlFactory().saveCurrentTenant();
             if (tenantControl == null) {
                 getLogger().warning(String.format("TenantControl factory return null: %s - %s)",
@@ -805,12 +808,12 @@ public abstract class Operation implements DataSerializable {
     /**
      * checks if operation is ready to execute,
      * if not, it will be pushed to the back of the queue
-     * Tenant's isAvailable() class is responsible for waiting
+     * Tenant's isAvailable() method is responsible for waiting
      * so there is no tight loop
      *
      * @return true if ready
      */
-    public boolean isOperationReady() {
+    public boolean isTenantAvailable() {
         return tenantControl.isAvailable(this);
     }
 
