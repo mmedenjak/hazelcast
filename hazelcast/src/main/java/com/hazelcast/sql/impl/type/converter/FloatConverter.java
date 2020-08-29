@@ -16,9 +16,14 @@
 
 package com.hazelcast.sql.impl.type.converter;
 
+import com.hazelcast.sql.impl.QueryException;
 import com.hazelcast.sql.impl.type.QueryDataTypeFamily;
 
 import java.math.BigDecimal;
+
+import static com.hazelcast.sql.impl.expression.math.ExpressionMath.DECIMAL_MATH_CONTEXT;
+import static com.hazelcast.sql.impl.type.QueryDataTypeFamily.DECIMAL;
+import static com.hazelcast.sql.impl.type.QueryDataTypeFamily.REAL;
 
 /**
  * Converter for {@link java.lang.Float} type.
@@ -28,7 +33,7 @@ public final class FloatConverter extends Converter {
     public static final FloatConverter INSTANCE = new FloatConverter();
 
     private FloatConverter() {
-        super(ID_FLOAT, QueryDataTypeFamily.REAL);
+        super(ID_FLOAT, REAL);
     }
 
     @Override
@@ -38,27 +43,89 @@ public final class FloatConverter extends Converter {
 
     @Override
     public byte asTinyint(Object val) {
-        return (byte) cast(val);
+        float casted = cast(val);
+        if (!Float.isFinite(casted)) {
+            throw cannotConvert(QueryDataTypeFamily.TINYINT, val);
+        }
+
+        // here the overflow may happen: (byte) casted = (byte) (int) casted
+        byte converted = (byte) casted;
+
+        // casts from float to int are saturating
+        if (converted != (int) casted) {
+            throw numericOverflow(QueryDataTypeFamily.TINYINT, val);
+        }
+
+        return converted;
     }
 
     @Override
     public short asSmallint(Object val) {
-        return (short) cast(val);
+        float casted = cast(val);
+        if (!Float.isFinite(casted)) {
+            throw cannotConvert(QueryDataTypeFamily.SMALLINT, val);
+        }
+
+        // here the overflow may happen: (short) casted = (short) (int) casted
+        short converted = (short) casted;
+
+        // casts from float to int are saturating
+        if (converted != (int) casted) {
+            throw numericOverflow(QueryDataTypeFamily.SMALLINT, val);
+        }
+
+        return converted;
     }
 
     @Override
     public int asInt(Object val) {
-        return (int) cast(val);
+        float casted = cast(val);
+        if (!Float.isFinite(casted)) {
+            throw cannotConvert(QueryDataTypeFamily.INTEGER, val);
+        }
+
+        // casts from float to int are saturating
+        int converted = (int) casted;
+
+        // casts from float to long are saturating
+        if (converted != (long) casted) {
+            throw numericOverflow(QueryDataTypeFamily.INTEGER, val);
+        }
+
+        return converted;
     }
 
     @Override
     public long asBigint(Object val) {
-        return (long) cast(val);
+        float casted = cast(val);
+        if (!Float.isFinite(casted)) {
+            throw cannotConvert(QueryDataTypeFamily.BIGINT, val);
+        }
+
+        float truncated = (float) (casted > 0.0 ? Math.floor(casted) : Math.ceil(casted));
+        // casts from float to long are saturating
+        long converted = (long) truncated;
+
+        if ((float) converted != truncated) {
+            throw numericOverflow(QueryDataTypeFamily.BIGINT, val);
+        }
+
+        return converted;
     }
 
     @Override
     public BigDecimal asDecimal(Object val) {
-        return BigDecimal.valueOf(cast(val));
+        float val0 = cast(val);
+
+        if (Float.isInfinite(val0)) {
+            throw QueryException.dataException("Cannot convert infinite " + REAL + " value to " + DECIMAL);
+        }
+
+        if (Float.isNaN(val0)) {
+            throw QueryException.dataException("Cannot convert NaN " + REAL + " value to " + DECIMAL);
+        }
+
+        return new BigDecimal(val0, DECIMAL_MATH_CONTEXT);
     }
 
     @Override
@@ -84,4 +151,5 @@ public final class FloatConverter extends Converter {
     private float cast(Object val) {
         return (float) val;
     }
+
 }

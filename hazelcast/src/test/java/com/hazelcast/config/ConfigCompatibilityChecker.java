@@ -136,6 +136,8 @@ public class ConfigCompatibilityChecker {
 
         checkCompatibleConfigs("instance-tracking", c1.getInstanceTrackingConfig(), c2.getInstanceTrackingConfig(),
                 new InstanceTrackingConfigChecker());
+        checkCompatibleConfigs("native memory", c1.getNativeMemoryConfig(), c2.getNativeMemoryConfig(),
+                new NativeMemoryConfigChecker());
 
         return true;
     }
@@ -526,7 +528,8 @@ public class ConfigCompatibilityChecker {
                     && nullSafeEqual(c1.getPoolSize(), c2.getPoolSize())
                     && nullSafeEqual(c1.getDurability(), c2.getDurability())
                     && nullSafeEqual(c1.getSplitBrainProtectionName(), c2.getSplitBrainProtectionName())
-                    && nullSafeEqual(c1.getCapacity(), c2.getCapacity());
+                    && nullSafeEqual(c1.getCapacity(), c2.getCapacity())
+                    && nullSafeEqual(c1.isStatisticsEnabled(), c2.isStatisticsEnabled());
         }
 
         @Override
@@ -543,7 +546,8 @@ public class ConfigCompatibilityChecker {
                     && nullSafeEqual(c1.getDurability(), c2.getDurability())
                     && nullSafeEqual(c1.getSplitBrainProtectionName(), c2.getSplitBrainProtectionName())
                     && isCompatible(c1.getMergePolicyConfig(), c2.getMergePolicyConfig())
-                    && nullSafeEqual(c1.getPoolSize(), c2.getPoolSize());
+                    && nullSafeEqual(c1.getPoolSize(), c2.getPoolSize())
+                    && nullSafeEqual(c1.isStatisticsEnabled(), c2.isStatisticsEnabled());
         }
 
         @Override
@@ -783,6 +787,32 @@ public class ConfigCompatibilityChecker {
         }
     }
 
+    public static class NativeMemoryConfigChecker extends ConfigChecker<NativeMemoryConfig> {
+
+        @Override
+        boolean check(NativeMemoryConfig c1, NativeMemoryConfig c2) {
+            if (c1 == c2) {
+                return true;
+            }
+            if (c1 == null || c2 == null) {
+                return false;
+            }
+
+            return c1.isEnabled() == c2.isEnabled()
+                    && c1.getAllocatorType() == c2.getAllocatorType()
+                    && c1.getMetadataSpacePercentage() == c2.getMetadataSpacePercentage()
+                    && c1.getMinBlockSize() == c2.getMinBlockSize()
+                    && c1.getPageSize() == c2.getPageSize()
+                    && c1.getPersistentMemoryConfig().getDirectoryConfigs()
+                         .equals(c2.getPersistentMemoryConfig().getDirectoryConfigs());
+        }
+
+        @Override
+        NativeMemoryConfig getDefault(Config c) {
+            return c.getNativeMemoryConfig();
+        }
+    }
+
     public static class SqlConfigChecker extends ConfigChecker<SqlConfig> {
 
         @Override
@@ -796,7 +826,7 @@ public class ConfigCompatibilityChecker {
 
             return c1.getExecutorPoolSize() == c2.getExecutorPoolSize()
                     && c1.getOperationPoolSize() == c2.getOperationPoolSize()
-                    && c1.getQueryTimeoutMillis() == c2.getQueryTimeoutMillis();
+                    && c1.getStatementTimeoutMillis() == c2.getStatementTimeoutMillis();
         }
 
         @Override

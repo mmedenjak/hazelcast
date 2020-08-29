@@ -16,8 +16,14 @@
 
 package com.hazelcast.sql.impl.calcite.parse;
 
+import com.hazelcast.sql.impl.calcite.schema.HazelcastTable;
+import com.hazelcast.sql.impl.calcite.validate.HazelcastSqlOperatorTable;
+import com.hazelcast.sql.impl.calcite.validate.types.HazelcastTypeSystem;
+import com.hazelcast.sql.impl.schema.Table;
+import com.hazelcast.sql.impl.schema.map.AbstractMapTable;
 import org.apache.calcite.runtime.CalciteContextException;
 import org.apache.calcite.runtime.Resources;
+import org.apache.calcite.sql.SqlBasicTypeNameSpec;
 import org.apache.calcite.sql.SqlCall;
 import org.apache.calcite.sql.SqlDataTypeSpec;
 import org.apache.calcite.sql.SqlDynamicParam;
@@ -27,11 +33,17 @@ import org.apache.calcite.sql.SqlKind;
 import org.apache.calcite.sql.SqlLiteral;
 import org.apache.calcite.sql.SqlNode;
 import org.apache.calcite.sql.SqlNodeList;
+import org.apache.calcite.sql.SqlOperator;
 import org.apache.calcite.sql.SqlSelect;
+import org.apache.calcite.sql.SqlUserDefinedTypeNameSpec;
 import org.apache.calcite.sql.SqlUtil;
+import org.apache.calcite.sql.fun.SqlStdOperatorTable;
+import org.apache.calcite.sql.fun.SqlTrimFunction;
 import org.apache.calcite.sql.type.SqlTypeName;
 import org.apache.calcite.sql.util.SqlVisitor;
+import org.apache.calcite.sql.validate.SqlValidatorCatalogReader;
 import org.apache.calcite.sql.validate.SqlValidatorException;
+import org.apache.calcite.sql.validate.SqlValidatorTable;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -39,9 +51,8 @@ import java.util.Set;
 /**
  * Visitor that throws exceptions for unsupported SQL features.
  */
+@SuppressWarnings("checkstyle:ExecutableStatementCount")
 public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
-
-    public static final UnsupportedOperationVisitor INSTANCE = new UnsupportedOperationVisitor();
 
     /** Error messages. */
     private static final Resource RESOURCE = Resources.create(Resource.class);
@@ -49,17 +60,35 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
     /** A set of {@link SqlKind} values that are supported without any additional validation. */
     private static final Set<SqlKind> SUPPORTED_KINDS;
 
+    /* A set of supported operators for functions. */
+    private static final Set<SqlOperator> SUPPORTED_OPERATORS;
+
     static {
         // We define all supported features explicitly instead of getting them from predefined sets of SqlKind class.
         // This is needed to ensure that we do not miss any unsupported features when something is added to a new version
         // of Apache Calcite.
         SUPPORTED_KINDS = new HashSet<>();
 
+        // Predicates
+        SUPPORTED_KINDS.add(SqlKind.AND);
+        SUPPORTED_KINDS.add(SqlKind.OR);
+        SUPPORTED_KINDS.add(SqlKind.NOT);
+
         // Arithmetics
         SUPPORTED_KINDS.add(SqlKind.PLUS);
+        SUPPORTED_KINDS.add(SqlKind.MINUS);
+        SUPPORTED_KINDS.add(SqlKind.TIMES);
+        SUPPORTED_KINDS.add(SqlKind.DIVIDE);
+        SUPPORTED_KINDS.add(SqlKind.MINUS_PREFIX);
+        SUPPORTED_KINDS.add(SqlKind.PLUS_PREFIX);
 
         // "IS" predicates
+        SUPPORTED_KINDS.add(SqlKind.IS_TRUE);
+        SUPPORTED_KINDS.add(SqlKind.IS_NOT_TRUE);
+        SUPPORTED_KINDS.add(SqlKind.IS_FALSE);
+        SUPPORTED_KINDS.add(SqlKind.IS_NOT_FALSE);
         SUPPORTED_KINDS.add(SqlKind.IS_NULL);
+        SUPPORTED_KINDS.add(SqlKind.IS_NOT_NULL);
 
         // Comparisons predicates
         SUPPORTED_KINDS.add(SqlKind.EQUALS);
@@ -71,10 +100,56 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
 
         // Miscellaneous
         SUPPORTED_KINDS.add(SqlKind.AS);
+        SUPPORTED_KINDS.add(SqlKind.CAST);
+        SUPPORTED_KINDS.add(SqlKind.CEIL);
+        SUPPORTED_KINDS.add(SqlKind.FLOOR);
+        SUPPORTED_KINDS.add(SqlKind.LIKE);
+        SUPPORTED_KINDS.add(SqlKind.TRIM);
+
+        // Supported operators
+        SUPPORTED_OPERATORS = new HashSet<>();
+
+        // Math
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.COS);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.SIN);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.TAN);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.COT);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.ACOS);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.ASIN);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.ATAN);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.EXP);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.LN);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.LOG10);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.RAND);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.ABS);
+        SUPPORTED_OPERATORS.add(SqlStdOperatorTable.PI);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.SIGN);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.DEGREES);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.RADIANS);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.ROUND);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.TRUNCATE);
+
+        // Strings
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.ASCII);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.INITCAP);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.CHAR_LENGTH);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.CHARACTER_LENGTH);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.LENGTH);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.LOWER);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.UPPER);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.CONCAT);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.SUBSTRING);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.LTRIM);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.RTRIM);
+        SUPPORTED_OPERATORS.add(HazelcastSqlOperatorTable.BTRIM);
     }
 
-    private UnsupportedOperationVisitor() {
-        // No-op.
+    private final SqlValidatorCatalogReader catalogReader;
+
+    public UnsupportedOperationVisitor(
+            SqlValidatorCatalogReader catalogReader
+    ) {
+        this.catalogReader = catalogReader;
     }
 
     @Override
@@ -88,10 +163,6 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
 
     @Override
     public Void visit(SqlNodeList nodeList) {
-        if (nodeList.size() == 0) {
-            return null;
-        }
-
         for (int i = 0; i < nodeList.size(); i++) {
             SqlNode node = nodeList.get(i);
 
@@ -103,19 +174,66 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
 
     @Override
     public Void visit(SqlIdentifier id) {
+        SqlValidatorTable table = catalogReader.getTable(id.names);
+        if (table != null) {
+            HazelcastTable hzTable = table.unwrap(HazelcastTable.class);
+            if (hzTable != null) {
+                Table target = hzTable.getTarget();
+                if (target != null && !(target instanceof AbstractMapTable)) {
+                    throw error(id, RESOURCE.custom(target.getClass().getSimpleName() + " is not supported"));
+                }
+            }
+        }
         return null;
     }
 
+    @SuppressWarnings("checkstyle:CyclomaticComplexity")
     @Override
     public Void visit(SqlDataTypeSpec type) {
-        throw error(type, RESOURCE.custom("Type specification is not supported"));
+        if (type.getTypeNameSpec() instanceof SqlUserDefinedTypeNameSpec) {
+            SqlIdentifier typeName = type.getTypeName();
+
+            if (HazelcastTypeSystem.isObject(typeName) || HazelcastTypeSystem.isTimestampWithTimeZone(typeName)) {
+                return null;
+            }
+        }
+
+        if (!(type.getTypeNameSpec() instanceof SqlBasicTypeNameSpec)) {
+            throw error(type, RESOURCE.custom("Complex type specifications are not supported"));
+        }
+
+        SqlTypeName typeName = SqlTypeName.get(type.getTypeName().getSimple());
+        switch (typeName) {
+            case BOOLEAN:
+            case TINYINT:
+            case SMALLINT:
+            case INTEGER:
+            case BIGINT:
+            case DECIMAL:
+            case REAL:
+            case DOUBLE:
+            case VARCHAR:
+            case DATE:
+            case TIME:
+            case TIMESTAMP:
+            case NULL:
+                return null;
+
+            case CHAR:
+                // char should be not accessible by users, we have only VARCHAR
+            case ANY:
+                // visible to users as OBJECT
+            default:
+                throw error(type, RESOURCE.notSupported(typeName.getName()));
+        }
     }
 
     @Override
     public Void visit(SqlDynamicParam param) {
-        throw error(param, RESOURCE.custom("Parameters are not supported"));
+        return null;
     }
 
+    @SuppressWarnings("checkstyle:CyclomaticComplexity")
     @Override
     public Void visit(SqlLiteral literal) {
         SqlTypeName typeName = literal.getTypeName();
@@ -127,7 +245,25 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
             case INTEGER:
             case BIGINT:
             case DECIMAL:
+            case REAL:
+            case DOUBLE:
+            case VARCHAR:
+            // CHAR is present here to support string literals: Calcite expects
+            // string literals to be of CHAR type, not VARCHAR. Validated type
+            // of string literals is still VARCHAR in HazelcastSqlValidator.
+            case CHAR:
+            case ANY:
+            case NULL:
                 return null;
+
+            case SYMBOL:
+                Object symbolValue = literal.getValue();
+
+                if (symbolValue instanceof SqlTrimFunction.Flag) {
+                    return null;
+                }
+
+                throw error(literal, RESOURCE.custom(symbolValue + " literal is not supported"));
 
             default:
                 throw error(literal, RESOURCE.custom(typeName + " literals are not supported"));
@@ -152,8 +288,13 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
 
                 return;
 
+            case OTHER:
+            case OTHER_FUNCTION:
+                processOther(call);
+                break;
+
             default:
-                throw unsupported(call, call.getKind());
+                throw unsupported(call);
         }
     }
 
@@ -173,6 +314,21 @@ public final class UnsupportedOperationVisitor implements SqlVisitor<Void> {
         if (select.getOffset() != null) {
             throw unsupported(select.getOffset(), "OFFSET");
         }
+    }
+
+    private void processOther(SqlCall call) {
+        SqlOperator operator = call.getOperator();
+
+        if (SUPPORTED_OPERATORS.contains(operator)) {
+            return;
+        }
+
+        throw unsupported(call, operator.getName());
+    }
+
+    private CalciteContextException unsupported(SqlCall call) {
+        String name = call.getOperator().getName();
+        return unsupported(call, name.replace("$", "").replace('_', ' '));
     }
 
     private CalciteContextException unsupported(SqlNode node, SqlKind kind) {

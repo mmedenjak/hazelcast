@@ -19,12 +19,17 @@ package com.hazelcast.sql.impl.calcite.opt.physical.visitor;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.sql.SqlColumnMetadata;
 import com.hazelcast.sql.SqlRowMetadata;
+import com.hazelcast.sql.impl.QueryException;
+import com.hazelcast.sql.impl.QueryParameterMetadata;
 import com.hazelcast.sql.impl.QueryUtils;
+import com.hazelcast.sql.impl.calcite.SqlToQueryType;
 import com.hazelcast.sql.impl.calcite.opt.physical.FilterPhysicalRel;
+import com.hazelcast.sql.impl.calcite.opt.physical.MapIndexScanPhysicalRel;
 import com.hazelcast.sql.impl.calcite.opt.physical.MapScanPhysicalRel;
 import com.hazelcast.sql.impl.calcite.opt.physical.PhysicalRel;
 import com.hazelcast.sql.impl.calcite.opt.physical.ProjectPhysicalRel;
 import com.hazelcast.sql.impl.calcite.opt.physical.RootPhysicalRel;
+import com.hazelcast.sql.impl.calcite.opt.physical.ValuesPhysicalRel;
 import com.hazelcast.sql.impl.calcite.opt.physical.exchange.AbstractExchangePhysicalRel;
 import com.hazelcast.sql.impl.calcite.opt.physical.exchange.RootExchangePhysicalRel;
 import com.hazelcast.sql.impl.calcite.schema.HazelcastTable;
@@ -32,7 +37,11 @@ import com.hazelcast.sql.impl.expression.Expression;
 import com.hazelcast.sql.impl.extract.QueryPath;
 import com.hazelcast.sql.impl.plan.Plan;
 import com.hazelcast.sql.impl.plan.PlanFragmentMapping;
+import com.hazelcast.sql.impl.plan.cache.PlanCacheKey;
+import com.hazelcast.sql.impl.plan.cache.PlanObjectKey;
+import com.hazelcast.sql.impl.plan.node.EmptyPlanNode;
 import com.hazelcast.sql.impl.plan.node.FilterPlanNode;
+import com.hazelcast.sql.impl.plan.node.MapIndexScanPlanNode;
 import com.hazelcast.sql.impl.plan.node.MapScanPlanNode;
 import com.hazelcast.sql.impl.plan.node.PlanNode;
 import com.hazelcast.sql.impl.plan.node.PlanNodeFieldTypeProvider;
@@ -48,6 +57,7 @@ import org.apache.calcite.rex.RexNode;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -81,8 +91,13 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
     /** Rel ID map. */
     private final Map<PhysicalRel, List<Integer>> relIdMap;
 
+    /** Key used for plan caching. */
+    private final PlanCacheKey planKey;
+
     /** Names of the returned columns from the original query. */
     private final List<String> rootColumnNames;
+
+    private final QueryParameterMetadata parameterMetadata;
 
     /** Prepared fragments. */
     private final List<PlanNode> fragments = new ArrayList<>();
@@ -108,16 +123,23 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
     /** Row metadata. */
     private SqlRowMetadata rowMetadata;
 
+    /** Collected IDs of objects used in the plan. */
+    private final Set<PlanObjectKey> objectIds = new HashSet<>();
+
     public PlanCreateVisitor(
         UUID localMemberId,
         Map<UUID, PartitionIdSet> partMap,
         Map<PhysicalRel, List<Integer>> relIdMap,
-        List<String> rootColumnNames
+        PlanCacheKey planKey,
+        List<String> rootColumnNames,
+        QueryParameterMetadata parameterMetadata
     ) {
         this.localMemberId = localMemberId;
         this.partMap = partMap;
         this.relIdMap = relIdMap;
+        this.planKey = planKey;
         this.rootColumnNames = rootColumnNames;
+        this.parameterMetadata = parameterMetadata;
 
         memberIds = new HashSet<>(partMap.keySet());
     }
@@ -157,7 +179,10 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
             outboundEdgeMap,
             inboundEdgeMap,
             inboundEdgeMemberCountMap,
-            rowMetadata
+            rowMetadata,
+            parameterMetadata,
+            planKey,
+            objectIds
         );
     }
 
@@ -193,14 +218,15 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
 
     @Override
     public void onMapScan(MapScanPhysicalRel rel) {
-        HazelcastTable hazelcastTable = rel.getTableUnwrapped();
         AbstractMapTable table = rel.getMap();
+
+        HazelcastTable hazelcastTable = rel.getTableUnwrapped();
 
         PlanNodeSchema schemaBefore = getScanSchemaBeforeProject(table);
 
         MapScanPlanNode scanNode = new MapScanPlanNode(
             pollId(rel),
-            table.getName(),
+            table.getMapName(),
             table.getKeyDescriptor(),
             table.getValueDescriptor(),
             getScanFieldPaths(table),
@@ -210,6 +236,35 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
         );
 
         pushUpstream(scanNode);
+
+        objectIds.add(table.getObjectKey());
+    }
+
+    @Override
+    public void onMapIndexScan(MapIndexScanPhysicalRel rel) {
+        HazelcastTable hazelcastTable = rel.getTableUnwrapped();
+        AbstractMapTable table = rel.getMap();
+
+        PlanNodeSchema schemaBefore = getScanSchemaBeforeProject(table);
+
+        MapIndexScanPlanNode scanNode = new MapIndexScanPlanNode(
+            pollId(rel),
+            table.getMapName(),
+            table.getKeyDescriptor(),
+            table.getValueDescriptor(),
+            getScanFieldPaths(table),
+            schemaBefore.getTypes(),
+            hazelcastTable.getProjects(),
+            rel.getIndex().getName(),
+            rel.getIndex().getComponentsCount(),
+            rel.getIndexFilter(),
+            rel.getConverterTypes(),
+            convertFilter(schemaBefore, rel.getRemainderExp())
+        );
+
+        pushUpstream(scanNode);
+
+        objectIds.add(table.getObjectKey());
     }
 
     @Override
@@ -277,6 +332,22 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
         pushUpstream(filterNode);
     }
 
+    @Override
+    public void onValues(ValuesPhysicalRel rel) {
+        if (!rel.getTuples().isEmpty()) {
+            throw QueryException.error("Non-empty VALUES are not supported");
+        }
+
+        QueryDataType[] fieldTypes = SqlToQueryType.mapRowType(rel.getRowType());
+
+        EmptyPlanNode planNode = new EmptyPlanNode(
+            pollId(rel),
+            Arrays.asList(fieldTypes)
+        );
+
+        pushUpstream(planNode);
+    }
+
     /**
      * Push node to upstream stack.
      *
@@ -341,7 +412,7 @@ public class PlanCreateVisitor implements PhysicalRelVisitor {
             return null;
         }
 
-        RexToExpressionVisitor converter = new RexToExpressionVisitor(fieldTypeProvider);
+        RexToExpressionVisitor converter = new RexToExpressionVisitor(fieldTypeProvider, parameterMetadata);
 
         return expression.accept(converter);
     }

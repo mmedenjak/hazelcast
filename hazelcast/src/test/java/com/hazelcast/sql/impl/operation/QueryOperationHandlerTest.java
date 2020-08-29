@@ -21,9 +21,10 @@ import com.hazelcast.instance.impl.HazelcastInstanceProxy;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.spi.impl.NodeEngineImpl;
-import com.hazelcast.sql.SqlErrorCode;
+import com.hazelcast.sql.impl.SqlErrorCode;
 import com.hazelcast.sql.impl.NodeServiceProviderImpl;
 import com.hazelcast.sql.impl.QueryId;
+import com.hazelcast.sql.impl.QueryParameterMetadata;
 import com.hazelcast.sql.impl.SqlInternalService;
 import com.hazelcast.sql.impl.SqlServiceImpl;
 import com.hazelcast.sql.impl.SqlTestSupport;
@@ -502,13 +503,17 @@ public class QueryOperationHandlerTest extends SqlTestSupport {
             Collections.emptyMap(),
             Collections.emptyMap(),
             Collections.emptyMap(),
-            null
+            null,
+            QueryParameterMetadata.EMPTY,
+            null,
+            Collections.emptySet()
         );
 
         QueryId queryId = initiatorService.getStateRegistry().onInitiatorQueryStarted(
             initiatorId,
             timeout,
             plan,
+            null,
             null,
             new BlockingRootResultConsumer(),
             initiatorService.getOperationHandler()
@@ -595,7 +600,8 @@ public class QueryOperationHandlerTest extends SqlTestSupport {
             Runtime.getRuntime().availableProcessors(),
             Runtime.getRuntime().availableProcessors(),
             1000,
-            stateCheckFrequency
+            stateCheckFrequency,
+            null
         );
 
         internalService.start();

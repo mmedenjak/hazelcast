@@ -22,8 +22,44 @@ import com.hazelcast.internal.serialization.impl.FactoryIdHelper;
 import com.hazelcast.internal.util.ConstructorFunction;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
+import com.hazelcast.sql.impl.exec.scan.index.IndexEqualsFilter;
+import com.hazelcast.sql.impl.exec.scan.index.IndexFilterValue;
+import com.hazelcast.sql.impl.exec.scan.index.IndexInFilter;
+import com.hazelcast.sql.impl.exec.scan.index.IndexRangeFilter;
+import com.hazelcast.sql.impl.expression.CastExpression;
 import com.hazelcast.sql.impl.expression.ColumnExpression;
+import com.hazelcast.sql.impl.expression.ConstantExpression;
+import com.hazelcast.sql.impl.expression.ParameterExpression;
+import com.hazelcast.sql.impl.expression.math.AbsFunction;
+import com.hazelcast.sql.impl.expression.math.DivideFunction;
+import com.hazelcast.sql.impl.expression.math.DoubleFunction;
+import com.hazelcast.sql.impl.expression.math.FloorCeilFunction;
+import com.hazelcast.sql.impl.expression.math.MinusFunction;
+import com.hazelcast.sql.impl.expression.math.MultiplyFunction;
+import com.hazelcast.sql.impl.expression.math.PlusFunction;
+import com.hazelcast.sql.impl.expression.math.RandFunction;
+import com.hazelcast.sql.impl.expression.math.RoundTruncateFunction;
+import com.hazelcast.sql.impl.expression.math.SignFunction;
+import com.hazelcast.sql.impl.expression.math.UnaryMinusFunction;
+import com.hazelcast.sql.impl.expression.predicate.AndPredicate;
+import com.hazelcast.sql.impl.expression.predicate.ComparisonPredicate;
+import com.hazelcast.sql.impl.expression.predicate.IsFalsePredicate;
+import com.hazelcast.sql.impl.expression.predicate.IsNotFalsePredicate;
+import com.hazelcast.sql.impl.expression.predicate.IsNotNullPredicate;
+import com.hazelcast.sql.impl.expression.predicate.IsNotTruePredicate;
 import com.hazelcast.sql.impl.expression.predicate.IsNullPredicate;
+import com.hazelcast.sql.impl.expression.predicate.IsTruePredicate;
+import com.hazelcast.sql.impl.expression.predicate.NotPredicate;
+import com.hazelcast.sql.impl.expression.predicate.OrPredicate;
+import com.hazelcast.sql.impl.expression.string.AsciiFunction;
+import com.hazelcast.sql.impl.expression.string.CharLengthFunction;
+import com.hazelcast.sql.impl.expression.string.ConcatFunction;
+import com.hazelcast.sql.impl.expression.string.InitcapFunction;
+import com.hazelcast.sql.impl.expression.string.LikeFunction;
+import com.hazelcast.sql.impl.expression.string.LowerFunction;
+import com.hazelcast.sql.impl.expression.string.SubstringFunction;
+import com.hazelcast.sql.impl.expression.string.TrimFunction;
+import com.hazelcast.sql.impl.expression.string.UpperFunction;
 import com.hazelcast.sql.impl.extract.GenericQueryTargetDescriptor;
 import com.hazelcast.sql.impl.extract.QueryPath;
 import com.hazelcast.sql.impl.operation.QueryBatchExchangeOperation;
@@ -33,9 +69,11 @@ import com.hazelcast.sql.impl.operation.QueryCheckResponseOperation;
 import com.hazelcast.sql.impl.operation.QueryExecuteOperation;
 import com.hazelcast.sql.impl.operation.QueryExecuteOperationFragment;
 import com.hazelcast.sql.impl.operation.QueryFlowControlExchangeOperation;
+import com.hazelcast.sql.impl.plan.node.EmptyPlanNode;
 import com.hazelcast.sql.impl.plan.node.FilterPlanNode;
-import com.hazelcast.sql.impl.plan.node.ProjectPlanNode;
+import com.hazelcast.sql.impl.plan.node.MapIndexScanPlanNode;
 import com.hazelcast.sql.impl.plan.node.MapScanPlanNode;
+import com.hazelcast.sql.impl.plan.node.ProjectPlanNode;
 import com.hazelcast.sql.impl.plan.node.RootPlanNode;
 import com.hazelcast.sql.impl.plan.node.io.ReceivePlanNode;
 import com.hazelcast.sql.impl.plan.node.io.RootSendPlanNode;
@@ -88,7 +126,51 @@ public class SqlDataSerializerHook implements DataSerializerHook {
 
     public static final int QUERY_PATH = 23;
 
-    public static final int LEN = QUERY_PATH + 1;
+    public static final int EXPRESSION_CONSTANT = 24;
+    public static final int EXPRESSION_PARAMETER = 25;
+    public static final int EXPRESSION_CAST = 26;
+    public static final int EXPRESSION_DIVIDE = 27;
+    public static final int EXPRESSION_MINUS = 28;
+    public static final int EXPRESSION_MULTIPLY = 29;
+    public static final int EXPRESSION_PLUS = 30;
+    public static final int EXPRESSION_UNARY_MINUS = 31;
+    public static final int EXPRESSION_AND = 32;
+    public static final int EXPRESSION_OR = 33;
+    public static final int EXPRESSION_NOT = 34;
+    public static final int EXPRESSION_COMPARISON = 35;
+    public static final int EXPRESSION_IS_TRUE = 36;
+    public static final int EXPRESSION_IS_NOT_TRUE = 37;
+    public static final int EXPRESSION_IS_FALSE = 38;
+    public static final int EXPRESSION_IS_NOT_FALSE = 39;
+    public static final int EXPRESSION_IS_NOT_NULL = 40;
+
+    public static final int EXPRESSION_ABS = 41;
+    public static final int EXPRESSION_SIGN = 42;
+    public static final int EXPRESSION_RAND = 43;
+    public static final int EXPRESSION_DOUBLE = 44;
+    public static final int EXPRESSION_FLOOR_CEIL = 45;
+    public static final int EXPRESSION_ROUND_TRUNCATE = 46;
+
+    public static final int NODE_EMPTY = 47;
+
+    public static final int INDEX_FILTER_VALUE = 48;
+    public static final int INDEX_FILTER_EQUALS = 49;
+    public static final int INDEX_FILTER_RANGE = 50;
+    public static final int INDEX_FILTER_IN = 51;
+
+    public static final int NODE_MAP_INDEX_SCAN = 52;
+
+    public static final int EXPRESSION_ASCII = 53;
+    public static final int EXPRESSION_CHAR_LENGTH = 54;
+    public static final int EXPRESSION_INITCAP = 55;
+    public static final int EXPRESSION_LOWER = 56;
+    public static final int EXPRESSION_UPPER = 57;
+    public static final int EXPRESSION_CONCAT = 58;
+    public static final int EXPRESSION_LIKE = 59;
+    public static final int EXPRESSION_SUBSTRING = 60;
+    public static final int EXPRESSION_TRIM = 61;
+
+    public static final int LEN = EXPRESSION_TRIM + 1;
 
     @Override
     public int getFactoryId() {
@@ -128,9 +210,53 @@ public class SqlDataSerializerHook implements DataSerializerHook {
         constructors[EXPRESSION_COLUMN] = arg -> new ColumnExpression<>();
         constructors[EXPRESSION_IS_NULL] = arg -> new IsNullPredicate();
 
-        constructors[TARGET_DESCRIPTOR_GENERIC] = arg -> GenericQueryTargetDescriptor.INSTANCE;
+        constructors[TARGET_DESCRIPTOR_GENERIC] = arg -> GenericQueryTargetDescriptor.DEFAULT;
 
         constructors[QUERY_PATH] = arg -> new QueryPath();
+
+        constructors[EXPRESSION_CONSTANT] = arg -> new ConstantExpression<>();
+        constructors[EXPRESSION_PARAMETER] = arg -> new ParameterExpression<>();
+        constructors[EXPRESSION_CAST] = arg -> new CastExpression<>();
+        constructors[EXPRESSION_DIVIDE] = arg -> new DivideFunction<>();
+        constructors[EXPRESSION_MINUS] = arg -> new MinusFunction<>();
+        constructors[EXPRESSION_MULTIPLY] = arg -> new MultiplyFunction<>();
+        constructors[EXPRESSION_PLUS] = arg -> new PlusFunction<>();
+        constructors[EXPRESSION_UNARY_MINUS] = arg -> new UnaryMinusFunction<>();
+        constructors[EXPRESSION_AND] = arg -> new AndPredicate();
+        constructors[EXPRESSION_OR] = arg -> new OrPredicate();
+        constructors[EXPRESSION_NOT] = arg -> new NotPredicate();
+        constructors[EXPRESSION_COMPARISON] = arg -> new ComparisonPredicate();
+        constructors[EXPRESSION_IS_TRUE] = arg -> new IsTruePredicate();
+        constructors[EXPRESSION_IS_NOT_TRUE] = arg -> new IsNotTruePredicate();
+        constructors[EXPRESSION_IS_FALSE] = arg -> new IsFalsePredicate();
+        constructors[EXPRESSION_IS_NOT_FALSE] = arg -> new IsNotFalsePredicate();
+        constructors[EXPRESSION_IS_NOT_NULL] = arg -> new IsNotNullPredicate();
+
+        constructors[EXPRESSION_ABS] = arg -> new AbsFunction<>();
+        constructors[EXPRESSION_SIGN] = arg -> new SignFunction<>();
+        constructors[EXPRESSION_RAND] = arg -> new RandFunction();
+        constructors[EXPRESSION_DOUBLE] = arg -> new DoubleFunction();
+        constructors[EXPRESSION_FLOOR_CEIL] = arg -> new FloorCeilFunction<>();
+        constructors[EXPRESSION_ROUND_TRUNCATE] = arg -> new RoundTruncateFunction<>();
+
+        constructors[NODE_EMPTY] = arg -> new EmptyPlanNode();
+
+        constructors[INDEX_FILTER_VALUE] = arg -> new IndexFilterValue();
+        constructors[INDEX_FILTER_EQUALS] = arg -> new IndexEqualsFilter();
+        constructors[INDEX_FILTER_RANGE] = arg -> new IndexRangeFilter();
+        constructors[INDEX_FILTER_IN] = arg -> new IndexInFilter();
+
+        constructors[NODE_MAP_INDEX_SCAN] = arg -> new MapIndexScanPlanNode();
+
+        constructors[EXPRESSION_ASCII] = arg -> new AsciiFunction();
+        constructors[EXPRESSION_CHAR_LENGTH] = arg -> new CharLengthFunction();
+        constructors[EXPRESSION_INITCAP] = arg -> new InitcapFunction();
+        constructors[EXPRESSION_LOWER] = arg -> new LowerFunction();
+        constructors[EXPRESSION_UPPER] = arg -> new UpperFunction();
+        constructors[EXPRESSION_CONCAT] = arg -> new ConcatFunction();
+        constructors[EXPRESSION_LIKE] = arg -> new LikeFunction();
+        constructors[EXPRESSION_SUBSTRING] = arg -> new SubstringFunction();
+        constructors[EXPRESSION_TRIM] = arg -> new TrimFunction();
 
         return new ArrayDataSerializableFactory(constructors);
     }

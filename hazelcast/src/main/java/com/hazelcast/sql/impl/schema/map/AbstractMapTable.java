@@ -23,40 +23,68 @@ import com.hazelcast.sql.impl.schema.Table;
 import com.hazelcast.sql.impl.schema.TableField;
 import com.hazelcast.sql.impl.schema.TableStatistics;
 
+import javax.annotation.Nonnull;
+import java.util.Collections;
 import java.util.List;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Table backed by IMap or ReplicatedMap.
  */
 public abstract class AbstractMapTable extends Table {
 
+    private final String mapName;
     private final QueryTargetDescriptor keyDescriptor;
     private final QueryTargetDescriptor valueDescriptor;
+    private final Object keyJetMetadata;
+    private final Object valueJetMetadata;
     private final QueryException exception;
 
+    /**
+     * @param sqlName Name of the table as it appears in the SQL
+     * @param mapName Name of the underlying map
+     */
     protected AbstractMapTable(
         String schemaName,
-        String name,
+        String sqlName,
+        String mapName,
         List<TableField> fields,
         TableStatistics statistics,
         QueryTargetDescriptor keyDescriptor,
-        QueryTargetDescriptor valueDescriptor
+        QueryTargetDescriptor valueDescriptor,
+        Object keyJetMetadata,
+        Object valueJetMetadata
     ) {
-        super(schemaName, name, fields, statistics);
+        super(schemaName, sqlName, fields, statistics);
 
+        this.mapName = requireNonNull(mapName);
         this.keyDescriptor = keyDescriptor;
         this.valueDescriptor = valueDescriptor;
+        this.keyJetMetadata = keyJetMetadata;
+        this.valueJetMetadata = valueJetMetadata;
 
         exception = null;
     }
 
     protected AbstractMapTable(String schemaName, String name, QueryException exception) {
-        super(schemaName, name, null, new ConstantTableStatistics(0));
+        super(schemaName, name, Collections.emptyList(), new ConstantTableStatistics(0));
 
+        this.mapName = name;
         this.keyDescriptor = null;
         this.valueDescriptor = null;
+        this.keyJetMetadata = null;
+        this.valueJetMetadata = null;
 
         this.exception = exception;
+    }
+
+    /**
+     * The name of the underlying map.
+     */
+    @Nonnull
+    public String getMapName() {
+        return mapName;
     }
 
     @Override
@@ -73,12 +101,24 @@ public abstract class AbstractMapTable extends Table {
         return super.getField(index);
     }
 
+    protected boolean isValid() {
+        return exception == null;
+    }
+
     public QueryTargetDescriptor getKeyDescriptor() {
         return keyDescriptor;
     }
 
     public QueryTargetDescriptor getValueDescriptor() {
         return valueDescriptor;
+    }
+
+    public Object getKeyJetMetadata() {
+        return keyJetMetadata;
+    }
+
+    public Object getValueJetMetadata() {
+        return valueJetMetadata;
     }
 
     public QueryException getException() {

@@ -17,16 +17,20 @@
 package com.hazelcast.sql.impl.calcite.schema;
 
 import com.hazelcast.sql.impl.QueryUtils;
+import com.hazelcast.sql.impl.calcite.SqlToQueryType;
+import com.hazelcast.sql.impl.schema.SqlCatalog;
 import com.hazelcast.sql.impl.schema.Table;
-import com.hazelcast.sql.impl.schema.TableResolver;
-import com.hazelcast.sql.impl.schema.map.AbstractMapTable;
+import com.hazelcast.sql.impl.schema.TableField;
+import com.hazelcast.sql.impl.type.QueryDataType;
+import com.hazelcast.sql.impl.type.QueryDataTypeFamily;
+import org.apache.calcite.rel.type.RelDataType;
+import org.apache.calcite.rel.type.RelDataTypeFactory;
 import org.apache.calcite.schema.Schema;
 import org.apache.calcite.schema.Statistic;
+import org.apache.calcite.sql.type.SqlTypeName;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -57,38 +61,32 @@ public final class HazelcastSchemaUtils {
      * objects such as IMap and ReplicatedMap as well as external tables created by Jet. This approach will not work well
      * should we need a relaxed/dynamic object resolution at some point in future.
      *
-     * @param tableResolvers Table resolver to be used to get the list of existing tables.
      * @return Top-level schema.
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public static HazelcastSchema createRootSchema(List<TableResolver> tableResolvers) {
-        // Create tables.
-        Map<String, Map<String, HazelcastTable>> tableMap = new HashMap<>();
+    public static HazelcastSchema createRootSchema(SqlCatalog catalog) {
+        // Create schemas.
+        Map<String, Schema> schemaMap = new HashMap<>();
 
-        for (TableResolver tableResolver : tableResolvers) {
-            for (Table table : tableResolver.getTables()) {
+        for (Map.Entry<String, Map<String, Table>> currentSchemaEntry : catalog.getSchemas().entrySet()) {
+            String schemaName = currentSchemaEntry.getKey();
+
+            Map<String, org.apache.calcite.schema.Table> schemaTables = new HashMap<>();
+
+            for (Map.Entry<String, Table> tableEntry : currentSchemaEntry.getValue().entrySet()) {
+                String tableName = tableEntry.getKey();
+                Table table = tableEntry.getValue();
+
                 HazelcastTable convertedTable = new HazelcastTable(
                     table,
                     createTableStatistic(table)
                 );
 
-                Map<String , HazelcastTable> schemaTableMap =
-                    tableMap.computeIfAbsent(table.getSchemaName(), (k) -> new HashMap<>());
-
-                schemaTableMap.putIfAbsent(table.getName(), convertedTable);
+                schemaTables.put(tableName, convertedTable);
             }
-        }
 
-        // Create schemas.
-        Map<String, Schema> schemaMap = new HashMap<>();
+            HazelcastSchema currentSchema = new HazelcastSchema(Collections.emptyMap(), schemaTables);
 
-        for (Map.Entry<String, Map<String, HazelcastTable>> schemaEntry : tableMap.entrySet()) {
-            String schemaName = schemaEntry.getKey();
-            Map schemaTables = schemaEntry.getValue();
-
-            HazelcastSchema schema = new HazelcastSchema(Collections.emptyMap(), schemaTables);
-
-            schemaMap.put(schemaName, schema);
+            schemaMap.put(schemaName, currentSchema);
         }
 
         HazelcastSchema rootSchema = new HazelcastSchema(schemaMap, Collections.emptyMap());
@@ -106,47 +104,23 @@ public final class HazelcastSchemaUtils {
      * @return Statistics for the table.
      */
     private static Statistic createTableStatistic(Table table) {
-        if (table instanceof AbstractMapTable) {
-            return new MapTableStatistic(table.getStatistics().getRowCount());
-        }
-
-        throw new UnsupportedOperationException("Unsupported table type: " + table.getClass().getName());
+        return new HazelcastTableStatistic(table.getStatistics().getRowCount());
     }
 
     /**
-     * Prepares schema paths that will be used for search.
-     *
-     * @param currentSearchPaths Additional schema paths to be considered.
-     * @return Schema paths to be used.
+     * Converts a {@link TableField} to {@link RelDataType}.
      */
-    public static List<List<String>> prepareSearchPaths(
-        List<List<String>> currentSearchPaths,
-        List<TableResolver> tableResolvers
-    ) {
-        // Current search paths have the highest priority.
-        List<List<String>> res = new ArrayList<>();
+    public static RelDataType convert(TableField field, RelDataTypeFactory typeFactory) {
+        QueryDataType fieldType = field.getType();
+        QueryDataTypeFamily fieldTypeFamily = fieldType.getTypeFamily();
 
-        if (currentSearchPaths != null) {
-            res.addAll(currentSearchPaths);
+        SqlTypeName sqlTypeName = SqlToQueryType.map(fieldTypeFamily);
+
+        if (sqlTypeName == null) {
+            throw new IllegalStateException("Unexpected type family: " + fieldTypeFamily);
         }
 
-        // Then add paths from table resolvers.
-        if (tableResolvers != null) {
-            for (TableResolver tableResolver : tableResolvers) {
-                List<List<String>> tableResolverSearchPaths = tableResolver.getDefaultSearchPaths();
-
-                if (tableResolverSearchPaths != null) {
-                    res.addAll(tableResolverSearchPaths);
-                }
-            }
-        }
-
-        // Add catalog scope.
-        res.add(Collections.singletonList(QueryUtils.CATALOG));
-
-        // Add top-level scope.
-        res.add(Collections.emptyList());
-
-        return res;
+        RelDataType relType = typeFactory.createSqlType(sqlTypeName);
+        return typeFactory.createTypeWithNullability(relType, true);
     }
 }

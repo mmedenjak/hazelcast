@@ -39,8 +39,8 @@ public enum SqlColumnType {
     /** SMALLINT type, represented by {@link java.lang.Short} */
     SMALLINT(3, Short.class),
 
-    /** INT type, represented by {@link java.lang.Integer} */
-    INT(4, Integer.class),
+    /** INTEGER type, represented by {@link java.lang.Integer} */
+    INTEGER(4, Integer.class),
 
     /** BIGINT type, represented by {@link java.lang.Long} */
     BIGINT(5, Long.class),
@@ -60,14 +60,21 @@ public enum SqlColumnType {
     /** TIME type, represented by {@link java.time.LocalTime} */
     TIME(10, LocalTime.class),
 
-    /** TIMESTAMP type,, represented by {@link java.time.LocalDateTime} */
+    /** TIMESTAMP type, represented by {@link java.time.LocalDateTime} */
     TIMESTAMP(11, LocalDateTime.class),
 
     /** TIMESTAMP_WITH_TIME_ZONE type, represented by {@link java.time.OffsetDateTime} */
     TIMESTAMP_WITH_TIME_ZONE(12, OffsetDateTime.class),
 
     /** OBJECT type, could be represented by any Java class. */
-    OBJECT(13, Object.class);
+    OBJECT(13, Object.class),
+
+    /**
+     * The type of the generic SQL {@code NULL} literal.
+     * <p>
+     * The only valid value of {@code NULL} type is {@code null}.
+     */
+    NULL(14, Void.class);
 
     private static final SqlColumnType[] CACHED_VALUES = values();
 

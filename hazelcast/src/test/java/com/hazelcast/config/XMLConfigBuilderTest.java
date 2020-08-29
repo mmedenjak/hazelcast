@@ -44,7 +44,6 @@ import org.junit.runner.RunWith;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Writer;
@@ -66,7 +65,6 @@ import static com.hazelcast.config.PermissionConfig.PermissionType.CONFIG;
 import static com.hazelcast.config.RestEndpointGroup.CLUSTER_READ;
 import static com.hazelcast.config.RestEndpointGroup.HEALTH_CHECK;
 import static com.hazelcast.config.WanQueueFullBehavior.THROW_EXCEPTION;
-import static com.hazelcast.config.XmlYamlConfigBuilderEqualsTest.readResourceToString;
 import static java.io.File.createTempFile;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -1977,7 +1975,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
                 + "    <executor-service name=\"foobar\">\n"
                 + "        <pool-size>2</pool-size>\n"
                 + "        <split-brain-protection-ref>customSplitBrainProtectionRule</split-brain-protection-ref>"
-                + "        <statistics-enabled>true</statistics-enabled>"
+                + "        <statistics-enabled>false</statistics-enabled>"
                 + "        <queue-capacity>0</queue-capacity>"
                 + "    </executor-service>"
                 + HAZELCAST_END_TAG;
@@ -1988,7 +1986,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
         assertFalse(config.getExecutorConfigs().isEmpty());
         assertEquals(2, executorConfig.getPoolSize());
         assertEquals("customSplitBrainProtectionRule", executorConfig.getSplitBrainProtectionName());
-        assertTrue(executorConfig.isStatisticsEnabled());
+        assertFalse(executorConfig.isStatisticsEnabled());
         assertEquals(0, executorConfig.getQueueCapacity());
     }
 
@@ -1997,6 +1995,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
     public void testDurableExecutorConfig() {
         String xml = HAZELCAST_START_TAG
                 + "    <durable-executor-service name=\"foobar\">\n"
+                + "        <statistics-enabled>false</statistics-enabled>"
                 + "        <pool-size>2</pool-size>\n"
                 + "        <durability>3</durability>\n"
                 + "        <capacity>4</capacity>\n"
@@ -2012,6 +2011,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals(3, durableExecutorConfig.getDurability());
         assertEquals(4, durableExecutorConfig.getCapacity());
         assertEquals("customSplitBrainProtectionRule", durableExecutorConfig.getSplitBrainProtectionName());
+        assertFalse(durableExecutorConfig.isStatisticsEnabled());
     }
 
     @Override
@@ -2019,6 +2019,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
     public void testScheduledExecutorConfig() {
         String xml = HAZELCAST_START_TAG
                 + "    <scheduled-executor-service name=\"foobar\">\n"
+                + "        <statistics-enabled>false</statistics-enabled>"
                 + "        <durability>4</durability>\n"
                 + "        <pool-size>5</pool-size>\n"
                 + "        <capacity>2</capacity>\n"
@@ -2037,6 +2038,7 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
         assertEquals("customSplitBrainProtectionRule", scheduledExecutorConfig.getSplitBrainProtectionName());
         assertEquals(99, scheduledExecutorConfig.getMergePolicyConfig().getBatchSize());
         assertEquals("PutIfAbsent", scheduledExecutorConfig.getMergePolicyConfig().getPolicy());
+        assertFalse(scheduledExecutorConfig.isStatisticsEnabled());
     }
 
     @Override
@@ -3308,17 +3310,133 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
 
     @Override
     @Test
-    public void testPersistentMemoryDirectoryConfiguration() throws IOException {
-        String fullExampleXml = readResourceToString("hazelcast-full-example.xml");
+    public void testPersistentMemoryDirectoryConfiguration() {
+        String xml = HAZELCAST_START_TAG
+                + "<native-memory>\n"
+                + "  <persistent-memory>\n"
+                + "    <directories>\n"
+                + "      <directory numa-node=\"0\">/mnt/pmem0</directory>\n"
+                + "      <directory numa-node=\"1\">/mnt/pmem1</directory>\n"
+                + "    </directories>\n"
+                + "  </persistent-memory>\n"
+                + "</native-memory>\n"
+                + HAZELCAST_END_TAG;
 
-        // remove imports to prevent the test from failing with importing non-existing files
-        fullExampleXml = fullExampleXml.replace("<import resource=\"your-configuration-XML-file\"/>", "");
+        Config xmlConfig = new InMemoryXmlConfig(xml);
 
-        Config xmlConfig = new InMemoryXmlConfig(fullExampleXml);
-
-        assertEquals("/mnt/optane", xmlConfig.getNativeMemoryConfig().getPersistentMemoryDirectory());
+        List<PersistentMemoryDirectoryConfig> directoryConfigs = xmlConfig.getNativeMemoryConfig()
+                                                                          .getPersistentMemoryConfig()
+                                                                          .getDirectoryConfigs();
+        assertEquals(2, directoryConfigs.size());
+        PersistentMemoryDirectoryConfig dir0Config = directoryConfigs.get(0);
+        PersistentMemoryDirectoryConfig dir1Config = directoryConfigs.get(1);
+        assertEquals("/mnt/pmem0", dir0Config.getDirectory());
+        assertEquals(0, dir0Config.getNumaNode());
+        assertEquals("/mnt/pmem1", dir1Config.getDirectory());
+        assertEquals(1, dir1Config.getNumaNode());
     }
 
+    @Override
+    @Test
+    public void testPersistentMemoryDirectoryConfigurationSimple() {
+        String xml = HAZELCAST_START_TAG
+                + "<native-memory>\n"
+                + "  <persistent-memory-directory>/mnt/pmem0</persistent-memory-directory>\n"
+                + "</native-memory>\n"
+                + HAZELCAST_END_TAG;
+
+        Config xmlConfig = new InMemoryXmlConfig(xml);
+
+        List<PersistentMemoryDirectoryConfig> directoryConfigs = xmlConfig.getNativeMemoryConfig()
+                                                                          .getPersistentMemoryConfig()
+                                                                          .getDirectoryConfigs();
+        assertEquals(1, directoryConfigs.size());
+        PersistentMemoryDirectoryConfig dir0Config = directoryConfigs.get(0);
+        assertEquals("/mnt/pmem0", dir0Config.getDirectory());
+        assertFalse(dir0Config.isNumaNodeSet());
+    }
+
+    @Override
+    @Test(expected = InvalidConfigurationException.class)
+    public void testPersistentMemoryDirectoryConfiguration_uniqueDirViolationThrows() {
+        String xml = HAZELCAST_START_TAG
+                + "<native-memory>\n"
+                + "  <persistent-memory>\n"
+                + "    <directories>\n"
+                + "      <directory numa-node=\"0\">/mnt/pmem0</directory>\n"
+                + "      <directory numa-node=\"1\">/mnt/pmem0</directory>\n"
+                + "    </directories>\n"
+                + "  </persistent-memory>\n"
+                + "</native-memory>\n"
+                + HAZELCAST_END_TAG;
+
+        buildConfig(xml);
+    }
+
+    @Override
+    @Test(expected = InvalidConfigurationException.class)
+    public void testPersistentMemoryDirectoryConfiguration_uniqueNumaNodeViolationThrows() {
+        String xml = HAZELCAST_START_TAG
+                + "<native-memory>\n"
+                + "  <persistent-memory>\n"
+                + "    <directories>\n"
+                + "      <directory numa-node=\"0\">/mnt/pmem0</directory>\n"
+                + "      <directory numa-node=\"0\">/mnt/pmem1</directory>\n"
+                + "    </directories>\n"
+                + "  </persistent-memory>\n"
+                + "</native-memory>\n"
+                + HAZELCAST_END_TAG;
+
+        buildConfig(xml);
+    }
+
+    @Override
+    @Test(expected = InvalidConfigurationException.class)
+    public void testPersistentMemoryDirectoryConfiguration_numaNodeConsistencyViolationThrows() {
+        String xml = HAZELCAST_START_TAG
+                + "<native-memory>\n"
+                + "  <persistent-memory>\n"
+                + "    <directories>\n"
+                + "      <directory numa-node=\"0\">/mnt/pmem0</directory>\n"
+                + "      <directory>/mnt/pmem1</directory>\n"
+                + "    </directories>\n"
+                + "  </persistent-memory>\n"
+                + "</native-memory>\n"
+                + HAZELCAST_END_TAG;
+
+        buildConfig(xml);
+    }
+
+    @Override
+    @Test
+    public void testPersistentMemoryDirectoryConfiguration_simpleAndAdvancedPasses() {
+        String xml = HAZELCAST_START_TAG
+                + "<native-memory>\n"
+                + "  <persistent-memory-directory>/mnt/optane</persistent-memory-directory>\n"
+                + "  <persistent-memory>\n"
+                + "    <directories>\n"
+                + "      <directory>/mnt/pmem0</directory>\n"
+                + "      <directory>/mnt/pmem1</directory>\n"
+                + "    </directories>\n"
+                + "  </persistent-memory>\n"
+                + "</native-memory>\n"
+                + HAZELCAST_END_TAG;
+
+        Config config = buildConfig(xml);
+        List<PersistentMemoryDirectoryConfig> directoryConfigs = config.getNativeMemoryConfig()
+                                                                       .getPersistentMemoryConfig()
+                                                                       .getDirectoryConfigs();
+        assertEquals(3, directoryConfigs.size());
+        PersistentMemoryDirectoryConfig dir0Config = directoryConfigs.get(0);
+        PersistentMemoryDirectoryConfig dir1Config = directoryConfigs.get(1);
+        PersistentMemoryDirectoryConfig dir2Config = directoryConfigs.get(2);
+        assertEquals("/mnt/optane", dir0Config.getDirectory());
+        assertFalse(dir0Config.isNumaNodeSet());
+        assertEquals("/mnt/pmem0", dir1Config.getDirectory());
+        assertFalse(dir1Config.isNumaNodeSet());
+        assertEquals("/mnt/pmem1", dir2Config.getDirectory());
+        assertFalse(dir2Config.isNumaNodeSet());
+    }
 
     @Override
     protected Config buildCompleteAdvancedNetworkConfig() {
@@ -3520,13 +3638,13 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
             + "<sql>\n"
             + "  <executor-pool-size>10</executor-pool-size>\n"
             + "  <operation-pool-size>20</operation-pool-size>\n"
-            + "  <query-timeout-millis>30</query-timeout-millis>\n"
+            + "  <statement-timeout-millis>30</statement-timeout-millis>\n"
             + "</sql>"
             + HAZELCAST_END_TAG;
         Config config = new InMemoryXmlConfig(xml);
         SqlConfig sqlConfig = config.getSqlConfig();
         assertEquals(10, sqlConfig.getExecutorPoolSize());
         assertEquals(20, sqlConfig.getOperationPoolSize());
-        assertEquals(30L, sqlConfig.getQueryTimeoutMillis());
+        assertEquals(30L, sqlConfig.getStatementTimeoutMillis());
     }
 }

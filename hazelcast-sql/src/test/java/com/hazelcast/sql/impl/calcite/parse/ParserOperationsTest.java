@@ -16,11 +16,14 @@
 
 package com.hazelcast.sql.impl.calcite.parse;
 
-import com.hazelcast.sql.SqlErrorCode;
+import com.hazelcast.sql.impl.SqlErrorCode;
 import com.hazelcast.sql.impl.QueryException;
+import com.hazelcast.sql.impl.QueryUtils;
+import com.hazelcast.sql.impl.calcite.HazelcastSqlBackend;
 import com.hazelcast.sql.impl.calcite.OptimizerContext;
 import com.hazelcast.sql.impl.calcite.TestMapTable;
 import com.hazelcast.sql.impl.calcite.TestTableResolver;
+import com.hazelcast.sql.impl.schema.SqlCatalog;
 import com.hazelcast.sql.impl.schema.TableResolver;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
@@ -30,6 +33,7 @@ import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -141,6 +145,16 @@ public class ParserOperationsTest {
         );
     }
 
+    @Test
+    public void testMalformedExpression() {
+        checkFailure("select 1 + from t", "Was expecting one of");
+    }
+
+    @Test
+    public void testUnsupportedFunction() {
+        checkFailure("select atan2(0, 0) from t", "ATAN2 is not supported");
+    }
+
     private static void checkSuccess(String sql) {
         createContext().parse(sql);
     }
@@ -153,7 +167,7 @@ public class ParserOperationsTest {
         } catch (QueryException e) {
             assertEquals(SqlErrorCode.PARSING, e.getCode());
 
-            assertTrue(e.getCause().getMessage(), e.getCause().getMessage().endsWith(message));
+            assertTrue(e.getCause().getMessage(), e.getCause().getMessage().contains(message));
         }
     }
 
@@ -163,10 +177,19 @@ public class ParserOperationsTest {
             TestMapTable.create("public", "t", TestMapTable.field("a"), TestMapTable.field("b"))
         );
 
+        List<TableResolver> tableResolvers = Collections.singletonList(resolver);
+
+        List<List<String>> searchPaths = QueryUtils.prepareSearchPaths(
+            Collections.emptyList(),
+            tableResolvers
+        );
+
         return OptimizerContext.create(
-            Collections.singletonList(resolver),
-            null,
-            1
+            new SqlCatalog(tableResolvers),
+            searchPaths,
+            1,
+            new HazelcastSqlBackend(null),
+            null
         );
     }
 }

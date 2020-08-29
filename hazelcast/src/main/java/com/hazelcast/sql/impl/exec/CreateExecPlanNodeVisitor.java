@@ -20,6 +20,7 @@ import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.internal.util.collection.PartitionIdSet;
 import com.hazelcast.map.impl.MapContainer;
 import com.hazelcast.sql.impl.NodeServiceProvider;
+import com.hazelcast.sql.impl.exec.scan.index.MapIndexScanExec;
 import com.hazelcast.sql.impl.exec.io.InboundHandler;
 import com.hazelcast.sql.impl.exec.io.Inbox;
 import com.hazelcast.sql.impl.exec.io.OutboundHandler;
@@ -34,6 +35,8 @@ import com.hazelcast.sql.impl.operation.QueryExecuteOperation;
 import com.hazelcast.sql.impl.operation.QueryExecuteOperationFragment;
 import com.hazelcast.sql.impl.operation.QueryExecuteOperationFragmentMapping;
 import com.hazelcast.sql.impl.operation.QueryOperationHandler;
+import com.hazelcast.sql.impl.plan.node.EmptyPlanNode;
+import com.hazelcast.sql.impl.plan.node.MapIndexScanPlanNode;
 import com.hazelcast.sql.impl.plan.node.MapScanPlanNode;
 import com.hazelcast.sql.impl.plan.node.FilterPlanNode;
 import com.hazelcast.sql.impl.plan.node.PlanNode;
@@ -229,6 +232,15 @@ public class CreateExecPlanNodeVisitor implements PlanNodeVisitor {
     }
 
     @Override
+    public void onEmptyNode(EmptyPlanNode node) {
+        Exec res = new EmptyExec(
+            node.getId()
+        );
+
+        push(res);
+    }
+
+    @Override
     public void onMapScanNode(MapScanPlanNode node) {
         Exec res;
 
@@ -253,6 +265,42 @@ public class CreateExecPlanNodeVisitor implements PlanNodeVisitor {
                     node.getProjects(),
                     node.getFilter(),
                     serializationService
+                );
+            }
+        }
+
+        push(res);
+    }
+
+    @Override
+    public void onMapIndexScanNode(MapIndexScanPlanNode node) {
+        Exec res;
+
+        if (localParts.isEmpty()) {
+            res = new EmptyExec(node.getId());
+        } else {
+            String mapName = node.getMapName();
+
+            MapContainer map = nodeServiceProvider.getMap(mapName);
+
+            if (map == null) {
+                res = new EmptyExec(node.getId());
+            } else {
+                res = new MapIndexScanExec(
+                    node.getId(),
+                    map,
+                    localParts,
+                    node.getKeyDescriptor(),
+                    node.getValueDescriptor(),
+                    node.getFieldPaths(),
+                    node.getFieldTypes(),
+                    node.getProjects(),
+                    node.getFilter(),
+                    serializationService,
+                    node.getIndexName(),
+                    node.getIndexComponentCount(),
+                    node.getIndexFilter(),
+                    node.getConverterTypes()
                 );
             }
         }

@@ -31,10 +31,16 @@ import java.util.Map;
 public abstract class AbstractMapTableResolver implements TableResolver {
 
     protected final NodeEngine nodeEngine;
+    protected final JetMapMetadataResolver jetMapMetadataResolver;
     private final List<List<String>> defaultSearchPaths;
 
-    protected AbstractMapTableResolver(NodeEngine nodeEngine, List<List<String>> defaultSearchPaths) {
+    protected AbstractMapTableResolver(
+        NodeEngine nodeEngine,
+        JetMapMetadataResolver jetMapMetadataResolver,
+        List<List<String>> defaultSearchPaths
+    ) {
         this.nodeEngine = nodeEngine;
+        this.jetMapMetadataResolver = jetMapMetadataResolver;
         this.defaultSearchPaths = defaultSearchPaths;
     }
 
@@ -44,7 +50,7 @@ public abstract class AbstractMapTableResolver implements TableResolver {
     }
 
     protected static List<TableField> mergeMapFields(Map<String, TableField> keyFields, Map<String, TableField> valueFields) {
-        LinkedHashMap<String, TableField> res = new LinkedHashMap<>(keyFields);
+        Map<String, TableField> res = new LinkedHashMap<>(keyFields);
 
         // Value fields do not override key fields.
         for (Map.Entry<String, TableField> valueFieldEntry : valueFields.entrySet()) {

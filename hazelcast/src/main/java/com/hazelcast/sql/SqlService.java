@@ -24,25 +24,33 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 /**
- * Service to execute distributed SQL queries.
+ * A service to execute SQL statements.
  * <p>
- * The service is in beta state. Behavior and API might be changed in future releases. Binary compatibility is not
- * guaranteed between minor and patch releases.
+ * The service is in beta state. Behavior and API might change in future releases. Binary compatibility is not
+ * guaranteed between minor or patch releases.
+ * <p>
+ * If this cluster is a Hazelcast Jet cluster, a statement can be executed by either the default SQL backend or by Hazelcast
+ * Jet backend, as a Jet job. If some of the features used in a statement isn't supported by the default backend, the engine will
+ * attempt to execute it using Jet. This class is the API to both backends.
+ * <p>
+ * The text below summarizes features supported by the default SQL engine. For a summary of Hazelcast Jet SQL features
+ * see {@code com.hazelcast.jet.sql} package javadoc in Hazelcast Jet (once released).
+ *
  * <h1>Overview</h1>
  * Hazelcast is able to execute distributed SQL queries over the following entities:
  * <ul>
  *     <li>IMap
  * </ul>
- * When a query is submitted to a member, it is parsed and optimized by the {@code hazelcast-sql} module, that is based on
- * <a href="https://calcite.apache.org">Apache Calcite</a>. The {@code hazelcast-sql} must be in the classpath, otherwise
+ * When an SQL statement is submitted to a member, it is parsed and optimized by the {@code hazelcast-sql} module, that is based
+ * on <a href="https://calcite.apache.org">Apache Calcite</a>. The {@code hazelcast-sql} must be in the classpath, otherwise
  * an exception will be thrown.
  * <p>
- * During optimization a query is converted into a directed acyclic graph (DAG) that is sent to cluster members for execution.
- * Query results are sent back to the originating member asynchronously and returned to the user via {@link SqlResult}.
+ * During optimization a statement is converted into a directed acyclic graph (DAG) that is sent to cluster members for execution.
+ * Results are sent back to the originating member asynchronously and returned to the user via {@link SqlResult}.
  *
  * <h1>Querying an IMap</h1>
  * Every IMap instance is exposed as a table with the same name in the {@code partitioned} schema. The {@code partitioned}
- * schema is included into a default search path, therefore an IMap could be referenced in an SQL query with or without the
+ * schema is included into a default search path, therefore an IMap could be referenced in an SQL statement with or without the
  * schema name.
  * <h2>Column resolution</h2>
  * Every table backed by an IMap has a set of columns that are resolved automatically. Column resolution uses IMap entries
@@ -96,7 +104,7 @@ import java.util.List;
  * <pre>
  *     HazelcastInstance instance = ...;
  *
- *     try (SqlResult result = instance.sql().query("SELECT * FROM person")) {
+ *     try (SqlResult result = instance.sql().execute("SELECT * FROM person")) {
  *         for (SqlRow row : result) {
  *             long personId = row.getObject("personId");
  *             String name = row.getObject("name");
@@ -110,42 +118,42 @@ public interface SqlService {
     /**
      * Convenient method to execute a distributed query with the given parameters.
      * <p>
-     * Converts passed SQL string and parameters into an {@link SqlQuery} object and invokes {@link #query(SqlQuery)}.
+     * Converts passed SQL string and parameters into an {@link SqlStatement} object and invokes {@link #execute(SqlStatement)}.
      *
      * @param sql SQL string
-     * @param params query parameters that will be passed to {@link SqlQuery#setParameters(List)}
+     * @param params query parameters that will be passed to {@link SqlStatement#setParameters(List)}
      * @return result
      * @throws NullPointerException if the SQL string is null
      * @throws IllegalArgumentException if the SQL string is empty
-     * @throws SqlException in case of execution error
+     * @throws HazelcastSqlException in case of execution error
      *
      * @see SqlService
-     * @see SqlQuery
-     * @see #query(SqlQuery)
+     * @see SqlStatement
+     * @see #execute(SqlStatement)
      */
     @Nonnull
-    default SqlResult query(@Nonnull String sql, Object... params) {
-        SqlQuery query = new SqlQuery(sql);
+    default SqlResult execute(@Nonnull String sql, Object... params) {
+        SqlStatement statement = new SqlStatement(sql);
 
         if (params != null) {
             for (Object param : params) {
-                query.addParameter(param);
+                statement.addParameter(param);
             }
         }
 
-        return query(query);
+        return execute(statement);
     }
 
     /**
-     * Executes a distributed query.
+     * Executes an SQL statement.
      *
-     * @param query query to be executed
+     * @param statement statement to be executed
      * @return result
-     * @throws NullPointerException if the query is null
-     * @throws SqlException in case of execution error
+     * @throws NullPointerException if the statement is null
+     * @throws HazelcastSqlException in case of execution error
      *
      * @see SqlService
      */
     @Nonnull
-    SqlResult query(@Nonnull SqlQuery query);
+    SqlResult execute(@Nonnull SqlStatement statement);
 }

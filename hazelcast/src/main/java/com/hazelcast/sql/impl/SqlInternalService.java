@@ -18,7 +18,6 @@ package com.hazelcast.sql.impl;
 
 import com.hazelcast.internal.nio.Packet;
 import com.hazelcast.internal.serialization.InternalSerializationService;
-import com.hazelcast.sql.impl.state.QueryClientStateRegistry;
 import com.hazelcast.sql.impl.exec.io.flowcontrol.FlowControlFactory;
 import com.hazelcast.sql.impl.exec.io.flowcontrol.simple.SimpleFlowControlFactory;
 import com.hazelcast.sql.impl.exec.root.BlockingRootResultConsumer;
@@ -26,9 +25,14 @@ import com.hazelcast.sql.impl.operation.QueryExecuteOperation;
 import com.hazelcast.sql.impl.operation.QueryExecuteOperationFactory;
 import com.hazelcast.sql.impl.operation.QueryOperationHandlerImpl;
 import com.hazelcast.sql.impl.plan.Plan;
+import com.hazelcast.sql.impl.plan.cache.CachedPlanInvalidationCallback;
+import com.hazelcast.sql.impl.plan.cache.PlanCacheChecker;
+import com.hazelcast.sql.impl.state.QueryClientStateRegistry;
 import com.hazelcast.sql.impl.state.QueryState;
 import com.hazelcast.sql.impl.state.QueryStateRegistry;
 import com.hazelcast.sql.impl.state.QueryStateRegistryUpdater;
+import com.hazelcast.sql.impl.type.converter.Converter;
+import com.hazelcast.sql.impl.type.converter.Converters;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +40,7 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Proxy for SQL service. Backed by either Calcite-based or no-op implementation.
+ * Proxy for SQL service.
  */
 public class SqlInternalService {
 
@@ -70,7 +74,8 @@ public class SqlInternalService {
         int operationThreadCount,
         int fragmentThreadCount,
         int outboxBatchSize,
-        long stateCheckFrequency
+        long stateCheckFrequency,
+        PlanCacheChecker planCacheChecker
     ) {
         this.nodeServiceProvider = nodeServiceProvider;
 
@@ -97,6 +102,7 @@ public class SqlInternalService {
             stateRegistry,
             clientStateRegistry,
             operationHandler,
+            planCacheChecker,
             stateCheckFrequency
         );
     }
@@ -122,10 +128,14 @@ public class SqlInternalService {
      *
      * @return Query state.
      */
-    public QueryState execute(Plan plan, List<Object> params, long timeout, int pageSize) {
-        if (!params.isEmpty()) {
-            throw new UnsupportedOperationException("SQL queries with parameters are not supported yet!");
-        }
+    public QueryState execute(
+        Plan plan,
+        List<Object> params,
+        long timeout,
+        int pageSize,
+        CachedPlanInvalidationCallback planInvalidationCallback
+    ) {
+        prepareParameters(plan, params);
 
         // Get local member ID and check if it is still part of the plan.
         UUID localMemberId = nodeServiceProvider.getLocalMemberId();
@@ -148,6 +158,7 @@ public class SqlInternalService {
             localMemberId,
             timeout,
             plan,
+            planInvalidationCallback,
             plan.getRowMetadata(),
             consumer,
             operationHandler
@@ -209,4 +220,42 @@ public class SqlInternalService {
     public QueryClientStateRegistry getClientStateRegistry() {
         return clientStateRegistry;
     }
+
+    private void prepareParameters(Plan plan, List<Object> params) {
+        assert params != null;
+        QueryParameterMetadata parameterMetadata = plan.getParameterMetadata();
+
+        int parameterCount = parameterMetadata.getParameterCount();
+        if (parameterCount != params.size()) {
+            throw QueryException.error(SqlErrorCode.DATA_EXCEPTION,
+                    "Unexpected parameter count: expected " + parameterCount + ", got " + params.size());
+        }
+
+        for (int i = 0; i < params.size(); ++i) {
+            Object value = params.get(i);
+            if (value == null) {
+                continue;
+            }
+
+            Converter fromConverter = Converters.getConverter(value.getClass());
+            Converter toConverter = parameterMetadata.getParameterType(i).getConverter();
+
+            if (fromConverter.getTypeFamily().getPrecedence() > toConverter.getTypeFamily().getPrecedence()) {
+                throw QueryException.error(SqlErrorCode.DATA_EXCEPTION,
+                    "Cannot implicitly convert parameter at position " + i + " from " + fromConverter.getTypeFamily()
+                        + " to " + toConverter.getTypeFamily() + " (consider adding an explicit CAST)"
+                );
+            }
+
+            try {
+                value = toConverter.convertToSelf(fromConverter, value);
+            } catch (RuntimeException e) {
+                throw QueryException.error(SqlErrorCode.DATA_EXCEPTION,
+                        String.format("Failed to convert parameter at position %s from %s to %s: %s", i,
+                                fromConverter.getTypeFamily(), toConverter.getTypeFamily(), e.getMessage()));
+            }
+            params.set(i, value);
+        }
+    }
+
 }

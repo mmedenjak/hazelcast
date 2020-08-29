@@ -17,9 +17,9 @@
 package com.hazelcast.sql;
 
 import com.hazelcast.client.config.ClientConfig;
-import com.hazelcast.client.test.TestHazelcastFactory;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.map.IMap;
+import com.hazelcast.sql.impl.SqlErrorCode;
 import com.hazelcast.sql.impl.SqlTestSupport;
 import com.hazelcast.sql.impl.exec.BlockingExec;
 import com.hazelcast.sql.impl.exec.FaultyExec;
@@ -38,7 +38,7 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
     protected static final String MAP_NAME = "map";
     private static final int DATA_SET_SIZE = 100;
 
-    protected final TestHazelcastFactory factory = new TestHazelcastFactory(3);
+    protected final SqlTestInstanceFactory factory = SqlTestInstanceFactory.create();
 
     protected HazelcastInstance instance1;
     protected HazelcastInstance instance2;
@@ -76,11 +76,13 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
             }
         });
 
-        blocker.unblockAfter(5000L);
-
         // Execute query on the instance1.
-        SqlException error = assertSqlException(useClient ? client : instance1, query().setTimeoutMillis(100L));
-        assertEquals(SqlErrorCode.TIMEOUT, error.getCode());
+        try {
+            HazelcastSqlException error = assertSqlException(useClient ? client : instance1, query().setTimeoutMillis(100L));
+            assertEquals(SqlErrorCode.TIMEOUT, error.getCode());
+        } finally {
+            blocker.unblock();
+        }
     }
 
     protected void checkExecutionError(boolean useClient, boolean fromFirstMember) {
@@ -106,7 +108,7 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
         });
 
         // Execute query.
-        SqlException error = assertSqlException(target, query());
+        HazelcastSqlException error = assertSqlException(target, query());
 
         assertEquals(SqlErrorCode.GENERIC, error.getCode());
         assertEquals(member.getLocalEndpoint().getUuid(), error.getOriginatingMemberId());
@@ -143,8 +145,8 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
         }).start();
 
         // Start query
-        SqlException error = assertSqlException(useClient ? client : instance1, query());
-        assertEquals(SqlErrorCode.PARTITION_MIGRATED, error.getCode());
+        HazelcastSqlException error = assertSqlException(useClient ? client : instance1, query());
+        assertEquals(SqlErrorCode.PARTITION_DISTRIBUTION_CHANGED, error.getCode());
     }
 
     protected void checkMapDestroy(boolean useClient, boolean firstMember) {
@@ -180,7 +182,7 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
         }).start();
 
         // Start query
-        SqlException error = assertSqlException(useClient ? client : instance1, query());
+        HazelcastSqlException error = assertSqlException(useClient ? client : instance1, query());
         assertEquals(SqlErrorCode.MAP_DESTROYED, error.getCode());
     }
 
@@ -199,7 +201,7 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
         }
 
         // Execute query.
-        SqlException error = assertSqlException(useClient ? client : instance1, query());
+        HazelcastSqlException error = assertSqlException(useClient ? client : instance1, query());
 
         assertEquals(SqlErrorCode.DATA_EXCEPTION, error.getCode());
         assertEquals(
@@ -218,7 +220,7 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
 
         HazelcastInstance target = useClient ? client : instance1;
 
-        SqlException error = assertSqlException(target, new SqlQuery("SELECT bad_field FROM " + MAP_NAME));
+        HazelcastSqlException error = assertSqlException(target, new SqlStatement("SELECT bad_field FROM " + MAP_NAME));
         assertEquals(SqlErrorCode.PARSING, error.getCode());
     }
 
@@ -233,7 +235,7 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
 
         HazelcastInstance target = useClient ? client : instance1;
 
-        try (SqlResult res = target.getSql().query(query().setCursorBufferSize(1))) {
+        try (SqlResult res = target.getSql().execute(query().setCursorBufferSize(1))) {
             res.close();
 
             try {
@@ -242,21 +244,21 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
                 }
 
                 fail("Exception is not thrown");
-            } catch (SqlException e) {
+            } catch (HazelcastSqlException e) {
                 assertEquals(SqlErrorCode.CANCELLED_BY_USER, e.getCode());
             }
         }
     }
 
     @Nonnull
-    protected static SqlException assertSqlException(HazelcastInstance instance, SqlQuery query) {
+    protected static HazelcastSqlException assertSqlException(HazelcastInstance instance, SqlStatement query) {
         try {
             execute(instance, query);
 
             fail("Exception is not thrown.");
 
             return null;
-        } catch (SqlException e) {
+        } catch (HazelcastSqlException e) {
             System.out.println(">>> Caught expected SQL error: " + e);
 
             return e;
@@ -264,8 +266,8 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
     }
 
     @SuppressWarnings("UnusedReturnValue")
-    protected static int execute(HazelcastInstance instance, SqlQuery query) {
-        try (SqlResult res = instance.getSql().query(query)) {
+    protected static int execute(HazelcastInstance instance, SqlStatement query) {
+        try (SqlResult res = instance.getSql().execute(query)) {
             int count = 0;
 
             for (SqlRow ignore : res) {
@@ -276,8 +278,8 @@ public class SqlErrorAbstractTest extends SqlTestSupport {
         }
     }
 
-    protected static SqlQuery query() {
-        return new SqlQuery("SELECT __key, this FROM " + MAP_NAME);
+    protected static SqlStatement query() {
+        return new SqlStatement("SELECT __key, this FROM " + MAP_NAME);
     }
 
     protected static void populate(HazelcastInstance instance) {

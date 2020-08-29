@@ -17,6 +17,7 @@
 package com.hazelcast.sql.impl.calcite;
 
 import com.google.common.collect.ImmutableList;
+import com.hazelcast.sql.impl.QueryParameterMetadata;
 import com.hazelcast.sql.impl.calcite.opt.QueryPlanner;
 import com.hazelcast.sql.impl.calcite.opt.cost.CostFactory;
 import com.hazelcast.sql.impl.calcite.opt.distribution.DistributionTraitDef;
@@ -30,10 +31,8 @@ import com.hazelcast.sql.impl.calcite.schema.HazelcastCalciteCatalogReader;
 import com.hazelcast.sql.impl.calcite.schema.HazelcastSchema;
 import com.hazelcast.sql.impl.calcite.schema.HazelcastSchemaUtils;
 import com.hazelcast.sql.impl.calcite.validate.HazelcastSqlConformance;
-import com.hazelcast.sql.impl.calcite.validate.HazelcastSqlOperatorTable;
-import com.hazelcast.sql.impl.calcite.validate.HazelcastSqlValidator;
-import com.hazelcast.sql.impl.schema.TableResolver;
-import org.apache.calcite.adapter.java.JavaTypeFactory;
+import com.hazelcast.sql.impl.calcite.validate.types.HazelcastTypeFactory;
+import com.hazelcast.sql.impl.schema.SqlCatalog;
 import org.apache.calcite.config.CalciteConnectionConfig;
 import org.apache.calcite.jdbc.HazelcastRootCalciteSchema;
 import org.apache.calcite.plan.Contexts;
@@ -47,14 +46,10 @@ import org.apache.calcite.rel.metadata.ChainedRelMetadataProvider;
 import org.apache.calcite.rel.metadata.DefaultRelMetadataProvider;
 import org.apache.calcite.rel.metadata.JaninoRelMetadataProvider;
 import org.apache.calcite.rel.metadata.RelMetadataProvider;
-import org.apache.calcite.rex.RexBuilder;
-import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.SqlOperatorTable;
-import org.apache.calcite.sql.fun.SqlStdOperatorTable;
-import org.apache.calcite.sql.util.ChainedSqlOperatorTable;
-import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.tools.RuleSet;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.List;
 
 /**
@@ -71,15 +66,18 @@ public final class OptimizerContext {
 
     private static final CalciteConnectionConfig CONNECTION_CONFIG = CasingConfiguration.DEFAULT.toConnectionConfig();
 
+    private final HazelcastRelOptCluster cluster;
     private final QueryParser parser;
     private final QueryConverter converter;
     private final QueryPlanner planner;
 
     private OptimizerContext(
+        HazelcastRelOptCluster cluster,
         QueryParser parser,
         QueryConverter converter,
         QueryPlanner planner
     ) {
+        this.cluster = cluster;
         this.parser = parser;
         this.converter = converter;
         this.planner = planner;
@@ -88,43 +86,43 @@ public final class OptimizerContext {
     /**
      * Create the optimization context.
      *
-     * @param tableResolvers Resolver to collect information about tables.
-     * @param currentSearchPaths Search paths to support "current schema" feature.
+     * @param searchPaths Search paths to support "current schema" feature.
      * @param memberCount Number of member that is important for distribution-related rules and converters.
      * @return Context.
      */
     public static OptimizerContext create(
-        List<TableResolver> tableResolvers,
-        List<List<String>> currentSearchPaths,
-        int memberCount
+        SqlCatalog schema,
+        List<List<String>> searchPaths,
+        int memberCount,
+        @Nonnull SqlBackend sqlBackend,
+        @Nullable SqlBackend jetSqlBackend
     ) {
-        // Prepare search paths.
-        List<List<String>> searchPaths = HazelcastSchemaUtils.prepareSearchPaths(currentSearchPaths, tableResolvers);
-
         // Resolve tables.
-        HazelcastSchema rootSchema = HazelcastSchemaUtils.createRootSchema(tableResolvers);
+        HazelcastSchema rootSchema = HazelcastSchemaUtils.createRootSchema(schema);
 
-        return create(rootSchema, searchPaths, memberCount);
+        return create(rootSchema, searchPaths, memberCount, sqlBackend, jetSqlBackend);
     }
 
     public static OptimizerContext create(
         HazelcastSchema rootSchema,
         List<List<String>> schemaPaths,
-        int memberCount
+        int memberCount,
+        @Nonnull SqlBackend sqlBackend,
+        @Nullable SqlBackend jetSqlBackend
     ) {
         DistributionTraitDef distributionTraitDef = new DistributionTraitDef(memberCount);
 
-        JavaTypeFactory typeFactory = new HazelcastTypeFactory();
+        HazelcastSqlConformance conformance = HazelcastSqlConformance.INSTANCE;
+        HazelcastTypeFactory typeFactory = HazelcastTypeFactory.INSTANCE;
         Prepare.CatalogReader catalogReader = createCatalogReader(typeFactory, CONNECTION_CONFIG, rootSchema, schemaPaths);
-        SqlValidator validator = createValidator(typeFactory, catalogReader);
         VolcanoPlanner volcanoPlanner = createPlanner(CONNECTION_CONFIG, distributionTraitDef);
         HazelcastRelOptCluster cluster = createCluster(volcanoPlanner, typeFactory, distributionTraitDef);
 
-        QueryParser parser = new QueryParser(validator);
-        QueryConverter converter = new QueryConverter(catalogReader, validator, cluster);
+        QueryParser parser = new QueryParser(typeFactory, catalogReader, conformance, sqlBackend, jetSqlBackend);
+        QueryConverter converter = new QueryConverter(catalogReader, cluster);
         QueryPlanner planner = new QueryPlanner(volcanoPlanner);
 
-        return new OptimizerContext(parser, converter, planner);
+        return new OptimizerContext(cluster, parser, converter, planner);
     }
 
     /**
@@ -140,11 +138,15 @@ public final class OptimizerContext {
     /**
      * Perform initial conversion of an SQL tree to a relational tree.
      *
-     * @param node SQL tree.
+     * @param parseResult Query parse result.
      * @return Relational tree.
      */
-    public QueryConvertResult convert(SqlNode node) {
-        return converter.convert(node);
+    public QueryConvertResult convert(QueryParseResult parseResult) {
+        return converter.convert(parseResult);
+    }
+
+    public void setParameterMetadata(QueryParameterMetadata parameterMetadata) {
+        cluster.setParameterMetadata(parameterMetadata);
     }
 
     /**
@@ -160,30 +162,18 @@ public final class OptimizerContext {
     }
 
     private static Prepare.CatalogReader createCatalogReader(
-        JavaTypeFactory typeFactory,
+        HazelcastTypeFactory typeFactory,
         CalciteConnectionConfig config,
         HazelcastSchema rootSchema,
-        List<List<String>> schemaPaths
+        List<List<String>> searchPaths
     ) {
+        assert searchPaths != null;
+
         return new HazelcastCalciteCatalogReader(
             new HazelcastRootCalciteSchema(rootSchema),
-            schemaPaths,
+            searchPaths,
             typeFactory,
             config
-        );
-    }
-
-    private static SqlValidator createValidator(JavaTypeFactory typeFactory, Prepare.CatalogReader catalogReader) {
-        SqlOperatorTable opTab = ChainedSqlOperatorTable.of(
-            HazelcastSqlOperatorTable.instance(),
-            SqlStdOperatorTable.instance()
-        );
-
-        return new HazelcastSqlValidator(
-            opTab,
-            catalogReader,
-            typeFactory,
-            HazelcastSqlConformance.INSTANCE
         );
     }
 
@@ -202,12 +192,12 @@ public final class OptimizerContext {
 
     private static HazelcastRelOptCluster createCluster(
         VolcanoPlanner planner,
-        JavaTypeFactory typeFactory,
+        HazelcastTypeFactory typeFactory,
         DistributionTraitDef distributionTraitDef
     ) {
         HazelcastRelOptCluster cluster = HazelcastRelOptCluster.create(
             planner,
-            new RexBuilder(typeFactory),
+            new HazelcastRexBuilder(typeFactory),
             distributionTraitDef
         );
 

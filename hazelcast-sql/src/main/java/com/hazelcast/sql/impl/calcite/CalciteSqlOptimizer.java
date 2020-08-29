@@ -17,37 +17,18 @@
 package com.hazelcast.sql.impl.calcite;
 
 import com.hazelcast.cluster.memberselector.MemberSelectors;
-import com.hazelcast.internal.util.collection.PartitionIdSet;
-import com.hazelcast.partition.Partition;
 import com.hazelcast.spi.impl.NodeEngine;
+import com.hazelcast.sql.impl.JetSqlCoreBackend;
 import com.hazelcast.sql.impl.calcite.opt.HazelcastConventions;
-import com.hazelcast.sql.impl.calcite.opt.OptUtils;
-import com.hazelcast.sql.impl.calcite.opt.logical.LogicalRules;
-import com.hazelcast.sql.impl.calcite.opt.logical.RootLogicalRel;
-import com.hazelcast.sql.impl.calcite.opt.physical.PhysicalRel;
-import com.hazelcast.sql.impl.calcite.opt.physical.PhysicalRules;
-import com.hazelcast.sql.impl.calcite.opt.physical.visitor.NodeIdVisitor;
-import com.hazelcast.sql.impl.calcite.opt.physical.visitor.PlanCreateVisitor;
-import com.hazelcast.sql.impl.calcite.parse.QueryConvertResult;
 import com.hazelcast.sql.impl.calcite.parse.QueryParseResult;
 import com.hazelcast.sql.impl.optimizer.OptimizationTask;
 import com.hazelcast.sql.impl.optimizer.SqlOptimizer;
 import com.hazelcast.sql.impl.optimizer.SqlPlan;
-import com.hazelcast.sql.impl.plan.Plan;
-import com.hazelcast.sql.impl.schema.TableResolver;
-import com.hazelcast.sql.impl.schema.map.PartitionedMapTableResolver;
 import org.apache.calcite.plan.Convention;
 import org.apache.calcite.plan.RelTraitSet;
 import org.apache.calcite.plan.volcano.VolcanoPlanner;
-import org.apache.calcite.rel.RelNode;
-import org.apache.calcite.rel.type.RelDataType;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import javax.annotation.Nullable;
 
 /**
  * SQL optimizer based on Apache Calcite.
@@ -114,12 +95,18 @@ import java.util.UUID;
 public class CalciteSqlOptimizer implements SqlOptimizer {
 
     private final NodeEngine nodeEngine;
-    private final List<TableResolver> tableResolvers;
 
-    public CalciteSqlOptimizer(NodeEngine nodeEngine) {
+    private final SqlBackend sqlBackend;
+    private final SqlBackend jetSqlBackend;
+
+    public CalciteSqlOptimizer(
+        NodeEngine nodeEngine,
+        @Nullable JetSqlCoreBackend jetSqlCoreBackend
+    ) {
         this.nodeEngine = nodeEngine;
 
-        tableResolvers = createTableResolvers(nodeEngine);
+        this.sqlBackend = new HazelcastSqlBackend(nodeEngine);
+        this.jetSqlBackend = jetSqlCoreBackend == null ? null : (SqlBackend) jetSqlCoreBackend.sqlBackend();
     }
 
     @Override
@@ -128,82 +115,17 @@ public class CalciteSqlOptimizer implements SqlOptimizer {
         int memberCount = nodeEngine.getClusterService().getSize(MemberSelectors.DATA_MEMBER_SELECTOR);
 
         OptimizerContext context = OptimizerContext.create(
-            tableResolvers,
+            task.getSchema(),
             task.getSearchPaths(),
-            memberCount
+            memberCount,
+            sqlBackend,
+            jetSqlBackend
         );
 
         // 2. Parse SQL string and validate it.
         QueryParseResult parseResult = context.parse(task.getSql());
 
-        // 3. Convert parse tree to relational tree.
-        QueryConvertResult convertResult = context.convert(parseResult.getNode());
-
-        // 4. Perform optimization.
-        PhysicalRel physicalRel = optimize(context, convertResult.getRel());
-
-        // 5. Create plan.
-        return createImdgPlan(parseResult.getParameterRowType(), physicalRel, convertResult.getFieldNames());
-    }
-
-    private PhysicalRel optimize(OptimizerContext context, RelNode rel) {
-        // Logical part.
-        RelNode logicalRel = context.optimize(rel, LogicalRules.getRuleSet(), OptUtils.toLogicalConvention(rel.getTraitSet()));
-
-        RootLogicalRel logicalRootRel = new RootLogicalRel(logicalRel.getCluster(), logicalRel.getTraitSet(), logicalRel);
-
-        // Physical part.
-        RelTraitSet physicalTraitSet = OptUtils.toPhysicalConvention(
-            logicalRootRel.getTraitSet(),
-            OptUtils.getDistributionDef(logicalRootRel).getTraitRoot()
-        );
-
-        return (PhysicalRel) context.optimize(logicalRootRel, PhysicalRules.getRuleSet(), physicalTraitSet);
-    }
-
-    /**
-     * Create plan from physical rel.
-     *
-     * @param rel Rel.
-     * @return Plan.
-     */
-    private Plan createImdgPlan(RelDataType parameterRowType, PhysicalRel rel, List<String> rootColumnNames) {
-        // Get partition mapping.
-        Collection<Partition> parts = nodeEngine.getHazelcastInstance().getPartitionService().getPartitions();
-
-        int partCnt = parts.size();
-
-        LinkedHashMap<UUID, PartitionIdSet> partMap = new LinkedHashMap<>();
-
-        for (Partition part : parts) {
-            UUID ownerId = part.getOwner().getUuid();
-
-            partMap.computeIfAbsent(ownerId, (key) -> new PartitionIdSet(partCnt)).add(part.getPartitionId());
-        }
-
-        // Assign IDs to nodes.
-        NodeIdVisitor idVisitor = new NodeIdVisitor();
-        rel.visit(idVisitor);
-        Map<PhysicalRel, List<Integer>> relIdMap = idVisitor.getIdMap();
-
-        // Create the plan.
-        PlanCreateVisitor visitor = new PlanCreateVisitor(
-            nodeEngine.getLocalMember().getUuid(),
-            partMap,
-            relIdMap,
-            rootColumnNames
-        );
-
-        rel.visit(visitor);
-
-        return visitor.getPlan();
-    }
-
-    private static List<TableResolver> createTableResolvers(NodeEngine nodeEngine) {
-        List<TableResolver> res = new ArrayList<>(1);
-
-        res.add(new PartitionedMapTableResolver(nodeEngine));
-
-        return res;
+        // 3. Create plan.
+        return parseResult.getSqlBackend().createPlan(task, parseResult, context);
     }
 }

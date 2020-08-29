@@ -1036,6 +1036,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 scheduledExecutorConfig.setPoolSize(parseInt(getTextContent(child)));
             } else if ("split-brain-protection-ref".equals(nodeName)) {
                 scheduledExecutorConfig.setSplitBrainProtectionName(getTextContent(child));
+            } else if ("statistics-enabled".equals(nodeName)) {
+                scheduledExecutorConfig.setStatisticsEnabled(getBooleanValue(getTextContent(child)));
             }
         }
 
@@ -2960,8 +2962,8 @@ public class MemberDomConfigProcessor extends AbstractDomConfigProcessor {
                 sqlConfig.setExecutorPoolSize(Integer.parseInt(value));
             } else if ("operation-pool-size".equals(nodeName)) {
                 sqlConfig.setOperationPoolSize(Integer.parseInt(value));
-            } else if ("query-timeout-millis".equals(nodeName)) {
-                sqlConfig.setQueryTimeoutMillis(Long.parseLong(value));
+            } else if ("statement-timeout-millis".equals(nodeName)) {
+                sqlConfig.setStatementTimeoutMillis(Long.parseLong(value));
             }
         }
     }

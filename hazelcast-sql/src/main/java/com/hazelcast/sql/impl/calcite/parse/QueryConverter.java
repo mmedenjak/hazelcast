@@ -18,15 +18,16 @@ package com.hazelcast.sql.impl.calcite.parse;
 
 import org.apache.calcite.plan.Contexts;
 import org.apache.calcite.plan.HazelcastRelOptCluster;
+import org.apache.calcite.plan.RelOptCluster;
 import org.apache.calcite.plan.RelOptCostImpl;
 import org.apache.calcite.plan.hep.HepPlanner;
 import org.apache.calcite.plan.hep.HepProgramBuilder;
 import org.apache.calcite.prepare.Prepare;
+import org.apache.calcite.prepare.Prepare.CatalogReader;
 import org.apache.calcite.rel.RelNode;
 import org.apache.calcite.rel.RelRoot;
 import org.apache.calcite.rel.rules.SubQueryRemoveRule;
 import org.apache.calcite.sql.SqlNode;
-import org.apache.calcite.sql.validate.SqlValidator;
 import org.apache.calcite.sql2rel.SqlToRelConverter;
 import org.apache.calcite.sql2rel.StandardConvertletTable;
 import org.apache.calcite.util.Pair;
@@ -49,7 +50,6 @@ public class QueryConverter {
     private static final boolean TRIM_UNUSED_FIELDS = true;
 
     private static final SqlToRelConverter.Config CONFIG;
-    private final SqlToRelConverter converter;
 
     static {
         SqlToRelConverter.ConfigBuilder configBuilder = SqlToRelConverter.configBuilder()
@@ -59,23 +59,34 @@ public class QueryConverter {
         CONFIG = configBuilder.build();
     }
 
-    public QueryConverter(Prepare.CatalogReader catalogReader, SqlValidator validator, HazelcastRelOptCluster cluster) {
-        converter = new SqlToRelConverter(
+    private final CatalogReader catalogReader;
+    private final RelOptCluster cluster;
+
+    public QueryConverter(
+        Prepare.CatalogReader catalogReader,
+        HazelcastRelOptCluster cluster
+    ) {
+        this.catalogReader = catalogReader;
+        this.cluster = cluster;
+    }
+
+    public QueryConvertResult convert(QueryParseResult parseResult) {
+        SqlNode node = parseResult.getNode();
+
+        SqlToRelConverter converter = parseResult.getSqlBackend().converter(
             null,
-            validator,
+            parseResult.getValidator(),
             catalogReader,
             cluster,
             StandardConvertletTable.INSTANCE,
             CONFIG
         );
-    }
 
-    public QueryConvertResult convert(SqlNode node) {
         // 1. Perform initial conversion.
         RelRoot root = converter.convertQuery(node, false, true);
 
         // 2. Remove subquery expressions, converting them to Correlate nodes.
-        RelNode relNoSubqueries = rewriteSubqueries(root.rel);
+        RelNode relNoSubqueries = rewriteSubqueries(root.project());
 
         // 3. Perform decorrelation, i.e. rewrite a nested loop where the right side depends on the value of the left side,
         // to a variation of joins, semijoins and aggregations, which could be executed much more efficiently.
