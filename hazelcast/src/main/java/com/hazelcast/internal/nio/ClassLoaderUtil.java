@@ -40,8 +40,10 @@ import static java.util.Collections.unmodifiableMap;
 @SuppressWarnings({"checkstyle:magicnumber", "checkstyle:npathcomplexity"})
 public final class ClassLoaderUtil {
     /**
+     * Marker interface.
      * do not cache constructors if an instance of this interface,
-     * interferes with OSGi on some systems
+     * Used by systems with complicated class loader schemes
+     * that may interfere with caching
      */
     public interface BypassClassCaching { };
 
@@ -431,7 +433,7 @@ public final class ClassLoaderUtil {
     private static boolean shouldBypassCache(Class clazz) {
         // dynamically loaded class should not be cached here, as they are already
         // cached in the DistributedLoadingService (when cache is enabled)
-        return (clazz.getClassLoader() instanceof ClassSource || clazz.isInstance(BypassClassCaching.class));
+        return (clazz.getClassLoader() instanceof ClassSource || BypassClassCaching.class.isAssignableFrom(clazz));
     }
 
     private static final class IrresolvableConstructor {
