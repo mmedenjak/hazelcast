@@ -231,9 +231,7 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
 
         @Override
         public void distributedObjectCreated(DestroyEventContext event) {
-            if (event != null) {
-                destroyEventContext.set(event);
-            }
+            destroyEventContext.set(event);
             registerTenantCount.incrementAndGet();
         }
 

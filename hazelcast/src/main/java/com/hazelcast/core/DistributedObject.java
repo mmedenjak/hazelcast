@@ -85,6 +85,6 @@ public interface DistributedObject {
      * @return destroy context, cannot be null
      */
     default DestroyEventContext getDestroyContextForTenant() {
-        return () -> {};
+        return () -> { };
     }
 }
