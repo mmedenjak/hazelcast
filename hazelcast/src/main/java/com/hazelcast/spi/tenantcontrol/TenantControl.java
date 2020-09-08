@@ -51,7 +51,7 @@ public interface TenantControl extends DataSerializable {
      * @param destroyEventContext hook to decouple any Hazelcast object when the tenant is destroyed,
      * This is used, for example, to delete all associated caches from the application when
      * it gets undeployed, so there are no ClassCastExceptions afterwards
-     * can be null if no context is necessary
+     * cannot be null. This is a functional interface, no-op lambda can be used
      */
     void distributedObjectCreated(DestroyEventContext destroyEventContext);
 

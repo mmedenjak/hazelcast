@@ -82,9 +82,9 @@ public interface DistributedObject {
      * to avoid class loader leaks and ClassNotFound exceptions
      * when the tenant is destroyed
      *
-     * @return destroy context or null
+     * @return destroy context, cannot be null
      */
     default DestroyEventContext getDestroyContextForTenant() {
-        return null;
+        return () -> {};
     }
 }
