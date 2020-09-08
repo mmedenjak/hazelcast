@@ -25,7 +25,6 @@ import com.hazelcast.transaction.TransactionalMultiMap;
 import com.hazelcast.transaction.TransactionalQueue;
 import com.hazelcast.multimap.MultiMap;
 import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
-import java.util.Optional;
 
 /**
  * Base interface for all distributed objects.
@@ -83,9 +82,9 @@ public interface DistributedObject {
      * to avoid class loader leaks and ClassNotFound exceptions
      * when the tenant is destroyed
      *
-     * @return destroy context
+     * @return destroy context or null
      */
-    default Optional<DestroyEventContext> getDestroyContextForTenant() {
-        return Optional.empty();
+    default DestroyEventContext getDestroyContextForTenant() {
+        return null;
     }
 }

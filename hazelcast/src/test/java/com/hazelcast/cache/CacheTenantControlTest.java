@@ -58,7 +58,6 @@ import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.properties.ClusterProperty;
 import java.io.IOException;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -231,8 +230,10 @@ public class CacheTenantControlTest extends HazelcastTestSupport {
         }
 
         @Override
-        public void distributedObjectCreated(Optional<DestroyEventContext> event) {
-            event.ifPresent((evt) -> destroyEventContext.set(evt));
+        public void distributedObjectCreated(DestroyEventContext event) {
+            if (event != null) {
+                destroyEventContext.set(event);
+            }
             registerTenantCount.incrementAndGet();
         }
 

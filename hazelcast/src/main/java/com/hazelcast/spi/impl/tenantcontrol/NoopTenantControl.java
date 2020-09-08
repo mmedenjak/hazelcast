@@ -25,7 +25,6 @@ import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 
 import java.io.IOException;
-import java.util.Optional;
 
 /**
  * Default no-op implementation of TenantControl
@@ -38,7 +37,7 @@ public final class NoopTenantControl implements TenantControl, IdentifiedDataSer
     }
 
     @Override
-    public void distributedObjectCreated(Optional<DestroyEventContext> destroyEventContext) {
+    public void distributedObjectCreated(DestroyEventContext destroyEventContext) {
     }
 
     @Override

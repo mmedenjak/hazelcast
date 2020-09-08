@@ -64,7 +64,6 @@ import static com.hazelcast.internal.util.FutureUtil.waitWithDeadline;
 import static com.hazelcast.internal.util.Preconditions.checkNotNull;
 import static com.hazelcast.internal.util.counters.MwCounter.newMwCounter;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
-import java.util.Optional;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
 
@@ -137,7 +136,7 @@ public class ProxyServiceImpl
         checkObjectNameNotNull(name);
 
         ProxyRegistry registry = getOrCreateRegistry(serviceName);
-        registry.createProxy(name, source, true, false, Optional.empty());
+        registry.createProxy(name, source, true, false, null);
         createdCounter.inc();
     }
 
@@ -246,7 +245,7 @@ public class ProxyServiceImpl
                 final ProxyRegistry registry = getOrCreateRegistry(serviceName);
                 if (!registry.contains(eventPacket.getName())) {
                     registry.createProxy(eventPacket.getName(), eventPacket.getSource(), true, true,
-                            Optional.of(eventPacket.getTenantControl()));
+                            eventPacket.getTenantControl());
                     // listeners will be called if proxy is created here.
                 }
             } catch (HazelcastInstanceNotActiveException ignored) {

@@ -180,7 +180,7 @@ public final class ProxyRegistry {
             if (!proxyService.nodeEngine.isRunning()) {
                 throw new HazelcastInstanceNotActiveException();
             }
-            proxyFuture = createProxy(name, source, initialize, !publishEvent, Optional.empty());
+            proxyFuture = createProxy(name, source, initialize, !publishEvent, null);
             if (proxyFuture == null) {
                 return getOrCreateProxyFuture(name, source, publishEvent, initialize);
             }
@@ -197,11 +197,11 @@ public final class ProxyRegistry {
      * @param local        {@code true} if the proxy should be only created on the local member,
      *                     otherwise fires {@code DistributedObjectEvent} to trigger cluster-wide
      *                     proxy creation.
-     * @param tenantControl optional, if it was transferred via PostOp
+     * @param tenantControl can be null, required if it was transferred via PostOp flow
      * @return The DistributedObject instance if it is created by this method, null otherwise.
      */
     public DistributedObjectFuture createProxy(String name, UUID source, boolean initialize, boolean local,
-            Optional<TenantControl> tenantControl) {
+            TenantControl tenantControl) {
         if (proxies.containsKey(name)) {
             return null;
         }
@@ -210,7 +210,7 @@ public final class ProxyRegistry {
             throw new HazelcastInstanceNotActiveException();
         }
 
-        DistributedObjectFuture proxyFuture = new DistributedObjectFuture(source, tenantControl
+        DistributedObjectFuture proxyFuture = new DistributedObjectFuture(source, Optional.ofNullable(tenantControl)
                 .orElse(proxyService.nodeEngine.getTenantControlFactory().saveCurrentTenant()));
         if (proxies.putIfAbsent(name, proxyFuture) != null) {
             return null;

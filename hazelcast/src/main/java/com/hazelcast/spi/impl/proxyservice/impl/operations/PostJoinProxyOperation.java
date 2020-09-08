@@ -38,7 +38,6 @@ import java.util.Collection;
 import static com.hazelcast.internal.util.EmptyStatement.ignore;
 import com.hazelcast.nio.serialization.impl.Versioned;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
-import java.util.Optional;
 
 public class PostJoinProxyOperation extends Operation implements IdentifiedDataSerializable, Versioned {
 
@@ -134,7 +133,7 @@ public class PostJoinProxyOperation extends Operation implements IdentifiedDataS
         public void run() {
             try {
                 registry.createProxy(proxyInfo.getObjectName(), proxyInfo.getSource(), true, true,
-                        Optional.of(proxyInfo.getTenantControl()));
+                        proxyInfo.getTenantControl());
             } catch (CacheNotExistsException e) {
                 // this can happen when a cache destroy event is received
                 // after the cache config is replicated during join (pre-join)

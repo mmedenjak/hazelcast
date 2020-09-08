@@ -20,7 +20,6 @@ import com.hazelcast.nio.serialization.DataSerializable;
 import com.hazelcast.spi.annotation.Beta;
 import com.hazelcast.spi.impl.operationservice.Operation;
 import com.hazelcast.spi.impl.tenantcontrol.NoopTenantControl;
-import java.util.Optional;
 
 /**
  * Hooks for multi-tenancy for application servers
@@ -52,8 +51,9 @@ public interface TenantControl extends DataSerializable {
      * @param destroyEventContext hook to decouple any Hazelcast object when the tenant is destroyed,
      * This is used, for example, to delete all associated caches from the application when
      * it gets undeployed, so there are no ClassCastExceptions afterwards
+     * can be null if no context is necessary
      */
-    void distributedObjectCreated(Optional<DestroyEventContext> destroyEventContext);
+    void distributedObjectCreated(DestroyEventContext destroyEventContext);
 
     /**
      * To be called when the Hazelcast object attached to this tenant is destroyed.

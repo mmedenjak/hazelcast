@@ -72,7 +72,6 @@ import static com.hazelcast.internal.util.ExceptionUtil.rethrow;
 import static com.hazelcast.internal.util.ExceptionUtil.rethrowAllowedTypeFirst;
 import static com.hazelcast.internal.util.SetUtil.createHashSet;
 import com.hazelcast.spi.tenantcontrol.DestroyEventContext;
-import java.util.Optional;
 
 /**
  * Abstract {@link com.hazelcast.cache.ICache} implementation which provides shared internal implementations
@@ -168,11 +167,11 @@ abstract class CacheProxySupport<K, V>
     }
 
     @Override
-    public Optional<DestroyEventContext> getDestroyContextForTenant() {
-        return Optional.of(() -> {
+    public DestroyEventContext getDestroyContextForTenant() {
+        return () -> {
             reSerializeCacheConfig();
             ((CacheService) cacheService).reSerializeCacheConfig(cacheConfig);
-        });
+        };
     }
 
     abstract void reSerializeCacheConfig();
