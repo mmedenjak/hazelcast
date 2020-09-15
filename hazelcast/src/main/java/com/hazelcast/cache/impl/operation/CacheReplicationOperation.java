@@ -23,6 +23,7 @@ import com.hazelcast.cache.impl.ICacheService;
 import com.hazelcast.cache.impl.PreJoinCacheConfig;
 import com.hazelcast.cache.impl.record.CacheRecord;
 import com.hazelcast.config.CacheConfig;
+import com.hazelcast.internal.cluster.Versions;
 import com.hazelcast.internal.nio.IOUtil;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.hazelcast.internal.util.MapUtil.createHashMap;
+import com.hazelcast.nio.serialization.impl.Versioned;
 
 /**
  * Replication operation is the data migration operation of {@link com.hazelcast.cache.impl.CacheRecordStore}.
@@ -57,12 +59,12 @@ import static com.hazelcast.internal.util.MapUtil.createHashMap;
  * </ul>
  * <p><b>Note:</b> This operation is a per partition operation.</p>
  */
-public class CacheReplicationOperation extends Operation implements IdentifiedDataSerializable {
+public class CacheReplicationOperation extends Operation implements IdentifiedDataSerializable, Versioned {
 
     private final List<CacheConfig> configs = new ArrayList<CacheConfig>();
     private final Map<String, Map<Data, CacheRecord>> data = new HashMap<String, Map<Data, CacheRecord>>();
     private CacheNearCacheStateHolder nearCacheStateHolder;
-    private boolean classesAlwaysAvailable = true;
+    private transient boolean classesAlwaysAvailable = true;
 
     public CacheReplicationOperation() {
         nearCacheStateHolder = new CacheNearCacheStateHolder();
@@ -146,7 +148,7 @@ public class CacheReplicationOperation extends Operation implements IdentifiedDa
         int confSize = configs.size();
         out.writeInt(confSize);
         for (CacheConfig config : configs) {
-            if (!classesAlwaysAvailable) {
+            if (out.getVersion().isGreaterOrEqual(Versions.V4_1) && !classesAlwaysAvailable) {
                 out.writeObject(PreJoinCacheConfig.of(config));
             } else {
                 out.writeObject(config);
@@ -183,7 +185,7 @@ public class CacheReplicationOperation extends Operation implements IdentifiedDa
         int confSize = in.readInt();
         for (int i = 0; i < confSize; i++) {
             final CacheConfig config = in.readObject();
-            if (!classesAlwaysAvailable) {
+            if (in.getVersion().isGreaterOrEqual(Versions.V4_1) && !classesAlwaysAvailable) {
                 configs.add(PreJoinCacheConfig.asCacheConfig(config));
             } else {
                 configs.add(config);

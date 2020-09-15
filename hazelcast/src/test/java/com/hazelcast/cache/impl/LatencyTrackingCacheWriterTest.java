@@ -16,6 +16,7 @@
 
 package com.hazelcast.cache.impl;
 
+import com.hazelcast.spi.impl.tenantcontrol.TenantContextual;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.diagnostics.StoreLatencyPlugin;
 import com.hazelcast.spi.tenantcontrol.TenantControl;

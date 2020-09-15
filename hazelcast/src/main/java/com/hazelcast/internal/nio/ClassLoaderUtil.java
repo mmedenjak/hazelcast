@@ -32,6 +32,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.hazelcast.internal.util.EmptyStatement.ignore;
 import static com.hazelcast.internal.util.Preconditions.isNotNull;
+import com.hazelcast.spi.tenantcontrol.BypassClassCaching;
 import static java.util.Collections.unmodifiableMap;
 
 /**
@@ -39,14 +40,6 @@ import static java.util.Collections.unmodifiableMap;
  */
 @SuppressWarnings({"checkstyle:magicnumber", "checkstyle:npathcomplexity"})
 public final class ClassLoaderUtil {
-    /**
-     * Marker interface.
-     * do not cache constructors if an instance of this interface,
-     * Used by systems with complicated class loader schemes
-     * that may interfere with caching
-     */
-    public interface BypassClassCaching { };
-
     public static final String HAZELCAST_BASE_PACKAGE = "com.hazelcast.";
     public static final String HAZELCAST_ARRAY = "[L" + HAZELCAST_BASE_PACKAGE;
 

@@ -157,7 +157,7 @@ public abstract class OperationThread extends HazelcastManagedThread implements 
                 completedTotalCount.inc();
             } else {
                 // retry later if not ready
-                queue.add(task, false);
+                queue.add(task, priority);
             }
         } catch (Throwable t) {
             errorCount.inc();

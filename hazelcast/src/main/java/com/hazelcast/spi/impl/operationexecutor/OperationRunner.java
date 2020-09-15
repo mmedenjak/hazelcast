@@ -49,10 +49,25 @@ public abstract class OperationRunner {
 
     public abstract long executedOperationsCount();
 
+    /**
+     * @param packet
+     * @return true if packet needs to be put back onto the queue again, and was not executed,
+     * otherwise false (false is the happy path)
+     * Used with Tenant Control to check if tenant is available,
+     * if tenant is unavailable, the packet needs to be re-scheduled
+     * @throws Exception
+     */
     public abstract boolean run(Packet packet) throws Exception;
 
     public abstract void run(Runnable task);
 
+    /**
+     * @param task
+     * @return true if task needs to be put back onto the queue again, and was not executed,
+     * otherwise false (false is the happy path)
+     * Used with Tenant Control to check if tenant is available,
+     * if tenant is unavailable, the task needs to be re-scheduled
+     */
     public abstract boolean run(Operation task);
 
     /**

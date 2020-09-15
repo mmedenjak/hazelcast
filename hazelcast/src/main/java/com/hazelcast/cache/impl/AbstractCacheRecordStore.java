@@ -16,6 +16,7 @@
 
 package com.hazelcast.cache.impl;
 
+import com.hazelcast.spi.impl.tenantcontrol.TenantContextual;
 import com.hazelcast.cache.CacheEventType;
 import com.hazelcast.cache.CacheNotExistsException;
 import com.hazelcast.cache.impl.maxsize.impl.EntryCountCacheEvictionChecker;

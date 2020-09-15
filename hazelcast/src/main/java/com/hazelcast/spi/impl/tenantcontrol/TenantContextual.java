@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package com.hazelcast.cache.impl;
+package com.hazelcast.spi.impl.tenantcontrol;
 
-import com.hazelcast.spi.annotation.PrivateApi;
 import com.hazelcast.spi.tenantcontrol.TenantControl;
 import com.hazelcast.spi.tenantcontrol.TenantControl.Closeable;
 import java.util.concurrent.locks.Lock;
@@ -29,7 +28,6 @@ import java.util.function.Supplier;
  * @author lprimak
  * @param <T> object type
  */
-@PrivateApi
 public class TenantContextual<T> {
     private T contextual;
     private volatile boolean initialized;
@@ -89,7 +87,7 @@ public class TenantContextual<T> {
      * @return newly-created delegate
      */
     public TenantContextual<T> delegate(T delegate) {
-        TenantContextual<T> newContextual = new TenantContextual(initFunction, existsFunction, tenantControl);
+        TenantContextual<T> newContextual = new TenantContextual<>(initFunction, existsFunction, tenantControl);
         newContextual.initialized = true;
         newContextual.contextual = delegate;
         return newContextual;
