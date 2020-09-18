@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.hazelcast.internal.util.EmptyStatement.ignore;
 import static com.hazelcast.internal.util.Preconditions.isNotNull;
-import com.hazelcast.spi.tenantcontrol.BypassClassCaching;
 import static java.util.Collections.unmodifiableMap;
 
 /**
@@ -426,7 +425,7 @@ public final class ClassLoaderUtil {
     private static boolean shouldBypassCache(Class clazz) {
         // dynamically loaded class should not be cached here, as they are already
         // cached in the DistributedLoadingService (when cache is enabled)
-        return (clazz.getClassLoader() instanceof ClassSource || BypassClassCaching.class.isAssignableFrom(clazz));
+        return (clazz.getClassLoader() instanceof ClassSource);
     }
 
     private static final class IrresolvableConstructor {
