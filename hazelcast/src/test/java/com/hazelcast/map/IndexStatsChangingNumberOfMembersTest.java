@@ -30,6 +30,7 @@ import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
+import com.hazelcast.test.annotation.Repeat;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -47,11 +48,12 @@ import static org.junit.Assert.assertTrue;
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(HazelcastParallelParametersRunnerFactory.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
+@Repeat(1000)
 public class IndexStatsChangingNumberOfMembersTest extends HazelcastTestSupport {
 
     @Parameterized.Parameters(name = "format:{0}")
     public static Collection<Object[]> parameters() {
-        return asList(new Object[][]{{InMemoryFormat.OBJECT}, {InMemoryFormat.BINARY}});
+        return asList(new Object[][]{/*{InMemoryFormat.OBJECT}, */{InMemoryFormat.BINARY}});
     }
 
     @Parameterized.Parameter
