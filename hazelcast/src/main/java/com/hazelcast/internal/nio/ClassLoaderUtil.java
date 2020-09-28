@@ -39,6 +39,7 @@ import static java.util.Collections.unmodifiableMap;
  */
 @SuppressWarnings({"checkstyle:magicnumber", "checkstyle:npathcomplexity"})
 public final class ClassLoaderUtil {
+
     public static final String HAZELCAST_BASE_PACKAGE = "com.hazelcast.";
     public static final String HAZELCAST_ARRAY = "[L" + HAZELCAST_BASE_PACKAGE;
 

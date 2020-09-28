@@ -225,7 +225,7 @@ public final class ProxyRegistry {
         DistributedObject proxy;
         try {
             proxy = service.createDistributedObject(name, source, local);
-            proxyFuture.getTenantControl().distributedObjectCreated(proxy.getDestroyContextForTenant());
+            proxyFuture.getTenantControl().registerObject(proxy.getDestroyContextForTenant());
             if (initialize && proxy instanceof InitializingObject) {
                 try {
                     ((InitializingObject) proxy).initialize();
@@ -290,7 +290,7 @@ public final class ProxyRegistry {
             ProxyEventProcessor callback = new ProxyEventProcessor(proxyService.listeners.values(), DESTROYED, serviceName, name,
                     proxy, source);
             eventService.executeEventCallback(callback);
-            proxyFuture.getTenantControl().distributedObjectDestroyed();
+            proxyFuture.getTenantControl().unregisterObject();
         }
         if (publishEvent) {
             publish(new DistributedObjectEventPacket(DESTROYED, serviceName, name, source, proxyFuture.getTenantControl()));

@@ -29,6 +29,8 @@ import java.util.function.Supplier;
  * @param <T> object type
  */
 public class TenantContextual<T> {
+    private static final TenantContextual<?> noop;
+
     private T contextual;
     private volatile boolean initialized;
     private final Supplier<T> initFunction;
@@ -36,7 +38,21 @@ public class TenantContextual<T> {
     private final TenantControl tenantControl;
     private final Lock lock = new ReentrantLock();
 
-    public TenantContextual(Supplier<T> initFunction, Supplier<Boolean> existsFunction, TenantControl tenantControl) {
+
+    @SuppressWarnings("unchecked")
+    static public<T> TenantContextual<T> create(Supplier<T> initFunction, Supplier<Boolean> existsFunction, TenantControl tenantControl) {
+        if (tenantControl == TenantControl.NOOP_TENANT_CONTROL && !existsFunction.get()) {
+            return (TenantContextual<T>) noop;
+        } else {
+            return new TenantContextual<>(initFunction, existsFunction, tenantControl);
+        }
+    }
+
+    static {
+        noop = new TenantContextual<>(() -> null, () -> false, new NoopTenantControl());
+    }
+
+    private TenantContextual(Supplier<T> initFunction, Supplier<Boolean> existsFunction, TenantControl tenantControl) {
         this.initFunction = initFunction;
         this.existsFunction = existsFunction;
         this.tenantControl = tenantControl;
@@ -87,6 +103,9 @@ public class TenantContextual<T> {
      * @return newly-created delegate
      */
     public TenantContextual<T> delegate(T delegate) {
+        if (this == noop) {
+            return this;
+        }
         TenantContextual<T> newContextual = new TenantContextual<>(initFunction, existsFunction, tenantControl);
         newContextual.initialized = true;
         newContextual.contextual = delegate;

@@ -251,4 +251,5 @@ public class AtomicLongProxy implements IAtomicLong {
     public CPGroupId getGroupId() {
         return groupId;
     }
+
 }
