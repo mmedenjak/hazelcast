@@ -57,7 +57,8 @@ public class LatencyTrackingCacheLoaderTest extends HazelcastTestSupport {
         HazelcastInstance hz = createHazelcastInstance();
         plugin = new StoreLatencyPlugin(getNodeEngineImpl(hz));
         delegate = mock(CacheLoader.class);
-        TenantContextual<CacheLoader<String, String>> contextual = new TenantContextual(() -> delegate, () -> true, TenantControl.NOOP_TENANT_CONTROL);
+        TenantContextual<CacheLoader<String, String>> contextual = TenantContextual.create(() -> delegate,
+                () -> true, TenantControl.NOOP_TENANT_CONTROL);
         cacheLoader = new LatencyTrackingCacheLoader<String, String>(contextual, plugin, NAME);
     }
 
