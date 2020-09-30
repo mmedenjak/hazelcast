@@ -203,17 +203,15 @@ public abstract class OperationThread extends HazelcastManagedThread implements 
             return false;
         }
 
-        boolean putBackInQueue = false;
         try {
             if (task instanceof Operation) {
-                putBackInQueue = process((Operation) task);
+                if (process((Operation) task)) {
+                    queue.add(task, false);
+                }
             } else if (task instanceof Runnable) {
                 process((Runnable) task);
             } else {
                 throw new IllegalStateException("Unhandled task: " + task + " from " + batch.taskFactory());
-            }
-            if (putBackInQueue) {
-                queue.add(task, false);
             }
         } finally {
             queue.add(batch, false);
