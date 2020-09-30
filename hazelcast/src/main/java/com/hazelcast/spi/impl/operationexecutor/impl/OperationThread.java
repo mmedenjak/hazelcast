@@ -132,32 +132,25 @@ public abstract class OperationThread extends HazelcastManagedThread implements 
 
     private void process(Object task) {
         try {
-            SwCounter counter;
-            // process() will return it's appropriate counter to be incremented
-            // if process() returns null instead, which means that task's tenant
-            // is not available, the task will be put in the back of the queue
-            // this, however, conflates the meaning of SwCounter return value
-            // design choice needed to be made, otherwise there would be a lot of
-            // code duplication. Wishing Java had tuples (although they bring their own problems)
+            boolean putBackInQueue = false;
             if (task.getClass() == Packet.class) {
-                counter = process((Packet) task);
+                putBackInQueue = process((Packet) task);
             } else if (task instanceof Operation) {
-                counter = process((Operation) task);
+                putBackInQueue = process((Operation) task);
             } else if (task instanceof PartitionSpecificRunnable) {
-                counter = process((PartitionSpecificRunnable) task);
+                process((PartitionSpecificRunnable) task);
             } else if (task instanceof Runnable) {
-                counter = process((Runnable) task);
+                process((Runnable) task);
             } else if (task instanceof TaskBatch) {
-                counter = process((TaskBatch) task);
+                putBackInQueue = process((TaskBatch) task);
             } else {
                 throw new IllegalStateException("Unhandled task:" + task);
             }
-            if (counter != null) {
-                counter.inc();
-                completedTotalCount.inc();
-            } else {
+            if (putBackInQueue) {
                 // retry later if not ready
                 queue.add(task, priority);
+            } else {
+                completedTotalCount.inc();
             }
         } catch (Throwable t) {
             errorCount.inc();
@@ -168,55 +161,64 @@ public abstract class OperationThread extends HazelcastManagedThread implements 
         }
     }
 
-    private SwCounter process(Operation operation) {
+    private boolean process(Operation operation) {
         currentRunner = operationRunner(operation.getPartitionId());
         try {
-            return currentRunner.run(operation) ? null : completedOperationCount;
+            if (currentRunner.run(operation)) {
+                return true;
+            } else {
+                completedOperationCount.inc();
+                return false;
+            }
         } finally {
             operation.clearThreadContext();
         }
     }
 
-    private SwCounter process(Packet packet) throws Exception {
+    private boolean process(Packet packet) throws Exception {
         currentRunner = operationRunner(packet.getPartitionId());
-        return currentRunner.run(packet) ? null : completedPacketCount;
+        if (currentRunner.run(packet)) {
+            return true;
+        } else {
+            completedPacketCount.inc();
+            return false;
+        }
     }
 
-    private SwCounter process(PartitionSpecificRunnable runnable) {
+    private void process(PartitionSpecificRunnable runnable) {
         currentRunner = operationRunner(runnable.getPartitionId());
         currentRunner.run(runnable);
-        return completedPartitionSpecificRunnableCount;
+        completedPartitionSpecificRunnableCount.inc();
     }
 
-    private SwCounter process(Runnable runnable) {
+    private void process(Runnable runnable) {
         runnable.run();
-        return completedRunnableCount;
+        completedRunnableCount.inc();
     }
 
-    private SwCounter process(TaskBatch batch) {
+    private boolean process(TaskBatch batch) {
         Object task = batch.next();
         if (task == null) {
-            return completedOperationBatchCount;
+            completedOperationBatchCount.inc();
+            return false;
         }
 
-        SwCounter counter = null;
+        boolean putBackInQueue = false;
         try {
             if (task instanceof Operation) {
-                counter = process((Operation) task);
+                putBackInQueue = process((Operation) task);
             } else if (task instanceof Runnable) {
-                counter = process((Runnable) task);
+                process((Runnable) task);
             } else {
                 throw new IllegalStateException("Unhandled task: " + task + " from " + batch.taskFactory());
             }
-            if (counter == null) {
+            if (putBackInQueue) {
                 queue.add(task, false);
-            } else {
-                counter.inc();
             }
         } finally {
             queue.add(batch, false);
         }
-        return null;
+        return true;
     }
 
     @Override
