@@ -38,10 +38,10 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
-@Repeat(5000)
+@Repeat(1000)
 public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
 
-    //@Test
+    @Test
     public void whenLockIsMigrated_thenSessionInformationShouldMigrate() {
         Config config = new Config();
         config.setProperty(ClusterProperty.PARTITION_COUNT.getName(), "2");
@@ -66,7 +66,7 @@ public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
         lock2.unlock();
     }
 
-    //@Test
+    @Test
     public void whenLockIsMigrated_thenWaitingOpsShouldBeNotified() throws Exception {
         Config config = new Config();
         config.setProperty(ClusterProperty.PARTITION_COUNT.getName(), "2");
