@@ -38,7 +38,7 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
-@Repeat(2000)
+@Repeat(5000)
 public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
 
     //@Test
