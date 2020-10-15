@@ -66,7 +66,7 @@ public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
         lock2.unlock();
     }
 
-    @Test
+    //@Test
     public void whenLockIsMigrated_thenWaitingOpsShouldBeNotified() throws Exception {
         Config config = new Config();
         config.setProperty(ClusterProperty.PARTITION_COUNT.getName(), "2");
@@ -108,7 +108,7 @@ public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
         waitingLock2.get();
     }
 
-    //@Test
+    @Test
     public void whenLockIsBlocked_thenBackupIsReplicated() {
         Config config = new Config();
 
