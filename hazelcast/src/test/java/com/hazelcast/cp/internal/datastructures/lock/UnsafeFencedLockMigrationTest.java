@@ -24,6 +24,7 @@ import com.hazelcast.spi.properties.ClusterProperty;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
+import com.hazelcast.test.annotation.Repeat;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -37,9 +38,10 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
+@Repeat(500)
 public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
 
-    @Test
+    //@Test
     public void whenLockIsMigrated_thenSessionInformationShouldMigrate() {
         Config config = new Config();
         config.setProperty(ClusterProperty.PARTITION_COUNT.getName(), "2");
@@ -106,7 +108,7 @@ public class UnsafeFencedLockMigrationTest extends HazelcastRaftTestSupport {
         waitingLock2.get();
     }
 
-    @Test
+    //@Test
     public void whenLockIsBlocked_thenBackupIsReplicated() {
         Config config = new Config();
 
