@@ -35,7 +35,6 @@ import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.ChangeLoggingRule;
 import com.hazelcast.test.HazelcastParallelClassRunner;
 import com.hazelcast.test.HazelcastTestSupport;
-import com.hazelcast.test.LRRecordingRule;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.hazelcast.test.annotation.ConfigureParallelRunnerWith;
 import com.hazelcast.test.annotation.HeavilyMultiThreadedTestLimiter;
@@ -44,7 +43,6 @@ import com.hazelcast.test.annotation.QuickTest;
 import com.hazelcast.test.annotation.SlowTest;
 import org.junit.Before;
 import org.junit.ClassRule;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
@@ -102,9 +100,6 @@ public class BasicMapTest extends HazelcastTestSupport {
      */
     @ClassRule
     public static ChangeLoggingRule changeLoggingRule = new ChangeLoggingRule("log4j2.xml");
-
-    @Rule
-    public LRRecordingRule recordingRule = new LRRecordingRule();
 
     static final int INSTANCE_COUNT = 3;
     static final Random RANDOM = new Random();

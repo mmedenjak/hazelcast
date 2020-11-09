@@ -127,6 +127,9 @@ public abstract class HazelcastTestSupport {
     private static final ILogger LOGGER = Logger.getLogger(HazelcastTestSupport.class);
 
     @Rule
+    public LRRecordingRule recordingRule = new LRRecordingRule();
+
+    @Rule
     public JitterRule jitterRule = new JitterRule();
 
     @Rule
