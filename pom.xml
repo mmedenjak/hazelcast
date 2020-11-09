@@ -400,6 +400,8 @@
                                         -Dhazelcast.test.use.network=false
                                         -Dhazelcast.test.multiple.jvm=true
                                         -Dlog4j.configurationFile=log4j2.xml
+                                        -XX:-Inline -XX:TieredStopAtLevel=1
+                                        -Dsun.zip.disableMemoryMapping=true -XX:UseAVX=2
                                         -Dlog4j.skipJansi=true
                                         ${extraVmArgs}
                                         ${jacocoArgLine}
@@ -441,6 +443,8 @@
                                         -Dhazelcast.test.use.network=false
                                         -Dlog4j.configurationFile=log4j2.xml
                                         -Dlog4j.skipJansi=true
+                                        -XX:-Inline -XX:TieredStopAtLevel=1
+                                        -Dsun.zip.disableMemoryMapping=true -XX:UseAVX=2
                                         ${extraVmArgs}
                                         ${jacocoArgLine}
                                     </argLine>
