@@ -19,7 +19,7 @@
 ### Background
 #### Description
 
-Provide a general description of the purpose of this design spec and a high-level summary of the functionality it covers. 
+`Provide a general description of the purpose of this design spec and a high-level summary of the functionality it covers. Mention goals, non-goals and motivation.`
 
 #### Terminology
 
@@ -29,34 +29,34 @@ Provide a general description of the purpose of this design spec and a high-leve
 
 #### Actors and Scenarios
 
-List of actors and the business function(s) they perform related to this feature goes here. 
-
+`List of actors and the business function(s) they perform related to this feature goes here.` 
 
 ### Functional Design
 #### Summary of Functionality
 
-List of functions user(s) can perform goes here. 
+`List of functions user(s) can perform goes here.` 
 
 #### Additional Functional Design Topics
 
-Provide functional design details that are pertinent to this specific design spec. Use the h3 heading tag to distinguish topic titles. 
+`Provide functional design details that are pertinent to this specific design spec. Use the h3 heading tag to distinguish topic titles.`
 
 ##### Notes/Questions/Issues
 
-- Document notes, questions, and issues identified with this functional design topic. Use the or icon to indicate an outstanding issue or question, and use the icon to indicate a resolved issue or question.
+`- Document notes, questions, and issues identified with this functional design topic. Use the or icon to indicate an outstanding issue or question, and use the icon to indicate a resolved issue or question.`
  
 ### User Interaction
 #### API design and/or Prototypes
-Listing of associated prototypes (latest versions) and any API design samples. 
+
+`Listing of associated prototypes (latest versions) and any API design samples.` 
 
 ### Technical Design
 
-Technical design specifications go here.
+`Technical design specifications go here. Mention alternatives, risks and assumptions`
 
 ### Testing Criteria
 
-Testing approach to developed functionality. Reference to Testlink or Testing artifacts
+`Testing approach to developed functionality. Reference to Testlink or Testing artifacts`
 
 ### Other Artifacts
  
-- Links to additional artifacts go here.
+`- Links to additional artifacts go here.`
