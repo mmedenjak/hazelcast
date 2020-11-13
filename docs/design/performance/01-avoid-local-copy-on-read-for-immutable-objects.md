@@ -1,4 +1,4 @@
-# Design document template
+# Avoid local copy on read for immutable objects
 
 ### Table of Contents
 
