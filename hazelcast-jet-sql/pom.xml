@@ -33,7 +33,7 @@
     </parent>
 
     <properties>
-        <confluent.version>4.1.4</confluent.version>
+        <confluent.version>6.1.1</confluent.version>
         <jaxb.version>2.3.1</jaxb.version>
 
         <argLine> <!-- surefire parameters -->
