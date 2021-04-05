@@ -118,7 +118,7 @@
         <jackson.version>2.12.1</jackson.version>
         <snakeyaml.engine.version>1.0</snakeyaml.engine.version>
         <affinity.version>3.2.3</affinity.version>
-        <aws.sdk.version>1.11.934</aws.sdk.version>
+        <aws.sdk.version>1.11.991</aws.sdk.version>
         <kotlin.version>1.3.61</kotlin.version>
 
         <hazelcast.aws.version>3.3</hazelcast.aws.version>
