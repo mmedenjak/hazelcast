@@ -34,7 +34,7 @@
 
     <properties>
         <testcontainers.version>1.15.2</testcontainers.version>
-        <log4j2.slf4j.binding.version>2.13.2</log4j2.slf4j.binding.version>
+        <log4j2.slf4j.binding.version>2.14.1</log4j2.slf4j.binding.version>
     </properties>
 
     <build>
