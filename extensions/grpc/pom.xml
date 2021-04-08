@@ -21,7 +21,7 @@
 
     <artifactId>hazelcast-jet-grpc</artifactId>
     <properties>
-        <guava.version>28.1-android</guava.version>
+        <guava.version>29.0-android</guava.version>
     </properties>
 
     <parent>
