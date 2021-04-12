@@ -1408,7 +1408,7 @@
             <dependency>
                 <groupId>com.google.code.findbugs</groupId>
                 <artifactId>annotations</artifactId>
-                <version>3.0.0</version>
+                <version>3.0.1u2</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
