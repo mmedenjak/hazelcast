@@ -74,7 +74,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.hazelcast.test.Accessors.getNode;
 import static com.hazelcast.test.TestCollectionUtils.setOfValuesBetween;
-import static com.hazelcast.test.TimeConstants.MINUTE;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static org.hamcrest.CoreMatchers.startsWith;
