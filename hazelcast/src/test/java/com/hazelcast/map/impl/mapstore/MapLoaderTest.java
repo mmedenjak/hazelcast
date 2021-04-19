@@ -94,7 +94,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     }
 
     @Test
-    @Repeat(100)
+    @Repeat(2000)
     public void testSenderAndBackupTerminates_AfterInitialLoad() {
         final ILogger logger = Logger.getLogger(MapLoaderTest.class);
         String name = randomString();
