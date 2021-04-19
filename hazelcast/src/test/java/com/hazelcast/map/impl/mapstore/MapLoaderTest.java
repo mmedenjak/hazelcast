@@ -48,6 +48,7 @@ import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.hazelcast.test.annotation.ParallelJVMTest;
 import com.hazelcast.test.annotation.QuickTest;
+import com.hazelcast.test.annotation.Repeat;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -94,6 +95,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     }
 
     @Test
+    @Repeat(100)
     public void testSenderAndBackupTerminates_AfterInitialLoad() {
         final ILogger logger = Logger.getLogger(MapLoaderTest.class);
         String name = randomString();
@@ -143,7 +145,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         return ownerAndReplicas;
     }
 
-    @Test
+    //@Test
     public void givenSpecificKeysWereReloaded_whenLoadAllIsCalled_thenAllEntriesAreLoadedFromTheStore() {
         String name = randomString();
         int keysInMapStore = 10000;
@@ -172,7 +174,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         assertEquals(keysInMapStore, map.size());
     }
 
-    @Test
+    //@Test
     public void testNullChecks_withMapStore_nullInKeys() {
         String name = "testNullChecks_withMapStore";
         int keysInMapStore = 10000;
@@ -198,7 +200,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     }
 
     @Ignore("See https://github.com/hazelcast/hazelcast/issues/11931")
-    @Test
+    //@Test
     public void testNullKey_loadAll() {
         String name = "testNullIn_loadAll";
 
@@ -258,7 +260,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     }
 
     @Ignore("See https://github.com/hazelcast/hazelcast/issues/11931")
-    @Test
+    //@Test
     public void testNullValue_loadAll() {
         String name = "testNullIn_loadAll";
 
@@ -323,7 +325,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     }
 
     @Ignore("See https://github.com/hazelcast/hazelcast/issues/11931")
-    @Test
+    //@Test
     public void testNullValue_loadAll_withInterceptor() {
         String name = "testNullIn_loadAll";
 
@@ -385,7 +387,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     }
 
     @Ignore("See https://github.com/hazelcast/hazelcast/issues/11931")
-    @Test
+    //@Test
     public void testNullKey_loadAllKeys() {
         String name = "testNullIn_loadAllKeys";
 
@@ -456,7 +458,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         }
     }
 
-    @Test
+    //@Test
     public void testNullChecks_withMapStore_nullKeys() {
         String name = "testNullChecks_withMapStore";
         int keysInMapStore = 10000;
@@ -480,7 +482,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
     /**
      * https://github.com/hazelcast/hazelcast/issues/1770
      */
-    @Test
+    //@Test
     public void test1770() {
         final AtomicBoolean loadAllCalled = new AtomicBoolean();
         MapStoreConfig mapStoreConfig = new MapStoreConfig()
@@ -515,7 +517,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
                 -> assertFalse("LoadAll should not have been called", loadAllCalled.get()), 10);
     }
 
-    @Test
+    //@Test
     public void testMapLoaderLoadUpdatingIndex_noPreload() {
         final int nodeCount = 3;
         String mapName = randomString();
@@ -534,7 +536,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         assertPredicateResultCorrect(map, predicate);
     }
 
-    @Test
+    //@Test
     public void testMapLoaderLoadUpdatingIndex_withPreload() {
         final int nodeCount = 3;
         String mapName = randomString();
@@ -552,7 +554,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         assertPredicateResultCorrect(map, predicate);
     }
 
-    @Test
+    //@Test
     public void testGetAll_putsLoadedItemsToIMap() {
         Integer[] requestedKeys = {1, 2, 3};
         AtomicInteger loadedKeysCounter = new AtomicInteger(0);
@@ -574,7 +576,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         assertEquals(requestedKeys.length, loadedKeysCounter.get());
     }
 
-    @Test(timeout = MINUTE)
+    //@Test(timeout = MINUTE)
     public void testMapCanBeLoaded_whenLoadAllKeysThrowsExceptionFirstTime() {
         Config config = getConfig();
         MapLoader failingMapLoader = new FailingMapLoader();
@@ -614,7 +616,7 @@ public class MapLoaderTest extends HazelcastTestSupport {
         });
     }
 
-    @Test
+    //@Test
     public void testMapLoaderHittingEvictionOnInitialLoad() {
         String mapName = "testMapLoaderHittingEvictionOnInitialLoad";
         int sizePerPartition = 1;
