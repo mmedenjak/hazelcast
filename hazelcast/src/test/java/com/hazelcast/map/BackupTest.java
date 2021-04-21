@@ -45,7 +45,7 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(HazelcastParallelClassRunner.class)
 @Category({QuickTest.class, ParallelJVMTest.class})
-@Repeat(100)
+@Repeat(600)
 public class BackupTest extends HazelcastTestSupport {
 
     private final String mapName = randomMapName();
