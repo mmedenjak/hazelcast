@@ -1226,7 +1226,7 @@
             <dependency>
                 <groupId>com.google.auth</groupId>
                 <artifactId>google-auth-library-bom</artifactId>
-                <version>0.21.1</version>
+                <version>0.25.5</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
