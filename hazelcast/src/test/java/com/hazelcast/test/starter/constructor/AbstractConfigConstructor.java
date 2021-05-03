@@ -149,6 +149,12 @@ abstract class AbstractConfigConstructor extends AbstractStarterObjectConstructo
             cloneMerkleTreeConfig(thisConfigObject, otherConfigObject);
         }
 
+        if (isMapConfig(thisConfigClass)
+                && hasField(otherConfigObject.getClass(), "perEntryStatsEnabled")) {
+            // need to enable per-entry stats in 4.0
+            setFieldValueReflectively(otherConfigObject, "perEntryStatsEnabled", true);
+        }
+
         return otherConfigObject;
     }
 
@@ -573,6 +579,10 @@ abstract class AbstractConfigConstructor extends AbstractStarterObjectConstructo
 
     private static boolean isConfig(Class<?> klass) throws Exception {
         return isAssignableFrom(klass, "com.hazelcast.config.Config");
+    }
+
+    private static boolean isMapConfig(Class<?> klass) throws Exception {
+        return isAssignableFrom(klass, "com.hazelcast.config.MapConfig");
     }
 
     private static boolean isMapStoreConfig(Class<?> klass) throws Exception {
