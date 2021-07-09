@@ -58,9 +58,9 @@ jobs:
           mvn -f hazelcast/pom.xml -B \
             -Dmaven.site.skip=true -Dmaven.javadoc.skip=true \
             -Dcheckstyle.skip -Dspotbugs.skip clean install -DskipTests
-          rm hazelcast/hazelcast-all/target/*-sources.jar \
-            hazelcast/hazelcast-all/target/*-tests.jar || true
-          cp hazelcast/hazelcast-all/target/hazelcast-all-*.jar hazelcast-all.jar
+          rm hazelcast/hazelcast/target/*-sources.jar \
+            hazelcast/hazelcast/target/*-tests.jar || true
+          cp hazelcast/hazelcast/target/hazelcast-*.jar hazelcast.jar
 
       - name: Docker Build and Push hazelcast-snapshot image
         run: |
